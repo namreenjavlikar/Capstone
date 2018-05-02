@@ -6,6 +6,7 @@
     "babel-cli": "^6.26.0",
     "create-react-class": "^15.6.3",
     "express": "^4.16.3",
+    "http": "0.0.0",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-rethinkdb": "^0.6.1",
