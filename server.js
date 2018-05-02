@@ -1,6 +1,6 @@
-import express from 'express'
-import http from 'http'
-import RethinkdbWebsocketServer from 'rethinkdb-websocket-server'
+var express = require('express');
+var http = require('http');
+var RethinkdbWebsocketServer = require('rethinkdb-websocket-server');
 
 var app = express();
 app.use('/', express.static('assets'));
