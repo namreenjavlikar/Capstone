@@ -32,6 +32,11 @@ let r = ReactRethinkdb.r;
         ReactRethinkdb.DefaultSession.runQuery(query);
         this.setState({ name: '', content: '' ,answer: ''  })
       },
+
+      handleDelete(val) {
+        let query = r.table('questions').get(val).delete();
+        ReactRethinkdb.DefaultSession.runQuery(query);
+      },
     
       render() {
         return (
@@ -56,6 +61,15 @@ let r = ReactRethinkdb.r;
                                     <td>{question.name}</td>
                                     <td>{question.content}</td>
                                     <td>{question.answer}</td>
+
+                                    <td>
+                                    <button onClick={() => this.handleSubmit(question.id)}>View</button>
+                                    <button onClick={() => this.handleSubmit(question.id)}>Edit</button>
+                                    <button onClick={() => this.handleSubmit(question.id)}>Delete</button>
+
+
+                                    </td>
+            
             
                             </tr>;
                         })
