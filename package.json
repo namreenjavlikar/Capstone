@@ -1,0 +1,22 @@
+{
+  "name": "rethinkdbtest",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "create-react-class": "^15.6.3",
+    "express": "^4.16.3",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
+    "react-rethinkdb": "^0.6.1",
+    "react-scripts": "1.1.4",
+    "rethinkdb-websocket-server": "^0.6.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "server": "babel-node --presets env server.js",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
