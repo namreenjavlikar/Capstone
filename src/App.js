@@ -5,12 +5,16 @@ import createReactClass from 'create-react-class'
 import Login from './Login'
 import Register from './Register'
 import * as Questions from './Questions'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom"
+import ResetPassword from './ResetPassword'
+import SyntaxHighlightTest from './SyntaxHighlightTest'
+import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
+
 
 let r = ReactRethinkdb.r
 
 const App = createReactClass({
 
+  
   render() {
     return <Router>
       <div>

@@ -115,7 +115,7 @@ const Login = createReactClass({
                         <button class="uk-button login-btn">Login</button>
                         <br />
                         <br />
-                        <a href="https://www.w3schools.com" className="login-link">Forgot Your Password?</a>
+                        <a onClick={() => this.props.history.push("/forgot")} className="login-link">Forgot Your Password?</a>
 
                     </div>
                 </center>

@@ -22,6 +22,7 @@ RethinkdbWebsocketServer.listen({
 httpServer.listen(8015);
 console.log('Listening on port 8015');
 
+<<<<<<< HEAD
 
 //import nodemailer from 'nodemailer'
 // let transporter = nodemailer.createTransport({
@@ -51,3 +52,5 @@ app.get('http://localhost:3000/api/users/resetpassword', async (req, res) => {
 	})
 	res.json({ "success": true })
 })
+=======
+>>>>>>> 8ef310dba09e4a4db42a2de15df4f16185675a0f
