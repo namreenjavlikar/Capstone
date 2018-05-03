@@ -14,8 +14,10 @@ const App = createReactClass({
   render() {
     return <Router>
       <div>
-        <Route path="/" component={Login} />
+        <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+        <Route path="/questions" component={Questions.Create} />
+        <Route path="/allquestions" component={Questions.All} />
       </div>
     </Router>
   },

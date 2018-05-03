@@ -23,16 +23,16 @@ httpServer.listen(8015);
 console.log('Listening on port 8015');
 
 
-import nodemailer from 'nodemailer'
-let transporter = nodemailer.createTransport({
-    host: 'smtp-mail.outlook.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: "dms-q-system@outlook.com",
-        pass: "12class34"
-    }
-});
+//import nodemailer from 'nodemailer'
+// let transporter = nodemailer.createTransport({
+//     host: 'smtp-mail.outlook.com',
+//     port: 587,
+//     secure: false, // true for 465, false for other ports
+//     auth: {
+//         user: "dms-q-system@outlook.com",
+//         pass: "12class34"
+//     }
+// });
 
 app.get('http://localhost:3000/api/users/resetpassword', async (req, res) => {
 	console.log("IN")
