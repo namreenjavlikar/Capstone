@@ -73,8 +73,6 @@ const ResetPassword = createReactClass({
             else if (this.state.password != this.state.confirmPassword)
                 this.setState({ error: "Error both password doesn't match" })
         }
-
-
     },
 
     render() {
