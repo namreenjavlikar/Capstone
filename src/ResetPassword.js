@@ -4,16 +4,14 @@ import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import bcrypt from "bcryptjs"
 
-let r = ReactRethinkdb.r;
+import '../node_modules/uikit/dist/css/uikit.css';
+import './App.css';
+import photo from './photo.png';
+import logo from './logo.png'
+var noScroll = require('no-scroll')
+noScroll.on();
 
-// Open a react-rethinkdb session (a WebSocket connection to the server)
-// ReactRethinkdb.DefaultSession.connect({
-//   host: 'localhost', // hostname of the websocket server
-//   port: 8015,        // port number of the websocket server
-//   path: '/db',       // HTTP path to websocket route
-//   secure: false,     // set true to use secure TLS websockets
-//   db: 'capstone',    // default database, passed to rethinkdb.connect
-// });
+let r = ReactRethinkdb.r;
 
 const ResetPassword = createReactClass({
 
@@ -28,32 +26,38 @@ const ResetPassword = createReactClass({
         };
     },
 
-    async  observe(props, state) {
+    async componentDidMount() {
+        let urlQuery = window.location.href
+        let username = urlQuery.split("/")[4]
+        let key = urlQuery.split("/")[5]
 
-        let query = window.location.href
-        let username = query.split("/")[5]
-        let key = query.split("/")[6]
+        let query = r.table('users').filter({ loginId: username })
 
-         return {
-            user: await new ReactRethinkdb.QueryRequest({
-                query: r.table('users'),
-                changes: true,
-                initial: [],
-            }),
-        };
-        if (!this.data.user.value() || !username || this.data.user.value().key != key)
-        {
-            await this.props.history.push("/auth/login")
+        let user = {}
+        await ReactRethinkdb.DefaultSession.runQuery(query).then(
+            (res) => {
+                res.toArray( (err, results) => {
+                    console.log("LOOP", results);
+                    user = results
+                });
+            })
+        console.log("user ", user[0])
+
+        if (!user[0] || !username || user[0].key != key) {
+            await this.props.history.push("/login")
         }
-        else{
+        else {
             await this.setState({
-                user: this.data.user.value()
+                user: user[0]
             })
         }
-
     },
 
-     handleReset () {
+    async observe(props, state) {
+        return { }
+    },
+
+    handleReset() {
         let strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/
         if (this.state.password.trim() != '' && this.state.confirmPassword.trim() != '' && this.state.password == this.state.confirmPassword && strongRegex.test(this.state.password)) {
             bcrypt.genSalt(10, (err, salt) => {
@@ -63,6 +67,7 @@ const ResetPassword = createReactClass({
                     user.key = ''
                     let replaceQuery = r.table("users").get(user.id).replace(user)
                     await ReactRethinkdb.DefaultSession.runQuery(replaceQuery)
+                    await this.props.history.push("/login")
                 })
             })
         } else {
@@ -77,13 +82,29 @@ const ResetPassword = createReactClass({
 
     render() {
         return (
-            <div>
-                <input type="text" value={this.state.password} placeholder="Enter New Password" onChange={
-                    (event) => this.setState({ password: event.target.value, error: '' })} />
-                <input type="text" value={this.state.confirmPassword} placeholder="Confirm Password" onChange={
-                    (event) => this.setState({ confirmPassword: event.target.value, error: '' })} />
-                <button onClick={() => this.handleReset()}>Reset</button>
-                <p>{this.state.error}</p>
+            <div className='login-container' style={{
+                backgroundImage: 'url(' + photo + ')',
+                backgroundSize: 'cover',
+                overflow: 'hidden',
+            }}>
+                <center>
+                    <div class="uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20 }}>
+                        <img src={logo} style={{ width: 200, height: 150 }} />
+                        <hr />
+                        <h2 class="login-title"><strong>Reset Password</strong></h2>
+                        <div class="uk-margin">
+                            <div class="uk-inline">
+                                <input class="uk-input reenter-input" type="password" placeholder="New Password" onChange={
+                                    (event) => this.setState({ password: event.target.value, error: '' })} />
+                                <input class="uk-input reenter-input" type="password" placeholder="Confirm Password" onChange={
+                                    (event) => this.setState({ confirmPassword: event.target.value, error: '' })} />
+                                <p>{this.state.error}</p>
+                            </div>
+                        </div>
+                        <button class="uk-button reenter-btn" onClick={this.handleReset}>Reset</button>
+                    </div>
+                </center>
+
             </div>
         )
     },
