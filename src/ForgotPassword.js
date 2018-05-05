@@ -26,7 +26,7 @@ const ForgotPassword = createReactClass({
 
     getInitialState() {
         return {
-            email: '60083587@cna-qatar.edu.qa',
+            email: '',
             errorMessage: ''
         };
     },
@@ -42,49 +42,42 @@ const ForgotPassword = createReactClass({
     },
 
     async sendEmail() {
-            const response = await fetch('http://localhost:8015/api/users/resetpassword/')
+        //find user with this specific email
+        let query = r.table('users').filter({ email: this.state.email })
+
+        let user = {}
+        await ReactRethinkdb.DefaultSession.runQuery(query).then(
+            (res) => {
+                res.toArray(function (err, results) {
+                    console.log(results);
+                    user = results
+                });
+            })
+
+        console.log("user ", user[0])
+        let emailCheck = /.+\@.+\..+/
+        if (user[0].recovEmail === this.state.email && emailCheck.test(this.state.email)) {
+            let key = Math.random().toString(36).substring(7)
+            user[0].key = key
+            let replaceQuery = r.table("users").get(user[0].id).replace(user[0])
+            await ReactRethinkdb.DefaultSession.runQuery(replaceQuery)
+
+            //send the email
+            const response = await fetch("http://localhost:3001/api/resetpassword/"+user[0].recovEmail+"/"+key+"/"+user[0].loginId)
             try {
                 const json = await response.json()
                 return json
             } catch (ex) {
                 return null
             }
-        //find user with this specific email
-        // let query = r.table('users').filter({ email: this.state.email })
+        }
+        else {
+            if (!emailCheck.test(this.state.email))
+                this.setState({ errorMessage: "Enter a valid email address" })
+            else if (user.email === this.state.email)
+                this.setState({ errorMessage: "Not a valid user" })
 
-        // let user = {}
-        // await ReactRethinkdb.DefaultSession.runQuery(query).then(
-        //     (res) => {
-        //         res.toArray(function (err, results) {
-        //             console.log(results);
-        //             user = results
-        //         });
-        //     })
-
-        // console.log("user ", user[0])
-        // let emailCheck = /.+\@.+\..+/
-        // if (user[0].email === this.state.email && emailCheck.test(this.state.email)) {
-        //     let key = Math.random().toString(36).substring(7)
-        //     user[0].key = key
-        //     let replaceQuery = r.table("users").get(user[0].id).replace(user[0])
-        //     await ReactRethinkdb.DefaultSession.runQuery(replaceQuery)
-
-        //     //send the email
-        //     const response = await fetch('http://localhost:8015/api/users/resetpassword/')
-        //     try {
-        //         const json = await response.json()
-        //         return json
-        //     } catch (ex) {
-        //         return null
-        //     }
-        // }
-        // else {
-        //     if (!emailCheck.test(this.state.email))
-        //         this.setState({ errorMessage: "Enter a valid email address" })
-        //     else if (user.email === this.state.email)
-        //         this.setState({ errorMessage: "Not a valid user" })
-
-        // }
+        }
 
     },
 

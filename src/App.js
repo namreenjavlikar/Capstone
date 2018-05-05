@@ -7,19 +7,20 @@ import Register from './Register'
 import * as Questions from './Questions'
 import ResetPassword from './ResetPassword'
 import SyntaxHighlightTest from './SyntaxHighlightTest'
+import ForgotPassword from './ForgotPassword'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
-
 
 let r = ReactRethinkdb.r
 
 const App = createReactClass({
 
-  
   render() {
     return <Router>
       <div>
         <Route path="/login" component={Login} />
+        <Route path="/forgot" component={ForgotPassword} />
         <Route path="/register" component={Register} />
+        <Route path="/reset/:loginId/:key" component={ResetPassword} />
         <Route path="/questions" component={Questions.Create} />
         <Route path="/allquestions" component={Questions.All} />
       </div>

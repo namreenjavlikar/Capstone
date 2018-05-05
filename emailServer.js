@@ -21,13 +21,12 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-app.get('/api/resetpassword', async (req, res) => {
+app.get('/api/resetpassword/:recovEmail/:key/:loginId', async (req, res) => {
 	let mailOptions = {
 		from: 'dms-q-system@outlook.com',
-		to: '60084089@cna-qatar.edu.qa',
+		to: req.params.recovEmail,
         subject: 'Reset Password',
-        // html: "<a href='http://localhost:3000/auth/reset/'>Click here to Reset</a>"
-		html: "<a href='http://localhost:3000/auth/reset/" + req.params.username + "/" + req.params.key + "'>Click here to Reset</a>"
+		html: "<a href='http://localhost:3000/reset/" + req.params.loginId + "/" + req.params.key + "'>Click here to Reset</a>"
 	}
 
 	transporter.sendMail(mailOptions, (error, info) => {
@@ -39,3 +38,19 @@ app.get('/api/resetpassword', async (req, res) => {
 	res.json({ "success": true })
 })
 
+app.get('/api/activate/:recovEmail/:key/:loginId', async (req, res) => {
+	let mailOptions = {
+		from: 'dms-q-system@outlook.com',
+		to: req.params.recovEmail,
+        subject: 'Activate Account',
+		html: "<a href='http://localhost:3000/reset/" + req.params.loginId + "/" + req.params.key + "'>Click here to Activate Account</a>"
+	}
+
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+			return console.log(error)
+		}
+		return console.log('Message sent')
+	})
+	res.json({ "success": true })
+})

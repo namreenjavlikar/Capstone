@@ -41,7 +41,7 @@ const Login = createReactClass({
         };
     },
 
-    handleLogin() {
+    async handleLogin() {
         let field = this.state.credentials;
         const specialCharacter = "."
         let splitIndex = -1
@@ -60,38 +60,42 @@ const Login = createReactClass({
         }
         else {
             let result = null;
-            let query = r.table('users').get(username);
-            ReactRethinkdb.DefaultSession.runQuery(query).then(user => {
-                console.log("user", user)
-                if (user) {
-                    bcrypt.compare(password, user.password, (err, check) => {
-                        if (check) {
-                            result = { user, token: sign(user, secret) }
-                            console.log('login result', result)
-                            sessionStorage.setItem("token", result.token)
-                            sessionStorage.setItem("user_id", result.user.id)
-                            sessionStorage.setItem("role", result.user.role)
-                            this.setState({ messageToUser: "" })
-                        }
-                        else {
-                            this.setState({ messageToUser: "Invalid Input" })
-                        }
-                    })
 
-                    //For now my goal is to be able to create an exam, but this 
-                    //should be in a "Home.js" file that checks who is logged in and 
-                    //depending on the role it will redirect the user to whatever 
-                    //homepage they can are supposed to be in
-                    //if (result.user.role === "Instructor")
-                    //    this.props.history.push("/Instructor")
-                }
-                else {
-                    this.setState({ messageToUser: "Invalid Input" })
-                }
-            });
+            let query = r.table('users').filter({ loginId: username })
+
+            let user = {}
+            await ReactRethinkdb.DefaultSession.runQuery(query).then(
+                (res) => {
+                    res.toArray(function (err, results) {
+                        user = results
+                    });
+                })
+            user = user[0]
+            // console.log("user ", user)
+            // let query = r.table('users').get(username);
+            // ReactRethinkdb.DefaultSession.runQuery(query).then(user => {
+            //     console.log("user", user)
+            if (user) {
+                bcrypt.compare(password, user.password, (err, check) => {
+                    if (check) {
+                        result = { user, token: sign(user, secret) }
+                        console.log('login result', result)
+                        sessionStorage.setItem("token", result.token)
+                        sessionStorage.setItem("user_id", result.user.id)
+                        sessionStorage.setItem("role", result.user.role)
+                        this.setState({ messageToUser: "" })
+                    }
+                    else {
+                        this.setState({ messageToUser: "Invalid Input" })
+                    }
+                })
+            }
+            else {
+                this.setState({ messageToUser: "Invalid Input" })
+            }
+            // });
         }
     },
-
 
     render() {
         return (
@@ -106,17 +110,29 @@ const Login = createReactClass({
                         <hr />
                         <h3 class="login-title"><strong>Username.Password</strong></h3>
 
-                        <div class="uk-margin">
+                        {/* <div class="uk-margin">
                             <div class="uk-inline">
-                                <span class="uk-form-icon uk-form-icon-flip" uk-icon="icon: lock"></span>
-                                <input class="uk-input login-input" type="password" placeholder="username.password" />
+                                <input class="uk-input login-input" type="password" placeholder="username.password" 
+                                value={this.state.credentials} onChange={(event) => this.setState({credentials: event.target.value})} />
+                                
+                            </div>
+                        </div> */}
+                        <div class="uk-margin">
+                            <div className="ui icon input">
+                                <input
+                                    type={this.state.showcredentials ? "text" : "password"}
+                                    placeholder="username.password"
+                                    value={this.state.credentials}
+                                    onChange={e => this.setState({ credentials: e.target.value, messageToUser: '' })} />
+                                <i className={this.state.showcredentials ? "hide link icon" : "unhide link icon"} style={{ fontSize: 22 }}
+                                    onClick={() => { this.setState({ showcredentials: !this.state.showcredentials }) }} ></i>
                             </div>
                         </div>
-                        <button class="uk-button login-btn">Login</button>
+                        <p style={{ color: 'white' }}>{this.state.messageToUser}</p>
+                        <button class="uk-button login-btn" onClick={this.handleLogin}>Login</button>
                         <br />
                         <br />
                         <a onClick={() => this.props.history.push("/forgot")} className="login-link">Forgot Your Password?</a>
-
                     </div>
                 </center>
 
