@@ -16,14 +16,6 @@ const secret = 'abc'
 let noScroll = require('no-scroll')
 noScroll.on();
 
-ReactRethinkdb.DefaultSession.connect({
-    host: 'localhost',
-    port: 8015,
-    path: '/db',
-    secure: false,
-    db: 'capstone',
-});
-
 const Login = createReactClass({
 
     mixins: [ReactRethinkdb.DefaultMixin],
