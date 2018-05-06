@@ -52,6 +52,12 @@ const Register = createReactClass({
         };
     },
 
+    componentWillMount() {
+        if(!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin"){
+            this.props.history.push("/")
+        }
+    },
+
     observe(props, state) {
         //this.setState({ messageToUser: "Invalid Input" })
         return {
@@ -61,17 +67,16 @@ const Register = createReactClass({
                 initial: [],               // return [] while loading
             }),
         };
-        //this.setState({ students: students})
     },
     
     async handleRegister() {
         console.log("Registering")
         let key = Math.random().toString(36).substring(7)
-        let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: this.state.loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, key: key, password: "" })
+        let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: this.state.loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
         await ReactRethinkdb.DefaultSession.runQuery(query)
         await fetch("http://localhost:3001/api/activate/"+this.state.recovEmail+"/"+key+"/"+this.state.loginId)
     },
-
+    
     async handleCreate() {
         this.handleCollegeId(this.state.collegeId)
         this.handleLoginId(this.state.loginId)
