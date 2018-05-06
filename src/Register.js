@@ -13,8 +13,6 @@ import bcrypt from "bcryptjs"
 
 let r = ReactRethinkdb.r;
 const secret = 'abc'
-let noScroll = require('no-scroll')
-noScroll.on();
 
 const Register = createReactClass({
 
@@ -323,6 +321,7 @@ const Register = createReactClass({
                                 </div>
 
                                 <button class="uk-button register-btn" style={{ borderRadius: 20 }} onClick={() => this.handleCreate()}>Register</button>
+                            dddddddd<br/>fff
                             </div>
                         </center>
                     </div>

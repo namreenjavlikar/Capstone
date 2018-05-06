@@ -8,8 +8,6 @@ import '../node_modules/uikit/dist/css/uikit.css';
 import './App.css';
 import photo from './photo.png';
 import logo from './logo.png'
-var noScroll = require('no-scroll')
-noScroll.on();
 
 let r = ReactRethinkdb.r;
 

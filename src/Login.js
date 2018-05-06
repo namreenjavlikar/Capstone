@@ -13,8 +13,6 @@ import bcrypt from "bcryptjs"
 
 let r = ReactRethinkdb.r;
 const secret = 'abc'
-let noScroll = require('no-scroll')
-noScroll.on();
 
 const Login = createReactClass({
 
