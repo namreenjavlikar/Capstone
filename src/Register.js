@@ -13,8 +13,8 @@ import bcrypt from "bcryptjs"
 
 let r = ReactRethinkdb.r;
 const secret = 'abc'
-// let noScroll = require('no-scroll')
-// noScroll.on();
+//  
+//  
 
 const Register = createReactClass({
 
@@ -66,16 +66,23 @@ const Register = createReactClass({
 
     async handleRegister() {
         console.log("Registering")
-        let key = Math.random().toString(36).substring(7)
-        let loginId = Math.random().toString(36)
-        loginId=loginId.substring(key.length-4)
-        let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, key: key, password: "" })
-        console.log('logIn Id:',loginId)
-        await ReactRethinkdb.DefaultSession.runQuery(query)
-        await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + loginId)
+        if (this.state.flag) {
+            let key = Math.random().toString(36).substring(7)
+            let loginId = Math.random().toString(36)
+            loginId = loginId.substring(key.length - 4)
+            let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, key: key, password: "" })
+            console.log('logIn Id:', loginId)
+            await ReactRethinkdb.DefaultSession.runQuery(query)
+            await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + loginId)
+        }
+        else {
+            console.log("not yet")
+        }
     },
 
     async handleCreate() {
+        await this.resetFlag()
+        console.log('after reset flag', this.state.flag)
         // let key = Math.random().toString(36)
         // console.log('key',key.substring(key.length-4))
         this.handleCollegeId(this.state.collegeId)
@@ -87,12 +94,12 @@ const Register = createReactClass({
         this.handleCollegeEmail(this.state.collegeEmail)
         this.handleRole(this.state.role)
         this.handleDepartment(this.state.department)
-        console.log('checking', this.state.flag)
-        if (this.state.flag) {
-            this.handleRegister()
-        } else {
-            console.log("failed")
-        }
+        this.handleRegister()
+    },
+
+    async resetFlag() {
+        await this.setState({ flag: true })
+        console.log('iside reset flag', this.state.flag)
     },
 
     handleCollegeId(collegeId) {
@@ -100,6 +107,7 @@ const Register = createReactClass({
         let check = false;
         let collegeIdMessage = ""
         this.data.students.value().forEach((element, i) => {
+            console.log('checking data', i, this.data.students.value()[i].collegeId)
             this.data.students.value()[i].collegeId === collegeId ? check = true : null
         })
         collegeId ?
@@ -116,29 +124,8 @@ const Register = createReactClass({
         collegeIdMessage === '' ? this.setState({ collegeIdMessage, flag: false }) : this.setState({ collegeIdMessage })
     },
 
-    // handleLoginId(loginId) {
-    //     let loginIdRegex = /^[0-9]{4}$/
-    //     let check = false;
-    //     let loginIdMessage = ""
-    //     this.data.students.value().forEach((element, i) => {
-    //         this.data.students.value()[i].loginId === loginId ? check = true : null
-    //     })
-    //     loginId ?
-    //         check ?
-    //             loginIdMessage = "Error Duplicate Login Id"
-    //             :
-    //             loginIdRegex.test(loginId)
-    //                 ?
-    //                 loginIdMessage = ""
-    //                 :
-    //                 loginIdMessage = "Error Invalid Login Id"
-    //         :
-    //         loginIdMessage = "Please enter a Login Id"
-    //     loginIdMessage === '' ? this.setState({ loginIdMessage, flag: false }) : this.setState({ loginIdMessage })
-    // },
-
     handleFirstName(firstName) {
-        console.log('checking email', this.state.firstName, firstName)
+        console.log('checking Name', this.state.firstName, firstName)
         let firstNameRegex = /^[a-zA-Z]*$/
         let firstNameMessage = ""
         firstName ?
@@ -169,7 +156,7 @@ const Register = createReactClass({
     handleNumber(number) {
         //console.log('nuber',numberRegex.test(number))
         let numberRegex = /^[0-9]{8}$/
-        
+
         let numberMessage = ""
         number ?
             numberRegex.test(number)
@@ -184,7 +171,7 @@ const Register = createReactClass({
 
     handleRecovEmail(recovEmail) {
         //console.log('checking Recovery Email', this.state.flag, recovEmail)
-        let recovEmailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9\-]+\.[A-Za-z\-]{2,}/
+        let recovEmailRegex = /^[a-zA-Z0-9\.\-]+@[a-zA-Z0-9\-]+\.[A-Za-z\-]{2,}/
         let check = false
         let recovEmailMessage = ""
         this.data.students.value().forEach((element, i) => {
@@ -256,101 +243,7 @@ const Register = createReactClass({
 
     render() {
         return (
-            // <div>
-            //     <div style={{ marginLeft: 120, marginRight: 5 }}>
-            //         <div class="ui raised very padded text container segment " style={{ height: '100vh' }} class="register-container">
-            //             <center>
-            //                 <img src={logo} style={{ width: 70, height: 70, marginTop: 20 }} />
-            //                 <h1 class="ui  header" style={{ color: '#76323f', fontSize: '400%', marginTop: 2 }}>Register </h1>
-            //             </center>
-            //             <hr class="uk-divider-icon" />
-            //             <center>
-            //                 <div class="ui form" style={{ marginLeft: 30 }} >
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>College ID</label>
-            //                         <input type="text" name="college-id" placeholder="College ID"
-            //                             value={this.state.collegeId} onChange={(event) => this.setState({ collegeId: event.target.value })} />
-            //                         <span>{this.state.collegeIdMessage}</span>
 
-            //                     </div>
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>Login ID</label>
-            //                         <input type="text" name="login-id" placeholder="Login ID"
-            //                             value={this.state.loginId} onChange={(event) => this.setState({ loginId: event.target.value })} />
-            //                         <span>{this.state.loginIdMessage}</span>
-
-            //                     </div>
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>First Name</label>
-            //                         <input type="text" name="name" placeholder="Name"
-            //                             value={this.state.firstName} onChange={(event) => this.setState({ firstName: event.target.value })} />
-            //                         <span>{this.state.firstNameMessage}</span>
-
-            //                     </div>
-
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>Last Name</label>
-            //                         <input type="text" name="name" placeholder="Name"
-            //                             value={this.state.lastName} onChange={(event) => this.setState({ lastName: event.target.value })} />
-            //                         <span>{this.state.lastNameMessage}</span>
-
-            //                     </div>
-
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>Contact No.</label>
-            //                         <input type="text" name="contact-no." placeholder="Contact No."
-            //                             value={this.state.number} onChange={(event) => this.setState({ number: event.target.value })} />
-            //                         <span>{this.state.numberMessage}</span>
-
-            //                     </div>
-
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>Personal(Recovery) Email</label>
-            //                         <input type="text" name="personal-email" placeholder="Email"
-            //                             value={this.state.recovEmail} onChange={(event) => this.setState({ recovEmail: event.target.value })} />
-            //                         <span>{this.state.recovEmailMessage}</span>
-
-            //                     </div>
-
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>College Email</label>
-            //                         <input type="text" name="college-email" placeholder="Email"
-            //                             value={this.state.collegeEmail} onChange={(event) => this.setState({ collegeEmail: event.target.value })} />
-            //                         <span>{this.state.collegeEmailMessage}</span>
-
-            //                     </div>
-
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>Role</label>
-            //                         <select class="ui search dropdown" onChange={(event) => this.setState({ role: event.target.value })}>
-            //                             <option value="">Role</option>
-            //                             <option value="Instructor">Instructor</option>
-            //                             <option value="Student">Student</option>
-            //                             <option value="Admin assistant">Admin assistant</option>
-            //                         </select>
-            //                         <span>{this.state.roleMessage}</span>
-
-            //                     </div>
-
-            //                     <div class="four wide field">
-            //                         <label style={{ float: "left", fontSize: 18 }}>Departments</label>
-            //                         <select class="ui search dropdown" onChange={(event) => this.setState({ department: event.target.value })}>
-            //                             <option value="">Departments</option>
-            //                             <option value="Business Studies">Business Studies</option>
-            //                             <option value="Engineering">Engineering</option>
-            //                             <option value="Information Technology">Information Technology</option>
-            //                             <option value="Health Sciences">Health Sciences</option>
-            //                         </select>
-            //                         <span>{this.state.departmentMessage}</span>
-
-            //                     </div>
-
-            //                     <button class="uk-button register-btn" style={{ borderRadius: 20 }} onClick={() => this.handleCreate()}>Register</button>
-            //                 </div>
-            //             </center>
-            //         </div>
-            //     </div>
-            // </div>
             <div >
                 {/* <div class="ui left fixed vertical menu " style={{ height: '100vh', backgroundColor: '#76323f' }}>
                 <div class="item">
@@ -381,7 +274,7 @@ const Register = createReactClass({
                             <div className='user-data'>
                                 <strong>
                                     Admin Name
-    
+
                             <br />
                                     60081926
                                 <br />
