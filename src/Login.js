@@ -61,18 +61,18 @@ const Login = createReactClass({
                     });
                 })
             user = user[0]
-            // console.log("user ", user)
-            // let query = r.table('users').get(username);
-            // ReactRethinkdb.DefaultSession.runQuery(query).then(user => {
-            //     console.log("user", user)
+
             if (user) {
                 bcrypt.compare(password, user.password, (err, check) => {
                     if (check) {
                         result = { user, token: sign(user, secret) }
-                        console.log('login result', result)
+                        console.log('Success')
                         sessionStorage.setItem("token", result.token)
                         sessionStorage.setItem("user_id", result.user.id)
                         sessionStorage.setItem("role", result.user.role)
+                        console.log(sessionStorage.getItem("token"))
+                        console.log(sessionStorage.getItem("user_id"))
+                        console.log(sessionStorage.getItem("role"))
                         this.setState({ messageToUser: "" })
                     }
                     else {
@@ -83,7 +83,6 @@ const Login = createReactClass({
             else {
                 this.setState({ messageToUser: "Invalid Input" })
             }
-            // });
         }
     },
 

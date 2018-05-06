@@ -42,7 +42,7 @@ const ResetPassword = createReactClass({
         console.log("user ", user[0])
 
         if (!user[0] || !username || user[0].key != key) {
-            await this.props.history.push("/login")
+            await this.props.history.push("/")
         }
         else {
             await this.setState({
