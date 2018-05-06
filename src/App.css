@@ -325,3 +325,37 @@ a{
   color: white;
 }
 
+.addwork{
+  float: left;
+  margin-right: 0.5vh;
+  margin-top: 0.25vh;
+  font-size: 2vh;
+  color:#76323f;
+  
+  }
+  .addwork1{
+   float: right;
+   margin-right: 5vh;
+   margin-top: 0.25vh;
+   font-size: 2vh;
+   color:#76323f;
+   
+  }
+  
+  .addwork2{
+   float: right;
+   margin-top: 0.25vh;
+   font-size: 2vh;
+   margin-left: 108.5vh;
+   /* margin-left: 110vh; */
+   
+   width:50vh;
+  }
+  .navstyle{
+   float: right;
+   margin-top: 0.25vh;
+   font-size: 2vh;
+   margin-left: 148vh;
+   /* margin-left: 150vh; */
+   
+  }
