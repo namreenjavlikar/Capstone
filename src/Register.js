@@ -104,7 +104,7 @@ const Register = createReactClass({
             let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
             console.log('logIn Id:', loginId)
             await ReactRethinkdb.DefaultSession.runQuery(query)
-            await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + loginId)
+            // await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + loginId)
             this.setState({
                 collegeId: " ", number: " ", firstName: " ", lastName: " ", role: " ", department: " ", recovEmail: " ", collegeEmail: " ",
                 collegeIdMessage: '',
