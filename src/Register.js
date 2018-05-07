@@ -115,7 +115,7 @@ const Register = createReactClass({
             // })
 
             // console.log('after check before register')
-            let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
+            let query = r.table('users').insert({ id: loginId,  collegeId: this.state.collegeId,number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
             console.log('logIn Id:', loginId)
 
             // console.log('after check after register')
