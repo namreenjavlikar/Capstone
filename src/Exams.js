@@ -74,6 +74,7 @@ export const Details = createReactClass({
             ReactRethinkdb.DefaultSession.runQuery(query);
         })
 
+        this.setState({ content: "" })
         // let query = r.table('exams').get(this.props.match.params.id).update({
         //     questions: r.row('questions').append(
         //         { question: this.state.question, answer: this.state.answer }
@@ -84,24 +85,53 @@ export const Details = createReactClass({
 
     handleDeleteQuestion(question) {
         let query = r.table('exams').get(this.props.match.params.id).update({
-            questions: r.row('questions').difference([{ question: question.question, answer: question.answer }])
+            questions: r.row('questions').difference([question])
         })
         ReactRethinkdb.DefaultSession.runQuery(query);
     },
 
-    handleEditQuestion(question) {
-        //let query = r.table('exams').get(this.props.match.params.id).update({
+    handleSelectQuestion(question) {
+        // let query = r.table('exams').get(this.props.match.params.id).update({
         //    questions: r.row('questions').difference([{ question: question.question, answer: question.answer }])
-        //})
-        //ReactRethinkdb.DefaultSession.runQuery(query);
-        this.setState({ question: question.question, answer: question.answer })
+        // })
+        // ReactRethinkdb.DefaultSession.runQuery(query);
+        let content = "Title: " + question.title + "\n" +
+            question.question + "\n" +
+            "*" + question.answer
+        this.setState({ content })
+        //this.setState({ question: question.question, answer: question.answer })
+    },
 
+    handleEditQuestion() {
+
+        // let content = "Title: " + question.title + "\n" +
+        //               question.question + "\n" +
+        //               "*" + question.answer
+        // this.setState({ content })
     },
 
     async handleMarkdown(e) {
         await this.setState({ content: e.target.value })
         let html = converter.makeHtml(this.state.content)
         await this.setState({ htmlcode: html })
+    },
+
+    async uploadFile(_id, password) {
+        const response = await fetch(
+            'http://localhost:3001/fileUpload',
+            {
+                method: 'POST',
+                body: FormData,
+                headers: null,
+                files: document.getElementById('file-to-upload').files[0]
+            }
+        )
+        const json = await response.json()
+        return json
+    },
+
+    handleFileUpload() {
+
     },
 
     render() {
@@ -112,6 +142,10 @@ export const Details = createReactClass({
                 :
                 <div>
                     Exam: {this.props.match.params.id}
+                    <form action="http://localhost:3001/fileUpload" enctype="multipart/form-data" method="post">
+                        <input type="file" name="file-to-upload" id="file-to-upload" />
+                        <input type="submit" value="Upload" />
+                    </form>
                     <div className="exam">
                         {
                             this.data.exam.value().questions.map((question, index) =>
@@ -131,7 +165,7 @@ export const Details = createReactClass({
                                     }
                                     <p>A. {question.answer}</p>
                                     <button onClick={() => this.handleDeleteQuestion(question)}>Delete</button>
-                                    <button onClick={() => this.handleEditQuestion(question)}>Edit</button>
+                                    <button onClick={() => this.handleSelectQuestion(question)}>Edit</button>
                                     <br /><br />
                                 </div>
                             )
@@ -150,6 +184,7 @@ export const Details = createReactClass({
                     <div dangerouslySetInnerHTML={{ __html: this.state.htmlcode}}></div>
                     <ReactMarkdown source={this.state.content} /> */}
                     <button onClick={() => this.handleAddQuestion()}>Add Question</button>
+                    <button onClick={() => this.handleEditQuestion()}>Edit Question</button>
                 </div>
 
         )
