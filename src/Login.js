@@ -51,7 +51,7 @@ const Login = createReactClass({
         else {
             let result = null;
 
-            let query = r.table('users').filter({ loginId: username })
+            let query = r.table('users').filter({ id: username })
 
             let user = {}
             await ReactRethinkdb.DefaultSession.runQuery(query).then(
