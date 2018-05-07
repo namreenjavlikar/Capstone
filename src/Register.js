@@ -73,8 +73,34 @@ const Register = createReactClass({
         console.log("Registering", this.state.flag)
         if (this.state.flag) {
             let key = Math.random().toString(36).substring(7)
-            let loginId = Math.random().toString(36)
-            loginId = loginId.substring(key.length - 4)
+            let loginId = Math.random().toString(24)
+            loginId = loginId.substring(loginId.length - 4)
+            let match = false;
+            let check = false;
+            let arr = this.data.students.value()
+            // console.log('arr',arr)
+             while (check === false) {
+                 for (let i = 0; i < arr.length; i++) {
+                    if (arr[i].loginId === loginId) {
+                        loginId = Math.random().toString(24)
+                        loginId = loginId.substring(key.length - 4)
+                        check = false
+                        break;
+                    } else {
+                        check = true
+                    }
+                    //console.log('inside for', match)
+                }
+                // if (check === false) {
+                //     loginId = Math.random().toString(24)
+                //     loginId = loginId.substring(key.length - 4)
+                // } else {
+                //     check = false
+                // }
+            }
+            // arr.forEach((element, i) => {
+            //     this.data.students.value()[i].loginId === loginId ? check = true : false
+            // })
             let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
             console.log('logIn Id:', loginId)
             await ReactRethinkdb.DefaultSession.runQuery(query)
@@ -192,7 +218,7 @@ const Register = createReactClass({
         let check = false
         let recovEmailMessage = ""
         this.data.students.value().forEach((element, i) => {
-            this.data.students.value()[i].recovEmail === recovEmail ? check = true : null
+            this.data.students.value()[i].recovEmail === recovEmail ? check = true : check = check
         })
         recovEmail ?
             check ?
@@ -214,7 +240,7 @@ const Register = createReactClass({
         let check = false
         let collegeEmailMessage = ""
         this.data.students.value().forEach((element, i) => {
-            this.data.students.value()[i].collegeEmail === collegeEmail ? check = true : null
+            this.data.students.value()[i].collegeEmail === collegeEmail ? check = true : check = check
         })
         collegeEmail ?
             check ?
@@ -273,7 +299,7 @@ const Register = createReactClass({
                             <div className='user-data'>
                                 <strong>
                                     Admin Name
-    
+
                        <br />
                                     60081926
                            <br />
@@ -327,12 +353,12 @@ const Register = createReactClass({
                                 <div class="fields">
                                     <div class="field text-field" style={{ width: 321, marginLeft: 45 }}>
                                         <label>First Name</label>
-                                        <input type="text" placeholder=" Name" onChange={(event) => this.setState({ firstName: event.target.value })} />
+                                        <input type="text" placeholder="First Name" onChange={(event) => this.setState({ firstName: event.target.value })} />
                                         <span>{this.state.firstNameMessage}</span>
                                     </div>
                                     <div class="field text-field" style={{ width: 321, marginLeft: 50 }}>
                                         <label>Last Name</label>
-                                        <input type="text" placeholder="Contact No." onChange={(event) => this.setState({ lastName: event.target.value })} />
+                                        <input type="text" placeholder="Last Name" onChange={(event) => this.setState({ lastName: event.target.value })} />
                                         <span>{this.state.lastNameMessage}</span>
                                     </div>
                                 </div>
