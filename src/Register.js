@@ -70,43 +70,61 @@ const Register = createReactClass({
     },
 
     async handleRegister() {
-        console.log("Registering", this.state.flag)
+        // console.log("Registering", this.state.flag)
         if (this.state.flag) {
             let key = Math.random().toString(36).substring(7)
             let loginId = Math.random().toString(24)
             loginId = loginId.substring(loginId.length - 4)
             let match = false;
             let check = false;
+            // console.log('inside if register, before arr')
+            let exist=r.table('users').isEmpty()
             let arr = this.data.students.value()
             // console.log('arr',arr)
-             while (check === false) {
-                 for (let i = 0; i < arr.length; i++) {
-                    if (arr[i].loginId === loginId) {
-                        loginId = Math.random().toString(24)
-                        loginId = loginId.substring(key.length - 4)
-                        check = false
-                        break;
-                    } else {
-                        check = true
+            if (!exist) {
+                while (check === false) {
+
+                    // console.log('inside while register')
+
+                    for (let i = 0; i < arr.length + 1; i++) {
+                        // console.log('inside for register')
+                        if (arr[i - 1].loginId === loginId) {
+                            loginId = Math.random().toString(24)
+                            loginId = loginId.substring(key.length - 4)
+                            check = false
+                            break;
+                        } else {
+                            check = true
+                            // console.log('inside else register')
+                        }
+                        //console.log('inside for', match)
                     }
-                    //console.log('inside for', match)
+                    // if (check === false) {
+                    //     loginId = Math.random().toString(24)
+                    //     loginId = loginId.substring(key.length - 4)
+                    // } else {
+                    //     check = false
+                    // }
                 }
-                // if (check === false) {
-                //     loginId = Math.random().toString(24)
-                //     loginId = loginId.substring(key.length - 4)
-                // } else {
-                //     check = false
-                // }
+            }
+            else {
+                check = true
             }
             // arr.forEach((element, i) => {
             //     this.data.students.value()[i].loginId === loginId ? check = true : false
             // })
+
+            // console.log('after check before register')
             let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
             console.log('logIn Id:', loginId)
+
+            // console.log('after check after register')
             await ReactRethinkdb.DefaultSession.runQuery(query)
-            try{
+            console.log('after query')
+
+            try {
                 await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + loginId)
-            }catch(ex){
+            } catch (ex) {
                 console.log("error")
             }
             this.setState({
@@ -133,6 +151,7 @@ const Register = createReactClass({
         console.log('after reset flag', this.state.flag)
         // let key = Math.random().toString(36)
         // console.log('key',key.substring(key.length-4))
+        console.log('before calling check')
         this.handleCollegeId(this.state.collegeId)
         // this.handleLoginId(this.state.loginId)
         this.handleFirstName(this.state.firstName)
@@ -154,10 +173,12 @@ const Register = createReactClass({
         let collegeIdRegex = /^600[0-9]{5}$/
         let check = false;
         let collegeIdMessage = ""
+        console.log('before first check')
         this.data.students.value().forEach((element, i) => {
             // console.log('checking data', i, this.data.students.value()[i].collegeId)
             this.data.students.value()[i].collegeId === collegeId ? check = true : null
         })
+        console.log('after first check')
         collegeId ?
             check ?
                 collegeIdMessage = "Error Duplicate College Id"
