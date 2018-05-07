@@ -10,7 +10,9 @@ import ResetPassword from './ResetPassword'
 import SyntaxHighlightTest from './SyntaxHighlightTest'
 import ForgotPassword from './ForgotPassword'
 import * as Courses from './Courses'
+import * as Instructors from './Instructors'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
+import * as Contacts  from './Contacts'
 
 let r = ReactRethinkdb.r
 
@@ -36,6 +38,11 @@ const App = createReactClass({
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
         <Route path="/exams/:id" component={Exams.Details} />
+        <Route path="/Instructors" component={Instructors} />
+
+        <Route path="/Contacts" component={Contacts.All} />
+        <Route path="/AddContacts" component={Contacts.Create} />
+
       </div>
     </Router>
   },
