@@ -53,9 +53,9 @@ const Register = createReactClass({
     },
 
     componentWillMount() {
-        if(!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin"){
-            this.props.history.push("/")
-        }
+        // if(!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin"){
+        //     this.props.history.push("/")
+        // }
     },
 
     observe(props, state) {
@@ -70,21 +70,34 @@ const Register = createReactClass({
     },
 
     async handleRegister() {
-        console.log("Registering")
+        console.log("Registering", this.state.flag)
         if (this.state.flag) {
             let key = Math.random().toString(36).substring(7)
             let loginId = Math.random().toString(36)
             loginId = loginId.substring(key.length - 4)
-            let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, key: key, password: "" })
+            let query = r.table('users').insert({ collegeId: this.state.collegeId, loginId: loginId, number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
             console.log('logIn Id:', loginId)
             await ReactRethinkdb.DefaultSession.runQuery(query)
             await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + loginId)
+            this.setState({
+                collegeId: " ", number: " ", firstName: " ", lastName: " ", role: " ", department: " ", recovEmail: " ", collegeEmail: " ",
+                collegeIdMessage: '',
+                loginIdMessage: '',
+                firstNameMessage: '',
+                lastNameMessage: '',
+                numberMessage: '',
+                recovEmailMessage: '',
+                collegeEmailMessage: '',
+                roleMessage: '',
+                departmentMessage: '',
+            })
+            this.props.history.push("/")
         }
         else {
             console.log("not yet")
         }
     },
-    
+
     async handleCreate() {
         await this.resetFlag()
         console.log('after reset flag', this.state.flag)
@@ -112,7 +125,7 @@ const Register = createReactClass({
         let check = false;
         let collegeIdMessage = ""
         this.data.students.value().forEach((element, i) => {
-            console.log('checking data', i, this.data.students.value()[i].collegeId)
+            // console.log('checking data', i, this.data.students.value()[i].collegeId)
             this.data.students.value()[i].collegeId === collegeId ? check = true : null
         })
         collegeId ?
@@ -126,11 +139,10 @@ const Register = createReactClass({
                     collegeIdMessage = "Error Invalid College Id"
             :
             collegeIdMessage = "Please enter a College Id"
-        collegeIdMessage === '' ? this.setState({ collegeIdMessage, flag: false }) : this.setState({ collegeIdMessage })
+        collegeIdMessage !== '' ? this.setState({ collegeIdMessage, flag: false }) : this.setState({ collegeIdMessage })
     },
 
     handleFirstName(firstName) {
-        console.log('checking Name', this.state.firstName, firstName)
         let firstNameRegex = /^[a-zA-Z]*$/
         let firstNameMessage = ""
         firstName ?
@@ -141,7 +153,7 @@ const Register = createReactClass({
                 firstNameMessage = "Error Invalid First Name"
             :
             firstNameMessage = "Please enter a First Name"
-        firstNameMessage === '' ? this.setState({ firstNameMessage, flag: false }) : this.setState({ firstNameMessage })
+        firstNameMessage !== '' ? this.setState({ firstNameMessage, flag: false }) : this.setState({ firstNameMessage })
     },
 
     handleLastName(lastName) {
@@ -155,7 +167,7 @@ const Register = createReactClass({
                 lastNameMessage = "Error Invalid Last Name"
             :
             lastNameMessage = "Please enter a Last Name"
-        lastNameMessage === '' ? this.setState({ lastNameMessage, flag: false }) : this.setState({ lastNameMessage })
+        lastNameMessage !== '' ? this.setState({ lastNameMessage, flag: false }) : this.setState({ lastNameMessage })
     },
 
     handleNumber(number) {
@@ -171,7 +183,7 @@ const Register = createReactClass({
                 numberMessage = "Error Invalid Phone Number"
             :
             numberMessage = "Please enter a Phone Number"
-        numberMessage === '' ? this.setState({ numberMessage, flag: false }) : this.setState({ numberMessage })
+        numberMessage !== '' ? this.setState({ numberMessage, flag: false }) : this.setState({ numberMessage })
     },
 
     handleRecovEmail(recovEmail) {
@@ -193,7 +205,7 @@ const Register = createReactClass({
                     recovEmailMessage = "Error Invalid Recovery Email"
             :
             recovEmailMessage = "Please enter a Recovery Email"
-        recovEmailMessage === '' ? this.setState({ recovEmailMessage, flag: false }) : this.setState({ recovEmailMessage })
+        recovEmailMessage !== '' ? this.setState({ recovEmailMessage, flag: false }) : this.setState({ recovEmailMessage })
     },
 
     handleCollegeEmail(collegeEmail) {
@@ -215,7 +227,7 @@ const Register = createReactClass({
                     collegeEmailMessage = "Error Invalid College Email"
             :
             collegeEmailMessage = "Please enter a College Email"
-        collegeEmailMessage === '' ? this.setState({ collegeEmailMessage, flag: false }) : this.setState({ collegeEmailMessage })
+        collegeEmailMessage !== '' ? this.setState({ collegeEmailMessage, flag: false }) : this.setState({ collegeEmailMessage })
     },
 
     handleRole(role) {
@@ -225,7 +237,7 @@ const Register = createReactClass({
             :
             roleMessage = ""
 
-        this.setState({ flag: !role ? false : null, roleMessage })
+        this.setState({ flag: !role ? false : this.state.flag, roleMessage })
     },
 
     handleDepartment(department) {
@@ -235,7 +247,7 @@ const Register = createReactClass({
             :
             departmentMessage = ""
 
-        this.setState({ flag: !department ? false : null, departmentMessage })
+        this.setState({ flag: !department ? false : this.state.flag, departmentMessage })
     },
 
     handleRoleSelect(role) {
@@ -248,44 +260,26 @@ const Register = createReactClass({
 
     render() {
         return (
+            <div>
 
-            <div >
-                {/* <div class="ui left fixed vertical menu " style={{ height: '100vh', backgroundColor: '#76323f' }}>
-                <div class="item">
-                    <img class="ui mini circular image" src={p1} style={{ width: 100, height: 95 }} />
-                </div>
-                <a class="item" style={{ color: 'white' }}>Faculty List</a>
-              
-            </div> */}
                 <div className="ui left fixed vertical menu" style={{ width: '15%', float: 'left', height: '100vh', backgroundColor: '#76323f' }}>
-                    {/* <div class="ui vertical menu right-nav" style={{ width: '15%', float: 'left', height: '100vh' }}> */}
                     <div class="item">
                         <div style={{ width: '100%', height: '30%' }}>
                             <div style={{ height: '100%', float: 'left', width: '50%' }} >
 
-                                <div class="uk-inline-clip uk-transition-toggle" tabindex="0" style={{ width: 100, height: 100 }}>
-                                    <a>
-                                        <img src={logo} style={{ width: 100, height: 100, borderRadius: 50 }}
-                                        />
-                                        <div class="uk-transition-slide-bottom uk-position-bottom uk-overlay uk-overlay-default" style={{ width: 100, height: 100, borderRadius: 50 }}>
-                                            <div class="uk-position-center">
-                                                <div class="uk-transition-slide-bottom-small"><h4 class="uk-margin-remove">Logout</h4></div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-
+                                <img src={logo} style={{ width: 100, height: 100, borderRadius: 50 }}
+                                />
                             </div>
                             <div className='user-data'>
                                 <strong>
                                     Admin Name
-
-                            <br />
+    
+                       <br />
                                     60081926
-                                <br />
+                           <br />
                                     <a uk-tooltip="title: My profile page; pos: bottom-right">
                                         My Profile
-                                </a>
+                           </a>
                                 </strong>
                                 <br />
                             </div>
@@ -299,11 +293,9 @@ const Register = createReactClass({
                             </a>
                         </li>
                     </div>
-
                 </div>
-                <div style={{ marginLeft: 120, marginRight: 5 }}>
+                <div style={{ width: '100%', float: 'left', height: '100vh' }}>
                     <div class="ui raised very padded text container segment " style={{ height: '100vh' }} class="register-container">
-
                         <div style={{ backgroundColor: 'white' }}>
                             <center>
                                 <img src={logo} style={{ width: 70, height: 70, marginTop: 20 }} />
@@ -312,163 +304,82 @@ const Register = createReactClass({
 
                             <hr class="uk-divider-icon" style={{ backgroundColor: '#76323f', opacity: 1 }} />
                         </div>
-
-                        <div class="centralize-form" style={{ marginLeft: 620, marginTop: 80 }}>
-
-                            <div class="ui  large form " style={{ marginLeft: 45 }}>
+                        <div class="" style={{
+                            marginLeft: '32%', marginTop: 80, width: 1500
+                        }}>
+                            <div class="ui large form ">
                                 <div class="fields">
-                                    <div class="field">
+                                    <div class="field text-field" style={{ width: 321, marginLeft: 45 }}>
                                         <label>College ID</label>
-                                        {/* <input type="text" placeholder="College ID" />
-                                    <label style={{ float: "left", fontSize: 18 }}>College ID</label> */}
-                                        <input type="text" name="college-id" placeholder="College ID"
-                                            value={this.state.collegeId} onChange={(event) => this.setState({ collegeId: event.target.value })} />
+                                        <input type="text" placeholder="College ID" onChange={(event) => this.setState({ collegeId: event.target.value })} />
                                         <span>{this.state.collegeIdMessage}</span>
                                     </div>
-                                    <div class="field" style={{ marginLeft: 50 }}>
-                                        {/* <label>Login ID</label>
-                                    <input type="text" placeholder="Login ID" /> */}
-                                        {/* <label>Contact No.</label>
-                                    <input type="text" placeholder="Contact No." /> */}
+                                    <div class="field text-field" style={{ width: 321, marginLeft: 50 }}>
                                         <label>Contact No.</label>
 
                                         <input type="text" name="contact-no." placeholder="Contact No."
                                             value={this.state.number} onChange={(event) => this.setState({ number: event.target.value })} />
                                         <span>{this.state.numberMessage}</span>
-                                        {/* <label style={{ float: "left", fontSize: 18 }}>Login ID</label>
-                                     <input type="text" name="login-id" placeholder="Login ID"
-                                         value={this.state.loginId} onChange={(event) => this.setState({ loginId: event.target.value })} />
-                                     <span>{this.state.loginIdMessage}</span>  */}
                                     </div>
-
                                 </div>
                             </div>
-
-                            <div class="ui large form" style={{ marginLeft: 45 }}>
+                            <div class="ui large form">
                                 <div class="fields">
-                                    <div class="field">
-                                        {/* <label>Name</label>
-                                    <input type="text" placeholder=" Name" /> */}
+                                    <div class="field text-field" style={{ width: 321, marginLeft: 45 }}>
                                         <label>First Name</label>
-                                        <input type="text" name="name" placeholder="Name"
-                                            value={this.state.firstName} onChange={(event) => this.setState({ firstName: event.target.value })} />
+                                        <input type="text" placeholder=" Name" onChange={(event) => this.setState({ firstName: event.target.value })} />
                                         <span>{this.state.firstNameMessage}</span>
-
                                     </div>
-                                    <div class="field" style={{ marginLeft: 50 }}>
-                                        {/* <label>Contact No.</label>
-                                    <input type="text" placeholder="Contact No." /> */}
+                                    <div class="field text-field" style={{ width: 321, marginLeft: 50 }}>
                                         <label>Last Name</label>
-                                        <input type="text" name="name" placeholder="Name"
-                                            value={this.state.lastName} onChange={(event) => this.setState({ lastName: event.target.value })} />
+                                        <input type="text" placeholder="Contact No." onChange={(event) => this.setState({ lastName: event.target.value })} />
                                         <span>{this.state.lastNameMessage}</span>
                                     </div>
-
                                 </div>
-                            </div>
-                            <div class="ui large form" style={{ marginLeft: 45 }}>
+                            </div><div class="ui large form">
                                 <div class="fields">
-                                    <div class="field">
-                                        {/* <label>Personal(Recovery) Email</label>
-                                    <input type="text" placeholder="Email" /> */}
+                                    <div class="field text-field" style={{ width: 321, marginLeft: 45 }}>
                                         <label>Personal(Recovery) Email</label>
-                                        <input type="text" name="personal-email" placeholder="Email"
-                                            value={this.state.recovEmail} onChange={(event) => this.setState({ recovEmail: event.target.value })} />
+                                        <input type="text" placeholder="Email" onChange={(event) => this.setState({ recovEmail: event.target.value })} />
                                         <span>{this.state.recovEmailMessage}</span>
-                                    </div>
-                                    <div class="field" style={{ marginLeft: 50 }}>
-                                        {/* <label>College Email</label>
-                                    <input type="text" placeholder="College Email" /> */}
+                                    </div><div class="field text-field" style={{ width: 321, marginLeft: 50 }}>
                                         <label>College Email</label>
-                                        <input type="text" name="college-email" placeholder="Email"
-                                            value={this.state.collegeEmail} onChange={(event) => this.setState({ collegeEmail: event.target.value })} />
+                                        <input type="text" placeholder="College Email" onChange={(event) => this.setState({ collegeEmail: event.target.value })} />
                                         <span>{this.state.collegeEmailMessage}</span>
                                     </div>
-
                                 </div>
                             </div>
-
-                            <div>
-
-                                <div class="ui large form " style={{ marginLeft: 5 }}>
-
-                                    <div class="fields">
-
-
-                                        {/* <div class="field">
+                            <div class="ui large form" style={{ marginLeft: 5 }}>
+                                <div class="fields">
+                                    <div class="field  ">
                                         <label style={{ marginLeft: 43 }}>Role</label>
-                                        <select style={{ width: 207, marginLeft: 40 }} class="ui fluid dropdown">
-                                            <option value="">Select </option>
-                                            <option value="">Admin</option>
-                                            <option value="">Instructor</option>
-                                            <option value="">Student</option>
+                                        <select style={{ width: 317, marginLeft: 39 }} class="ui fluid dropdown" onChange={(event) => this.setState({ role: event.target.value })}>
+                                            <option value="">Role</option>
+                                            <option value="Instructor">Instructor</option>
+                                            <option value="Student">Student</option>
+                                            <option value="Admin assistant">Admin assistant</option>
                                         </select>
-                                    </div> */}
-                                        <div class="four wide field">
-                                            <label>Role</label>
-                                            <select class="ui search dropdown" onChange={(event) => this.setState({ role: event.target.value })}>
-                                                <option value="">Role</option>
-                                                <option value="Instructor">Instructor</option>
-                                                <option value="Student">Student</option>
-                                                <option value="Admin assistant">Admin assistant</option>
-                                            </select>
-                                            <span>{this.state.roleMessage}</span>
-
-                                        </div>
-
-                                        {/* <div class="field" style={{ marginRight: 500 }}>
+                                        <span style={{ width: '100%', marginLeft: 45 }} >{this.state.roleMessage}</span>
+                                    </div>
+                                    <div class="field" style={{ marginRight: 400 }}>
                                         <label style={{ marginLeft: 50 }}>Department</label>
-                                        <select style={{ width: 207, marginLeft: 45 }} class="ui fluid dropdown">
-                                            <option value="">Select </option>
-                                            <option value="">School of Information Technology</option>
-                                            <option value="">School of Information Technology</option>
-                                            <option value="">School of Engineering Technology</option>
-                                            <option value="">School of Business </option>
-                                            <option value="">School of Health Sciences</option>
+                                        <select style={{ width: 317, marginLeft: 45 }} class="ui fluid dropdown" onChange={(event) => this.setState({ department: event.target.value })}>
+                                            <option value="">Departments</option>
+                                            <option value="Business Studies">Business Studies</option>
+                                            <option value="Engineering">Engineering</option>
+                                            <option value="Information Technology">Information Technology</option>
+                                            <option value="Health Sciences">Health Sciences</option>
                                         </select>
-                                    </div> */}
-                                        <div class="four wide field">
-                                            <label>Departments</label>
-                                            <select class="ui search dropdown" onChange={(event) => this.setState({ department: event.target.value })}>
-                                                <option value="">Departments</option>
-                                                <option value="Business Studies">Business Studies</option>
-                                                <option value="Engineering">Engineering</option>
-                                                <option value="Information Technology">Information Technology</option>
-                                                <option value="Health Sciences">Health Sciences</option>
-                                            </select>
-                                            <span>{this.state.departmentMessage}</span>
-
-                                        </div>
+                                        <span style={{ width: '100%', marginLeft: 45 }} >{this.state.departmentMessage}</span>
                                     </div>
                                 </div>
-                                {/* <button class="uk-button register-btn" style={{ borderRadius: 20, marginLeft: 190, marginTop: 30 }} onClick={() => this.handle()}>Register</button> */}
-                                <button class="uk-button register-btn" style={{ borderRadius: 20, marginLeft: 190, marginTop: 30 }} onClick={() => this.handleCreate()}>Register</button>
-
                             </div>
+                            <button class="uk-button register-btn" style={{ borderRadius: 20, marginLeft: '23%', marginTop: 30 }} onClick={() => this.handleCreate()}>Register</button>
+
                         </div>
                     </div>
-
-
                 </div>
-                {/* <div class="uk-offcanvas-content right-chat">
 
-                    <button class="uk-button uk-button-default chat-btn" type="button" uk-toggle="target: #offcanvas-flip" >Chat</button>
-
-                    <div id="offcanvas-flip" uk-offcanvas="flip: true; overlay: true">
-                        <div class="uk-offcanvas-bar" style={{ backgroundColor: 'lightblue' }}>
-
-                            <button class="uk-offcanvas-close" type="button" uk-close style={{ color: 'black' }}>x</button>
-
-                            <h3>Title</h3>
-
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-
-
-                        </div>
-
-                    </div>
-
-                </div> */}
             </div>
         )
     },
