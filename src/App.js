@@ -13,6 +13,7 @@ import * as Courses from './Courses'
 import * as Instructors from './Instructors'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import * as Contacts  from './Contacts'
+import * as Messages  from './Messages'
 
 let r = ReactRethinkdb.r
 
@@ -42,6 +43,7 @@ const App = createReactClass({
 
         <Route path="/Contacts" component={Contacts.All} />
         <Route path="/AddContacts" component={Contacts.Create} />
+        <Route path="/Messages" component={Messages.All} />
 
       </div>
     </Router>

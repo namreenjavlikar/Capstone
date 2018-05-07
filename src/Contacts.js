@@ -18,12 +18,11 @@ export const All = createReactClass({
     },
 
     observe(props, state) {
-        
-    
+
+
         return {
             user: new ReactRethinkdb.QueryRequest({
                 // get the id from the session cookie later
-                
                 query: r.table('users').get('6f6ed3b6-ea31-4a4b-b140-a0e892254cf8'),
                 changes: true,
                 initial: [],
@@ -48,30 +47,30 @@ export const All = createReactClass({
                 <div>
 
                 </div>
-                <center><h1>Chat page</h1>
+                <center><h1>Contacts page</h1>
                 </center>
                 <br />
                 <center>
                     <table striped bordered condensed hover style={{ width: '70%' }} >
                         <thead>
-                            <tr><th>Id</th><th>Name</th><th>content</th><th>answer</th><th>Actions</th></tr>
+                            <tr><th>Name</th></tr>
                         </thead>
                         <tbody>
                             {
                                 this.data.user.value().contacts
-                                ?
-                                
-                                this.data.user.value().contacts.map( (x)=> { <p> {x.userid} </p>}
-                                
-                                )
-
-                                :
-                                <p>Loading</p>
+                                    ?
+                                    this.data.user.value().contacts.map((item) => {
+                                        return <tr key={item.userid}>
+                                            <td>{item.userid}</td>
+                                            <td>
+                                                <button disabled onClick={() => this.handleSubmit(item.userid)}>Message</button>
+                                            </td>
+                                        </tr>;
+                                    })
+                                    :
+                                    <p>Loading</p>
                             }
 
-                            
-
-                            
                         </tbody>
                     </table >
                 </center>
@@ -115,17 +114,16 @@ export const Create = createReactClass({
 
         let tempContact = {
             userid: this.state.name,
-            messages : []
+            messages: []
         }
 
         // get the user id from the session
-
         let query = r.table('users').get('6f6ed3b6-ea31-4a4b-b140-a0e892254cf8').update({
             contacts: r.row('contacts').append(tempContact)
         });
 
-
         ReactRethinkdb.DefaultSession.runQuery(query);
+        this.props.history.push("/contacts")
         this.setState({ name: '' })
     },
 
