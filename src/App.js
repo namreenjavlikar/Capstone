@@ -5,7 +5,7 @@ import createReactClass from 'create-react-class'
 import Login from './Login'
 import Register from './Register'
 import * as Questions from './Questions'
-import * as Exams from './Exams'
+import * as Documents from './Documents'
 import ResetPassword from './ResetPassword'
 import SyntaxHighlightTest from './SyntaxHighlightTest'
 import ForgotPassword from './ForgotPassword'
@@ -35,7 +35,7 @@ const App = createReactClass({
         <Route path="/allquestions" component={Questions.All} />
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
-        <Route path="/exams/:id" component={Exams.Details} />
+        <Route path="/documents/:id" component={Documents.Details} />
       </div>
     </Router>
   },
