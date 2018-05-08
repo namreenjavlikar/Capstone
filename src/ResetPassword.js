@@ -29,7 +29,7 @@ const ResetPassword = createReactClass({
         let username = urlQuery.split("/")[4]
         let key = urlQuery.split("/")[5]
 
-        let query = r.table('users').filter({ loginId: username })
+        let query = r.table('users').filter({ id: username })
 
         let user = {}
         await ReactRethinkdb.DefaultSession.runQuery(query).then(

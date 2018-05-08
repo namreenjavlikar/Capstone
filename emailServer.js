@@ -38,12 +38,12 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage });
 
-app.get('/api/resetpassword/:recovEmail/:key/:loginId', async (req, res) => {
+app.get('/api/resetpassword/:recovEmail/:key/:id', async (req, res) => {
 	let mailOptions = {
 		from: 'dms-q-system@outlook.com',
 		to: req.params.recovEmail,
 		subject: 'Reset Password',
-		html: "<a href='http://localhost:3000/reset/" + req.params.loginId + "/" + req.params.key + "'>Click here to Reset</a>"
+		html: "<a href='http://localhost:3000/reset/" + req.params.id + "/" + req.params.key + "'>Click here to Reset</a>"
 	}
 
 	transporter.sendMail(mailOptions, (error, info) => {
@@ -55,12 +55,12 @@ app.get('/api/resetpassword/:recovEmail/:key/:loginId', async (req, res) => {
 	res.json({ "success": true })
 })
 
-app.get('/api/activate/:recovEmail/:key/:loginId', async (req, res) => {
+app.get('/api/activate/:recovEmail/:key/:id', async (req, res) => {
 	let mailOptions = {
 		from: 'dms-q-system@outlook.com',
 		to: req.params.recovEmail,
 		subject: 'Activate Account',
-		html: "<a href='http://localhost:3000/reset/" + req.params.loginId + "/" + req.params.key + "'>Click here to Activate Account</a>"
+		html: "<a href='http://localhost:3000/reset/" + req.params.id + "/" + req.params.key + "'>Click here to Activate Account</a>"
 	}
 
 	transporter.sendMail(mailOptions, (error, info) => {

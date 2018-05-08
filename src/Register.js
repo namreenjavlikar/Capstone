@@ -23,7 +23,7 @@ const Register = createReactClass({
     getInitialState() {
         return {
             collegeId: null,
-            loginId: null,
+            id: null,
             firstName: null,
             lastName: null,
             number: null,
@@ -73,8 +73,8 @@ const Register = createReactClass({
         // console.log("Registering", this.state.flag)
         if (this.state.flag) {
             let key = Math.random().toString(36).substring(7)
-            let loginId = Math.random().toString(24)
-            loginId = loginId.substring(loginId.length - 4)
+            let id = Math.random().toString(24)
+            id = id.substring(id.length - 4)
             let match = false;
             let check = false;
             // console.log('inside if register, before arr')
@@ -88,9 +88,9 @@ const Register = createReactClass({
 
                     for (let i = 0; i < arr.length + 1; i++) {
                         // console.log('inside for register')
-                        if (arr[i - 1].loginId === loginId) {
-                            loginId = Math.random().toString(24)
-                            loginId = loginId.substring(key.length - 4)
+                        if (arr[i - 1].id === id) {
+                            id = Math.random().toString(24)
+                            id = id.substring(key.length - 4)
                             check = false
                             break;
                         } else {
@@ -100,8 +100,8 @@ const Register = createReactClass({
                         //console.log('inside for', match)
                     }
                     // if (check === false) {
-                    //     loginId = Math.random().toString(24)
-                    //     loginId = loginId.substring(key.length - 4)
+                    //     id = Math.random().toString(24)
+                    //     id = id.substring(key.length - 4)
                     // } else {
                     //     check = false
                     // }
@@ -111,19 +111,19 @@ const Register = createReactClass({
                 check = true
             }
             // arr.forEach((element, i) => {
-            //     this.data.students.value()[i].loginId === loginId ? check = true : false
+            //     this.data.students.value()[i].id === id ? check = true : false
             // })
 
             // console.log('after check before register')
-            let query = r.table('users').insert({ id: loginId,  collegeId: this.state.collegeId,number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
-            console.log('logIn Id:', loginId)
+            let query = r.table('users').insert({ id: id,  collegeId: this.state.collegeId,number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
+            console.log('logIn Id:', id)
 
             // console.log('after check after register')
             await ReactRethinkdb.DefaultSession.runQuery(query)
             console.log('after query')
 
             try {
-                await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + loginId)
+                await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + id)
             } catch (ex) {
                 console.log("error")
             }
@@ -153,7 +153,7 @@ const Register = createReactClass({
         // console.log('key',key.substring(key.length-4))
         console.log('before calling check')
         this.handleCollegeId(this.state.collegeId)
-        // this.handleLoginId(this.state.loginId)
+        // this.handleLoginId(this.state.id)
         this.handleFirstName(this.state.firstName)
         this.handleLastName(this.state.lastName)
         this.handleNumber(this.state.number)
