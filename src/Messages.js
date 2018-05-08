@@ -13,45 +13,49 @@ export const All = createReactClass({
 
     getInitialState() {
         return {
-            content: ""
+            user: "TestUser",
+            txtMessage: ""
         };
     },
 
     observe(props, state) {
         return {
             messages: new ReactRethinkdb.QueryRequest({
-                // get the id from the session cookie later
-                query: r.table('users').get('6f6ed3b6-ea31-4a4b-b140-a0e892254cf8'),
+                query: r.table('chatmessages'),
                 changes: true,
                 initial: [],
             })
         };
     },
 
-
+    handleSend() {
+        let query = r.table('chatmessages').insert({ from: this.state.user, to: "all", content: this.state.txtMessage, date: new Date() });
+        ReactRethinkdb.DefaultSession.runQuery(query);
+        this.setState({ txtMessage: '' })
+    },
 
     render() {
         return (
 
-            <div style={{ padding: 20, backgroundImage: "url(../images/Birds.jpg)", backgroundSize: 'cover', height: 1600, width: 3060, filter: 'blur' }}>
+            <div style={{ padding: 20, backgroundSize: 'cover', height: 1600, width: 3060, filter: 'blur' }}>
                 <div style={{ padding: 10, backgroundColor: '#b7ebff', width: '50%', borderRadius: 10 }}>
                     <h1 style={{ fontSize: 50 }}>Messaging Page</h1>
 
-                    {
-                        this.data.messages.value()
-                        ?
-                        console.log(this.data.messages.value())
-                        :
-                        <p>Loading</p>
-                    }
 
-                    <textarea rows="20" cols="150">
-                        At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.
-                    </textarea>
+                    <div style={{ backgroundColor: "white", width: 1000, height: 400 }}>
+
+                    {
+                        this.data.messages.value().map((item) => {
+                            return <tr key={item.id}>
+                                <td>{item.from} : {item.content}</td>
+                            </tr>;
+                        })
+                    }
+                    </div>
 
                     <div style={{ padding: 10 }}>
                         <div class="four wide field">
-                            <input type="text" value={this.state.content} onChange={(event) => this.setState({ content: event.target.value })} />
+                            <input type="text" value={this.state.txtMessage} onChange={(event) => this.setState({ txtMessage: event.target.value })} />
                         </div>
                         <button onClick={() => this.handleSend()}>Send</button>
                     </div>
