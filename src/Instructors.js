@@ -1,62 +1,53 @@
-
-import React, { Component } from 'react';
-// import testing from './testing';
-
+import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import jwt from 'express-jwt'
 import '../node_modules/uikit/dist/css/uikit.css';
 import './App.css';
-// import testing from './testing';
+import photo from './photo.png';
 import userpic from './logo.png'
 
- import logo from './logo.png'
+import logo from './logo.png'
 
 // import Workdetail from './workdetail';
 // var noScroll = require ('no-scroll');
 // noScroll.on();
 
-// const users = ['ade']
-// export default class InstructorHome extends Component {
+let r = ReactRethinkdb.r;
 
-//     state = { items: users.slice(0, 3) }
+const users = ['ade']
 
+const Instructors = createReactClass({
 
+    mixins: [ReactRethinkdb.DefaultMixin],
 
-// render() {
-    let r = ReactRethinkdb.r;
-
-    const users = ['ade']
-    const InstructorHome = createReactClass({
-
-        mixins: [ReactRethinkdb.DefaultMixin],
-
-        // export default class Details extends Component {
-        getInitialState() {
-            return {
-                items: users.slice(0, 3)
-            }; 
-        },
-        observe(props, state) {
+    getInitialState() {
+        return {
+            items: users.slice(0, 3)
+        }; 
+    },
+    observe(props, state) {
             //this.setState({ messageToUser: "Invalid Input" })
-            return {
-                students: new ReactRethinkdb.QueryRequest({
-                    query: r.table('users'), // RethinkDB query
-                    changes: true,             // subscribe to realtime changefeed
-                    initial: [],               // return [] while loading
-                }),
-            };
+        return {
+            students: new ReactRethinkdb.QueryRequest({
+                query: r.table('users'), // RethinkDB query
+                changes: true,             // subscribe to realtime changefeed
+                initial: [],               // return [] while loading
+            }),
+        };
             //this.setState({ students: students})
-        },
-        handleAdd  () { 
-            this.setState({ items: users.slice(0, this.state.items.length + 1) })
-        },
-        handleRemove  () { this.setState({ items: this.state.items.slice(0, -1) })},
-        render() {
-            const { items } = this.state
+    },
+    handleAdd  () { 
+        this.setState({ items: users.slice(0, this.state.items.length + 1) })
+    },
+    handleRemove  () { 
+        this.setState({ items: this.state.items.slice(0, -1) })
+    },
+    render() {
+        const { items } = this.state
 
-            return (
+        return (
 
                 <div style={{ backgroundColor: '#E9E9E9' }}>
                     <div class="ui left fixed vertical menu" style={{ width: '15%', float: 'left', height: '100vh', backgroundColor: '#76323f' }}>
@@ -576,53 +567,43 @@ import userpic from './logo.png'
                                                             <label>2</label>
                                                         </div>
                                                     </div>
-                                                    <div class="field">
-                                                        <div class="ui radio checkbox">
-                                                            <input type="radio" name="frequency" />
-                                                            <label>3</label>
-                                                        </div>
+                                                <div class="field">
+                                                    <div class="ui radio checkbox">
+                                                        <input type="radio" name="frequency" />
+                                                        <label>3</label>
                                                     </div>
-                                                    <div class="field">
-                                                        <div class="ui radio checkbox">
-                                                            <input type="radio" name="frequency" />
-                                                            <label>4</label>
-                                                        </div>
+                                                </div>    
+                                                <div class="field">
+                                                    <div class="ui radio checkbox">
+                                                        <input type="radio" name="frequency" />
+                                                        <label>4</label>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="inline fields">
-                                                <ths> Feedback:
-                                                               </ths>
-                                                <textarea placeholder="Q03 Feedback" rows="1" style={{ width: '50vh', height: '3vh' }}></textarea>
-                                            </div>
-                                            <h3 class="ui dividing header"></h3>
-
-                                            <h3> Feedback: </h3>
-
-                                            <textarea placeholder="General Feedback" rows="1" style={{ width: '60vh', marginLeft: "1%" }}></textarea>
-
                                         </div>
+                                        <div class="inline fields">
+                                            <ths> Feedback:
+                                            </ths>
+                                            <textarea placeholder="Q03 Feedback" rows="1" style={{ width: '50vh', height: '3vh' }}></textarea>
+                                        </div>
+                                        <h3 class="ui dividing header"></h3>
+
+                                        <h3> Feedback: </h3>
+
+                                        <textarea placeholder="General Feedback" rows="1" style={{ width: '60vh', marginLeft: "1%" }}></textarea>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
-                    {/* {
-                    this.state.select
-                        ?
-                        <div>
-                            <Workdetail user={this.state.select} />
-                            <LikedList user={this.state.select} />
-                        </div>
-                        :
-                        <div></div>
-                } */}
-                  </div>
- )
-},
+
+
+                </div>
+            </div>
+        )
+    },
 });
 
-export default InstructorHome;
+export default Instructors;
 // {/* <a class="uk-button uk-button-primary" href="#target" uk-scroll>Scroll down</a> */ }
