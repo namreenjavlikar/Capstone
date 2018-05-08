@@ -44,45 +44,41 @@ const Login = createReactClass({
         }
         let username = field.substring(0, splitIndex).trim()
         let password = field.substring(splitIndex + 1).trim()
-
+        console.log(username)
         if (username === "" || password === "") {
             this.setState({ messageToUser: "Invalid Input" })
         }
         else {
             let result = null;
-
-            let query = r.table('users').filter({ id: username })
-
-            let user = {}
-            await ReactRethinkdb.DefaultSession.runQuery(query).then(
+            let query = r.table('users').get(username)
+            ReactRethinkdb.DefaultSession.runQuery(query).then(
                 (res) => {
-                    res.toArray(function (err, results) {
-                        user = results
-                    });
-                })
-            user = user[0]
-
-            if (user) {
-                bcrypt.compare(password, user.password, (err, check) => {
-                    if (check) {
-                        result = { user, token: sign(user, secret) }
-                        console.log('Success')
-                        sessionStorage.setItem("token", result.token)
-                        sessionStorage.setItem("user_id", result.user.id)
-                        sessionStorage.setItem("role", result.user.role)
-                        console.log(sessionStorage.getItem("token"))
-                        console.log(sessionStorage.getItem("user_id"))
-                        console.log(sessionStorage.getItem("role"))
-                        this.setState({ messageToUser: "" })
+                    console.log(res)
+                    let user = res
+                    console.log("USER", user)
+                    if (user) {
+                        bcrypt.compare(password, user.password, (err, check) => {
+                            if (check) {
+                                result = { user, token: sign(user, secret) }
+                                console.log('Success')
+                                sessionStorage.setItem("token", result.token)
+                                sessionStorage.setItem("user_id", result.user.id)
+                                sessionStorage.setItem("role", result.user.role)
+                                console.log(sessionStorage.getItem("token"))
+                                console.log(sessionStorage.getItem("user_id"))
+                                console.log(sessionStorage.getItem("role"))
+                                this.setState({ messageToUser: "" })
+                            }
+                            else {
+                                this.setState({ messageToUser: "Invalid Input" })
+                            }
+                        })
                     }
                     else {
                         this.setState({ messageToUser: "Invalid Input" })
                     }
                 })
-            }
-            else {
-                this.setState({ messageToUser: "Invalid Input" })
-            }
+
         }
     },
 
