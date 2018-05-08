@@ -79,7 +79,7 @@ const Register = createReactClass({
             console.log('logIn Id:', loginId)
             await ReactRethinkdb.DefaultSession.runQuery(query)
             await fetch("http://localhost:3001/api/activate/" + this.state.recovEmail + "/" + key + "/" + loginId)
-        }
+        } 
         else {
             console.log("not yet")
         }
