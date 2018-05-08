@@ -8,8 +8,6 @@ import '../node_modules/uikit/dist/css/uikit.css';
 import './App.css';
 import photo from './photo.png';
 import logo from './logo.png'
-var noScroll = require('no-scroll')
-noScroll.on();
 
 let r = ReactRethinkdb.r;
 
@@ -31,7 +29,7 @@ const ResetPassword = createReactClass({
         let username = urlQuery.split("/")[4]
         let key = urlQuery.split("/")[5]
 
-        let query = r.table('users').filter({ loginId: username })
+        let query = r.table('users').filter({ id: username })
 
         let user = {}
         await ReactRethinkdb.DefaultSession.runQuery(query).then(

@@ -63,7 +63,7 @@ const ForgotPassword = createReactClass({
             await ReactRethinkdb.DefaultSession.runQuery(replaceQuery)
 
             //send the email
-            const response = await fetch("http://localhost:3001/api/resetpassword/"+user[0].recovEmail+"/"+key+"/"+user[0].loginId)
+            const response = await fetch("http://localhost:3001/api/resetpassword/"+user[0].recovEmail+"/"+key+"/"+user[0].id)
             try {
                 const json = await response.json()
                 return json
