@@ -1,118 +1,104 @@
-import React, { Component } from 'react';
 import _ from 'lodash'
 import { Button, Image, List, Transition, Form } from 'semantic-ui-react'
+import * as BS from 'react-bootstrap'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactRethinkdb from 'react-rethinkdb';
+import createReactClass from 'create-react-class';
+import showdown from 'showdown';
+import ReactMarkdown from 'react-markdown'
+let r = ReactRethinkdb.r;
+let converter = new showdown.Converter();
 
-export class Details extends Component {
+export const Create = createReactClass({
+    mixins: [ReactRethinkdb.DefaultMixin],
+
+    getInitialState() {
+        return {
+            type: ""
+        };
+    },
+
+    observe(props, state) {
+        return {
+            // exam: new ReactRethinkdb.QueryRequest({
+            //     query: r.table('exams').get(this.props.match.params.id),
+            //     changes: true,
+            //     initial: true,
+            // }),
+        };
+    },
 
     render() {
         return (
-            <div class="uk-section uk-section-default" style={{ backgroundColor: '#E9E9E9', marginRight: 20 }}>
-                <div style={{ marginLeft: 123, backgroundColor: '#E9E9E9' }}>
-                    <div class="ui form">
-                        <div class="inline fields" style={{ width: '155%' }}>
-                            <div class="eight wide field" >
-                                <label style={{ marginLeft: '2%', marginRight: "2%", fontWeight: 'bold', fontSize: 20 }}>Quiz 1</label>
-                                <label style={{ marginLeft: '2%', marginRight: "2%" }}>Title</label>
-                                <input type="text" placeholder="Title" />
-                                <label style={{ marginRight: "2%", marginLeft: '2%' }}>Start</label>
-                                <input type="text" placeholder="Start Date" />
-                                <label style={{ marginRight: "2%", marginLeft: '2%' }}>Due</label>
-                                <input type="text" placeholder="Due Date" />
-                                <label style={{ marginRight: "2%", marginLeft: '2%' }}>End</label>
-                                <input type="text" placeholder="End Date" />
-                                <span uk-icon="icon: arrow-left; ratio: 2" style={{ marginLeft: '91.5%' }}></span>
-                                <span uk-icon="icon: arrow-right; ratio: 2"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ui form">
-                        <div className="quiz-area">
-                            <h4 style={{ color: 'black', marginLeft: '2%' }}>What is the ...?</h4>
-                            <a href="" uk-icon="close" style={{ float: 'right', marginLeft: '1%' }}></a>
-                            <a href="" uk-icon="pencil" style={{ float: 'right', marginLeft: '1%' }}></a>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <hr />
-                            <h4 style={{ color: 'black', marginLeft: '2%' }}>What is the ...?</h4>
-                            <a href="" uk-icon="close" style={{ float: 'right', marginLeft: '1%' }}></a>
-                            <a href="" uk-icon="pencil" style={{ float: 'right', marginLeft: '1%' }}></a>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <hr />
-                            <h4 style={{ color: 'black', marginLeft: '2%' }}>What is the ...?</h4>
-                            <a href="" uk-icon="close" style={{ float: 'right', marginLeft: '1%' }}></a>
-                            <a href="" uk-icon="pencil" style={{ float: 'right', marginLeft: '1%' }}></a>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                            <p style={{ color: 'black', marginLeft: '2%' }}>*</p>
-                        </div>
-                    </div>
-                    <br />
-                    <table style={{ width: '35%' }}>
-                        <tr>
-                            <th className="radio-table" style={{ textAlign: 'center' }}>MCQ</th>
-                            <th className="radio-table" style={{ textAlign: 'center' }}>Short Answers</th>
-                            <th className="radio-table" style={{ textAlign: 'center' }}>Multiple</th>
-                            <th className="radio-table" style={{ textAlign: 'center' }}>Fill in the blanks</th>
+            <div>
+                <div className="document-create-header">
+                    <BS.FormControl type="text" value={this.state.type} placeholder="Enter Type" onChange={(e) => this.setState({ type: e.target.value })} />
+                    <BS.FormControl type="text" value={this.state.name} placeholder="Enter Name" onChange={(e) => this.setState({ name: e.target.value })} />
+                    <BS.FormControl type="datetime-local" value={this.state.startDate} placeholder="Enter Start Date" onChange={(e) => this.setState({ startDate: e.target.value })} />
+                    <BS.FormControl type="datetime-local" value={this.state.dueDate} placeholder="Enter Due Date" onChange={(e) => this.setState({ dueDate: e.target.value })} />
+                    <BS.FormControl type="datetime-local" value={this.state.endDate} placeholder="Enter End Date" onChange={(e) => this.setState({ endDate: e.target.value })} />
+                </div>
 
-                        </tr>
-                        <tr>
-                            <td style={{ textAlign: 'center', marginLeft: '20%' }}> <Form.Field label='' control='input' type='radio' name='htmlRadios' /></td>
-                            <td style={{ textAlign: 'center' }}> <Form.Field label='' control='input' type='radio' name='htmlRadios' /></td>
-                            <td style={{ textAlign: 'center' }}> <Form.Field label='' control='input' type='radio' name='htmlRadios' /></td>
-                            <td style={{ textAlign: 'center' }}> <Form.Field label='' control='input' type='radio' name='htmlRadios' /></td>
-
-                        </tr>
-                    </table>
-                </div>
-                <div class="uk-margin">
-                    <input class="uk-input uk-form-width-medium" type="text" placeholder="Title" style={{ marginLeft: '6.5%', fontSize: 18, width: '30%' }} />
-                </div>
-                <div class="uk-accordion-content" style={{ marginLeft: '5%' }}>
-                    <div class="text-area1">
-                        <Form>
-                            <Form.Field label='' control='textarea' rows='3' />
-                        </Form>
-                    </div>
-                </div>
-                <br />
-                <div>
-                    <div style={{ width: '100%' }}>
-                        <button class="uk-button profile-btn" style={{ borderRadius: 20, marginLeft: '50%' }} onClick={() => this.handle()}>Cancel</button>
-                        <button class="uk-button profile-btn" style={{ borderRadius: 20 }} onClick={() => this.handle()}>Done</button>
-                        <button class="uk-button profile-btn" style={{ borderRadius: 20 }} onClick={() => this.handle()}>Upload</button>
-                    </div>
-                </div>
-                <div class="ui right fixed vertical menu " style={{ height: '100%', backgroundColor: '#76323f', width: '15%' }}>
-                    <div class="item" style={{ color: 'white' }}></div>
-                    <ul uk-accordion="multiple: true">
-                        <li class="" style={{ color: 'white' }}>
-                            <a class="uk-accordion-title" href="#" style={{ color: 'white', marginLeft: '5%' }}>Version</a>
-                            <div class="uk-accordion-content">
+                <div className="document-questions-view">
+                    <div className="document-question">
+                        <div className="document-question-header">
+                            <p className="document-question-name">Q1. What is HTML?</p>
+                            <div className="document-question-options">
+                                <a href="" uk-icon="pencil"></a>
+                                <a href="" uk-icon="close"></a>
                             </div>
-                        </li>
-                    </ul>
-                    <ul uk-accordion="multiple: true">
-                        <li class="" style={{ BackgroundColor: 'white' }}>
-                            <a class="uk-accordion-title" href="#" style={{ color: 'white', marginLeft: '5%' }}>Collaboration</a>
-                            <div class="uk-accordion-content">
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="ui search">
-                        <div class="ui icon input" >
-                            <input class="prompt" type="text" placeholder="Search..." style={{ marginLeft: '5%' }} />
-                            <i class="search icon"></i>
                         </div>
-                        <div class="results"></div>
+                        <ol type="a" className="document-question-choices">
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                        </ol>
+                        <p className="document-question-answer">A. Hyper Text Markup Language</p>
                     </div>
+                    <hr />
+                    <div className="document-question">
+                        <div className="document-question-header">
+                            <p className="document-question-name">Q1. What is HTML?</p>
+                            <div className="document-question-options">
+                                <a href="" uk-icon="pencil"></a>
+                                <a href="" uk-icon="close"></a>
+                            </div>
+                        </div>
+                        <ol type="a" className="document-question-choices">
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                        </ol>
+                        <p className="document-question-answer">A. Hyper Text Markup Language</p>
+                    </div>
+                    <hr />
+                    <div className="document-question">
+                        <div className="document-question-header">
+                            <p className="document-question-name">Q1. What is HTML?</p>
+                            <div className="document-question-options">
+                                <a href="" uk-icon="pencil"></a>
+                                <a href="" uk-icon="close"></a>
+                            </div>
+                        </div>
+                        <ol type="a" className="document-question-choices">
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                            <li>Hyper Text Markup Language</li>
+                        </ol>
+                        <p className="document-question-answer">A. Hyper Text Markup Language</p>
+                    </div>
+                </div>
+
+                <div className="document-questions-create">
+                    <BS.FormControl componentClass="textarea" placeholder="Enter Questions" />
+                    <BS.Button bsStyle="primary">Done</BS.Button>
+                    <BS.Button bsStyle="primary">Upload</BS.Button>
                 </div>
             </div>
-        );
-    }
-}
+        )
+    },
+});

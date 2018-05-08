@@ -6,6 +6,8 @@ import Login from './Login'
 import Register from './Register'
 import * as Questions from './Questions'
 import * as Documents from './Documents'
+import * as Documents2 from './Documents2'
+import * as Exams from './Exams'
 import ResetPassword from './ResetPassword'
 import SyntaxHighlightTest from './SyntaxHighlightTest'
 import ForgotPassword from './ForgotPassword'
@@ -39,9 +41,8 @@ const App = createReactClass({
         <Route path="/allquestions" component={Questions.All} />
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
-<<<<<<< HEAD
-        <Route path="/documents/:id" component={Documents.Details} />
-=======
+        <Route path="/documents2/:id" component={Documents2.Details} />
+        <Route path="/documents/create" component={Documents.Create} />
         <Route path="/enroll" component={Students.Enroll} />
         <Route path="/exams/:id" component={Exams.Details} />
         <Route path="/instructors" component={Instructors} />
@@ -49,7 +50,6 @@ const App = createReactClass({
         <Route path="/AddContacts" component={Contacts.Create} />
         <Route path="/Messages" component={Messages.All} />
 
->>>>>>> 7dc9836df70154009379287a2e375ff12f9b3a95
       </div>
     </Router>
   },

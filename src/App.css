@@ -440,7 +440,7 @@ a{
   
   
   body{
-     background-color:#E9E9E9;
+     background-color:white;
     height: 100%;
    
   }
@@ -534,4 +534,70 @@ a{
     width: 30%;
     height: 30%;
     border: 1px solid green;
+  }
+
+  /* namreen */
+
+  .document-create-header{
+    /* border: 1px solid black; */
+    padding: 15px;
+    margin: 15px;
+  }
+
+  .document-create-header input{
+    display: inline-block;
+    width: 200px;
+    margin: 15px;
+  }
+
+  .document-questions-view{
+    border: 1px solid black;
+    padding: 20px;
+    margin: 15px 45px 15px 45px;
+    height: 500px;
+    overflow-y: scroll;
+  }
+
+  .document-question {
+    /* border: 1px solid black; */
+    margin-bottom: 25px;
+  }
+
+  .document-question-name {
+    font-size: 18px;
+    float: left;
+  }
+
+  .document-question-choices {
+    font-size: 17px;
+    clear: both
+  }
+
+  .document-question-options {
+    /* border: 1px solid black; */
+    float: right;
+  }
+
+  .document-question-answer {
+    font-size: 18px;
+  }
+
+  .document-questions-create {
+    /* border: 1px solid black; */
+    padding: 10px;
+    margin: 15px 35px 15px 35px;
+    height: 300px;
+  }
+
+  .document-questions-create textarea {
+    font-size: 16px;
+    resize: none;
+    width: 100%;
+    height: 80%;
+  }
+
+  .document-questions-create button {
+    margin-top: 15px;
+    margin-left: 10px;
+    float: right;
   }
