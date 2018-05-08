@@ -33,14 +33,13 @@ const App = createReactClass({
         <Route path="/login" component={Login} />
         <Route path="/forgot" component={ForgotPassword} />
         <Route path="/register" component={Register} />
-        <Route path="/reset/:loginId/:key" component={ResetPassword} />
+        <Route path="/reset/:id/:key" component={ResetPassword} />
         <Route path="/questions" component={Questions.Create} />
         <Route path="/allquestions" component={Questions.All} />
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
         <Route path="/exams/:id" component={Exams.Details} />
         <Route path="/instructors" component={Instructors} />
-
         <Route path="/Contacts" component={Contacts.All} />
         <Route path="/AddContacts" component={Contacts.Create} />
         <Route path="/Messages" component={Messages.All} />
