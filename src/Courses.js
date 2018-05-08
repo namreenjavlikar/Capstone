@@ -50,7 +50,6 @@ export const All = createReactClass({
     handleSubmit() {
         let query = r.table('courses').insert({ name: this.state.name, semester: this.state.semester, instructors: this.state.selectedInstructors });
         ReactRethinkdb.DefaultSession.runQuery(query);
-        // this.setState({ name: '', semester: '', selectedInstructors: [] })
     },
 
     render() {
@@ -65,7 +64,7 @@ export const All = createReactClass({
                 <center>
                     <table striped bordered condensed hover style={{ width: '70%' }} >
                         <thead>
-                            <tr><th>Id</th><th>Name</th><th>Semester</th><th>Instructors</th></tr>
+                            <tr><th>Id</th><th>Name</th><th>Term</th><th>Year</th><th>Instructors</th></tr>
                         </thead>
                         <tbody>
                             {
@@ -73,7 +72,8 @@ export const All = createReactClass({
                                     return <tr key={course.id}>
                                         <td>{course.id}</td>
                                         <td>{course.name}</td>
-                                        <td>{course.semester}</td>
+                                        <td>{course.term}</td>
+                                        <td>{course.year}</td>
                                         <td>{course.instructors}</td>
                                     </tr>
                                 })
@@ -93,7 +93,6 @@ export const Create = createReactClass({
     getInitialState() {
         return {
             name: "",
-            semester: "",
             allInstructors: [],
             selectedInstructors: [],
             dropDownSelection: "",
@@ -125,12 +124,12 @@ export const Create = createReactClass({
     },
 
     handleSubmit() {
-        if (this.state.name.trim() !== "" && this.state.semester.trim() !== "" && this.state.selectedInstructors.length === 0) {
+        if (this.state.name.trim() !== "" && this.state.selectedInstructors.length > 0) {
             console.log(this.state.selectedInstructors)
-            let instructors = []
-            this.state.selectedInstructors.map((inst, i) => instructors.push({ id: inst.id, sections: [{ number: i + 1, courseWorks: [] }] }))
-            let query = r.table('courses').insert({ name: this.state.name, semester: this.state.semester, instructors: instructors, exams: [] });
-            ReactRethinkdb.DefaultSession.runQuery(query);
+            let sections = []
+            this.state.selectedInstructors.map((inst, i) => sections.push({  sectionNo: i + 1, instructorId: inst.id, students: [] }))
+            let query = r.table('courses').insert({ name: this.state.name, sections: sections, contents: [] })
+            ReactRethinkdb.DefaultSession.runQuery(query)
         } else {
             this.setState({ error: "Invalid Input" })
         }
@@ -168,8 +167,6 @@ export const Create = createReactClass({
                         <div class="ui form">
                             <p>name</p>
                             <input type={"text"} value={this.state.name} onChange={(event) => this.setState({ name: event.target.value, error: ""  })} />
-                            <p>semester</p>
-                            <input type={"text"} value={this.state.semester} onChange={(event) => this.setState({ semester: event.target.value, error: ""  })} />
                             <p>Instructors</p>
                             <select class="ui search dropdown" placeholder={"Select Instructor"} onChange={this.handleSelectInstructor}>
                                 <option value="">Select Instructor</option>
@@ -182,7 +179,7 @@ export const Create = createReactClass({
                             <button onClick={this.handleAddInstructor}>Add Instructor</button><br />
                             Selected Instructors: {this.state.selectedInstructors.map(inst => <p>{inst.name}</p>)}<br />
                             <button onClick={this.handleSubmit}>Submit</button>
-                            <br /> 
+                            <br />
                             {this.state.error}
                         </div>
                     </div>
