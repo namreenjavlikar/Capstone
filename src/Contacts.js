@@ -19,8 +19,6 @@ export const All = createReactClass({
     },
 
     observe(props, state) {
-
-
         return {
             user: new ReactRethinkdb.QueryRequest({
                 // get the id from the session cookie later
@@ -33,11 +31,9 @@ export const All = createReactClass({
 
     handleAddContact() {
 
-        if(this.state.txtMessage = ""){
+        if(this.state.txtGroupName = ""){
             return
         }
-
-
         let query = r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a').update({
             contacts: r.row('contacts').append({userid : this.state.txtUsername})
         });
