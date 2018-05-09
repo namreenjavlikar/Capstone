@@ -22,7 +22,7 @@ export const Single = createReactClass({
         return {
             user: new ReactRethinkdb.QueryRequest({
                 // get the id from the session cookie later
-                query: r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a'),
+                query: r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46'),
                 changes: true,
                 initial: [],
             })
@@ -34,7 +34,7 @@ export const Single = createReactClass({
         if(this.state.txtGroupName = ""){
             return
         }
-        let query = r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a').update({
+        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
             contacts: r.row('contacts').append({userid : this.state.txtUsername})
         });
 
@@ -45,7 +45,7 @@ export const Single = createReactClass({
     },
 
     handleDeleteContact(value) {
-        let query = r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a').update({
+        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
             contacts: r.row('contacts').difference([{userid: value}])
         })
         ReactRethinkdb.DefaultSession.runQuery(query);
@@ -118,7 +118,7 @@ export const Groups = createReactClass({
         return {
             user: new ReactRethinkdb.QueryRequest({
                 // get the id from the session cookie later
-                query: r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a'),
+                query: r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46'),
                 changes: true,
                 initial: [],
             })
@@ -131,12 +131,15 @@ export const Groups = createReactClass({
             return
         }
 
-        let query = r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a').update({
+        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
             groups: r.row('groups').append({groupid : this.state.txtGroupName})
         });
 
+
+        // if the group doesnt exist 
         let query2 = r.table('groups').insert({
             "id": this.state.txtGroupName,
+            "messages": []
         })
 
         // dont forget to do it both ways
@@ -148,7 +151,7 @@ export const Groups = createReactClass({
     },
 
     handleDeleteContact(value) {
-        let query = r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a').update({
+        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
             groups: r.row('groups').difference([{groupid: value}])
         })
 
