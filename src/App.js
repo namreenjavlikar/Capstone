@@ -16,7 +16,6 @@ import * as Students from './Students'
 import Instructors from './Instructors'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import * as Contacts  from './Contacts'
-import * as Groups  from './Groups'
 import * as Messages  from './Messages'
 
 let r = ReactRethinkdb.r
@@ -47,8 +46,8 @@ const App = createReactClass({
         <Route path="/enroll" component={Students.Enroll} />
         <Route path="/exams/:id" component={Exams.Details} />
         <Route path="/instructors" component={Instructors} />
-        <Route path="/Groups" component={Groups.All} />
-        <Route path="/Contacts" component={Contacts.All} />
+        <Route path="/Groups" component={Contacts.Groups} />
+        <Route path="/Contacts" component={Contacts.Single} />
         <Route path="/Messages/:id" component={Messages.Single} />
         <Route path="/GroupMessages/:id" component={Messages.Group} />
 
