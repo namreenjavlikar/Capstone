@@ -25,7 +25,7 @@ export const All = createReactClass({
     observe(props, state) {
         return {
             messages: new ReactRethinkdb.QueryRequest({
-                query: r.table('users').get("6f6ed3b6-ea31-4a4b-b140-a0e892254cf8"),
+                query: r.table('users').get("c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a"),
                 changes: true,
                 initial: [],
             })
@@ -42,7 +42,7 @@ export const All = createReactClass({
         }
 
         // get the user id from the session
-        let query = r.table('users').get('6f6ed3b6-ea31-4a4b-b140-a0e892254cf8').update({
+        let query = r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a').update({
             messages: r.row('messages').append(tempMessage)
         });
 
@@ -131,9 +131,12 @@ export const Create = createReactClass({
         }
 
         // get the user id from the session
-        let query = r.table('users').get('6f6ed3b6-ea31-4a4b-b140-a0e892254cf8').update({
+        let query = r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a').update({
             contacts: r.row('contacts').append(tempContact)
         });
+
+        // dont forget to do it both ways
+
 
         ReactRethinkdb.DefaultSession.runQuery(query);
         this.props.history.push("/contacts")
