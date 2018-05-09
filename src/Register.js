@@ -356,7 +356,7 @@ const Register = createReactClass({
                             <hr class="uk-divider-icon" style={{ backgroundColor: '#76323f', opacity: 1 }} />
                         </div>
                         <div class="" style={{
-                            marginLeft: '32%', marginTop: 80, width: 1500
+                            marginLeft: '32%', marginTop: 80, width: 1200
                         }}>
                             <div class="ui large form ">
                                 <div class="fields">
