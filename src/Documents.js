@@ -5,14 +5,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
-import showdown from 'showdown';
-import ReactMarkdown from 'react-markdown'
 import $ from 'jquery'
-require('jquery-ui');
-require('jquery-ui/ui/widgets/sortable');
-require('jquery-ui/ui/disable-selection');
 let r = ReactRethinkdb.r;
-let converter = new showdown.Converter();
 
 export const Create = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
@@ -26,8 +20,10 @@ export const Create = createReactClass({
             questions: [],
             order: [],
             type: "Quiz",
-            question: "",
-            answer: "",
+            name: "",
+            startDate: "",
+            endDate: "",
+            dueDate: "",
             content: "",
         };
     },
@@ -47,7 +43,6 @@ export const Create = createReactClass({
         }
         console.log("order", order)
         await this.setState({ order })
-
     },
 
     async handleAddQuestion() {
@@ -99,12 +94,18 @@ export const Create = createReactClass({
 
     async handleDeleteQuestion(question) {
         let newQuestions = this.state.questions;
+        let newOrder = this.state.order
+        let id = newQuestions.findIndex((item) => item == question)
+        newOrder.splice(newOrder.findIndex((item) => item == id), 1)
         newQuestions.splice(newQuestions.findIndex((item) => item == question), 1)
-        await this.setState({ questions: newQuestions })
+        await this.setState({ questions: newQuestions, order: newOrder })
+        console.log("newOrder", this.state.order)
     },
+
     handleSelectType(eventKey) {
-        this.setState({type:eventKey})
+        this.setState({ type: eventKey })
     },
+
     handleSelectQuestion(question) {
         let content = ""
         if (question.choices.length == 0) {
@@ -132,46 +133,71 @@ export const Create = createReactClass({
 
     },
 
-    async uploadFile(_id, password) {
-        const response = await fetch(
-            'http://localhost:3001/fileUpload',
-            {
-                method: 'POST',
-                body: FormData,
-                headers: null,
-                files: document.getElementById('file-to-upload').files[0]
-            }
-        )
-        const json = await response.json()
-        return json
+    async uploadFile() {
+
     },
 
     handleFileUpload() {
 
     },
 
-    handleCreate() {
+    async handleCreate() {
         let newQuestions = []
         this.state.order.map((item) => {
             newQuestions.push(this.state.questions[parseInt(item)])
         })
-        let query = r.table('exams').insert({
-            name: "Testing",
-            questions: newQuestions
+
+        let questionIds = []
+        for (let i =0; i < newQuestions.length; i++) {
+            let query = r.table('questions').insert({
+                title: newQuestions[i].title,
+                question: newQuestions[i].question,
+                answer: newQuestions[i].answer,
+                choices: newQuestions[i].choices
+            })
+            await ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
+                questionIds.push(res.generated_keys[0])
+                console.log("gen", res.generated_keys[0])
+            })
+        }
+
+        console.log("questions id", questionIds)
+
+        let query = r.table('documents').insert({
+            type: this.state.type,
+            name: this.state.name,
+            startDate: this.state.startDate,
+            endDate: this.state.endDate,
+            dueDate: this.state.dueDate,
+            questions: questionIds
         })
         ReactRethinkdb.DefaultSession.runQuery(query);
+    },
+
+    async getQuestionIds(newQuestions) {
+        let questionIds = []
+        newQuestions.map( (question) => {
+            let query = r.table('questions').insert({
+                title: question.title,
+                question: question.question,
+                answer: question.answer,
+                choices: question.choices
+            })
+            ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
+                questionIds.push(res.generated_keys[0])
+                console.log("gen", res.generated_keys[0])
+                //console.log("questions id", questionIds)
+            })
+        })
+        return questionIds
     },
 
     render() {
         return (
             <div>
                 <div className="document-create-header">
-                    <BS.DropdownButton style={{ margin: 15 }}id="type" title={this.state.type} onSelect={
-                        // (event) => 
-                        this.handleSelectType
-                        // ({ type: event.value })
-                        }>
-                        <BS.MenuItem key="Key" eventKey="Key" value="Quiz">Quiz</BS.MenuItem>
+                    <BS.DropdownButton style={{ margin: 15 }} id="type" title={this.state.type} onSelect={this.handleSelectType}>
+                        <BS.MenuItem key="Quiz" eventKey="Quiz" value="Quiz">Quiz</BS.MenuItem>
                         <BS.MenuItem key="Exam" eventKey="Exam" value="Exam">Exam</BS.MenuItem>
                         <BS.MenuItem key="Assignment" eventKey="Assignment" value="Assignment">Assignment</BS.MenuItem>
                         <BS.MenuItem key="Lab" eventKey="Lab" value="Labs">Lab</BS.MenuItem>

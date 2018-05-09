@@ -46,9 +46,9 @@ const App = createReactClass({
         <Route path="/enroll" component={Students.Enroll} />
         <Route path="/exams/:id" component={Exams.Details} />
         <Route path="/instructors" component={Instructors} />
-        <Route path="/Contacts" component={Contacts.All} />
-        <Route path="/AddContacts" component={Contacts.Create} />
-        <Route path="/Messages" component={Messages.All} />
+        {/* <Route path="/Contacts" component={Contacts.All} />
+        <Route path="/AddContacts" component={Contacts.Create} /> */}
+        {/* <Route path="/Messages" component={Messages.All} /> */}
         <Route path="/Groups" component={Contacts.Groups} />
         <Route path="/Contacts" component={Contacts.Single} />
         <Route path="/Messages/:id" component={Messages.Single} />
