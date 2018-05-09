@@ -55,27 +55,32 @@ const Login = createReactClass({
                 (res) => {
                     console.log(res)
                     let user = res
-                    console.log("USER", user)
-                    if (user) {
-                        bcrypt.compare(password, user.password, (err, check) => {
-                            if (check) {
-                                result = { user, token: sign(user, secret) }
-                                console.log('Success')
-                                sessionStorage.setItem("token", result.token)
-                                sessionStorage.setItem("user_id", result.user.id)
-                                sessionStorage.setItem("role", result.user.role)
-                                console.log(sessionStorage.getItem("token"))
-                                console.log(sessionStorage.getItem("user_id"))
-                                console.log(sessionStorage.getItem("role"))
-                                this.setState({ messageToUser: "" })
-                            }
-                            else {
-                                this.setState({ messageToUser: "Invalid Input" })
-                            }
-                        })
+                    if (user.password != "") {
+                        console.log("USER", user)
+                        if (user) {
+                            bcrypt.compare(password, user.password, (err, check) => {
+                                if (check) {
+                                    result = { user, token: sign(user, secret) }
+                                    console.log('Success')
+                                    sessionStorage.setItem("token", result.token)
+                                    sessionStorage.setItem("user_id", result.user.id)
+                                    sessionStorage.setItem("role", result.user.role)
+                                    console.log(sessionStorage.getItem("token"))
+                                    console.log(sessionStorage.getItem("user_id"))
+                                    console.log(sessionStorage.getItem("role"))
+                                    this.setState({ messageToUser: "" })
+                                }
+                                else {
+                                    this.setState({ messageToUser: "Invalid Input" })
+                                }
+                            })
+                        }
+                        else {
+                            this.setState({ messageToUser: "Invalid Input" })
+                        }
                     }
-                    else {
-                        this.setState({ messageToUser: "Invalid Input" })
+                    else{
+                        this.setState({ messageToUser: "Activate your account to login" })
                     }
                 })
 
