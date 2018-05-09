@@ -544,15 +544,21 @@ a{
     margin: 15px;
   }
 
-  .document-create-header input{
+  .document-create-header input {
     display: inline-block;
     width: 200px;
     margin: 15px;
   }
 
+  .document-create-header button{
+    display: inline-block;
+    width: 200px;
+
+  }
+
   .document-questions-view{
     border: 1px solid black;
-    padding: 20px;
+    /* padding: 20px; */
     margin: 15px 45px 15px 45px;
     height: 500px;
     overflow-y: scroll;
@@ -560,7 +566,6 @@ a{
 
   .document-question {
     /* border: 1px solid black; */
-    margin-bottom: 25px;
   }
 
   .document-question-name {
@@ -580,6 +585,7 @@ a{
 
   .document-question-answer {
     font-size: 18px;
+    clear: both;
   }
 
   .document-questions-create {
@@ -601,3 +607,24 @@ a{
     margin-left: 10px;
     float: right;
   }
+
+  .document-question-button {
+    margin-left: 7px;
+  }
+
+  /* .document-question-numbers {
+    border: 1px solid black;
+    float: left;
+    width: 5%;
+  }
+
+  .document-question-numbers p{
+    font-size: 18px;
+    padding: 15px;
+  }
+
+  .document-question-content {
+    border: 1px solid black;
+    float: right;
+    width: 95%; */
+  /* } */
