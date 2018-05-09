@@ -49,6 +49,11 @@ const App = createReactClass({
         <Route path="/Contacts" component={Contacts.All} />
         <Route path="/AddContacts" component={Contacts.Create} />
         <Route path="/Messages" component={Messages.All} />
+        <Route path="/Groups" component={Contacts.Groups} />
+        <Route path="/Contacts" component={Contacts.Single} />
+        <Route path="/Messages/:id" component={Messages.Single} />
+        <Route path="/GroupMessages/:id" component={Messages.Group} />
+
       </div>
     </Router>
   },

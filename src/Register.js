@@ -115,7 +115,7 @@ const Register = createReactClass({
             // })
 
             // console.log('after check before register')
-            let query = r.table('users').insert({ id: id,  collegeId: this.state.collegeId,number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "" })
+            let query = r.table('users').insert({ id: id,  collegeId: this.state.collegeId,number: this.state.number, name: (this.state.firstName + " " + this.state.lastName), role: this.state.role, department: this.state.department, recovEmail: this.state.recovEmail, collegeEmail: this.state.collegeEmail, key: key, password: "", courses: [] })
             console.log('logIn Id:', id)
 
             // console.log('after check after register')
@@ -356,7 +356,7 @@ const Register = createReactClass({
                             <hr class="uk-divider-icon" style={{ backgroundColor: '#76323f', opacity: 1 }} />
                         </div>
                         <div class="" style={{
-                            marginLeft: '32%', marginTop: 80, width: 1500
+                            marginLeft: '32%', marginTop: 80, width: 1200
                         }}>
                             <div class="ui large form ">
                                 <div class="fields">
