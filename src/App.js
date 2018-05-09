@@ -5,11 +5,14 @@ import createReactClass from 'create-react-class'
 import Login from './Login'
 import Register from './Register'
 import * as Questions from './Questions'
+import * as Documents from './Documents'
+import * as Documents2 from './Documents2'
 import * as Exams from './Exams'
 import ResetPassword from './ResetPassword'
 import SyntaxHighlightTest from './SyntaxHighlightTest'
 import ForgotPassword from './ForgotPassword'
 import * as Courses from './Courses'
+import * as Students from './Students'
 import Instructors from './Instructors'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import * as Contacts  from './Contacts'
@@ -38,6 +41,9 @@ const App = createReactClass({
         <Route path="/allquestions" component={Questions.All} />
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
+        <Route path="/documents2/:id" component={Documents2.Details} />
+        <Route path="/documents/create" component={Documents.Create} />
+        <Route path="/enroll" component={Students.Enroll} />
         <Route path="/exams/:id" component={Exams.Details} />
         <Route path="/instructors" component={Instructors} />
         <Route path="/Contacts" component={Contacts.All} />

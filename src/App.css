@@ -358,3 +358,246 @@ a{
    /* margin-left: 150vh; */
    
   }
+
+  h1,h3,h4{
+    font-family: 'Roboto', sans-serif;
+    color: black;
+  
+  }
+  h2{
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .addwork{
+  float: left;
+  margin-right: 0.5%;
+  margin-top: 0.25%;
+  font-size: 2%;
+  color:#76323f;
+  
+  }
+  .addwork1{
+    float: right;
+    margin-right: 5%;
+    margin-top: 0.25%;
+    font-size: 2%;
+    color:#76323f;
+  
+    
+    }
+  
+  th{
+  
+   background-color:#76323f;
+   text-align: center;
+   align-items: center;
+   align-content:  center;
+   font-size: 19px;
+  
+  }
+  
+  .radio-table{
+  background-color: #e9e9e9;
+  }
+  ths{
+    /* background-color:#8f8f8f; */
+    text-align: center;
+    align-items: center;
+    align-content:  center;
+    font-size: 19px;
+    font-family: 'Roboto', sans-serif;
+    
+    margin-right: 1%;
+  }
+  
+  
+   td{
+  
+    font-size: 18px;
+   }
+  
+   label{
+   font-size: 17px;
+    color: black;
+   }
+  
+  /* button{
+  
+      width: 40%;
+      background-color: #76323f;  
+      color: white;
+      border-radius: 20px;
+     
+  
+  } */
+  
+  .edit-btn{
+    width: 90%;
+    background-color: #76323f;  
+    color: white;
+    border-radius: 20px;
+  }
+  
+  
+  body{
+     background-color:white;
+    height: 100%;
+   
+  }
+  
+   div.ex1 {
+    height: 20%;
+    overflow: scroll;
+   
+  }
+  
+  
+  .App {
+    text-align: center;
+  }
+  
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 80%;
+  }
+  
+  .App-header {
+    background-color: #222;
+    height: 150%;
+    padding: 20%;
+    color: white;
+   
+  }
+  
+  .App-title {
+    font-size: 1.5em;
+    
+  }
+  
+  .App-intro {
+    font-size: large;
+  }
+  
+  
+  .text-area1{
+    height: 50;
+    max-width: 100%;
+    overflow-x: hidden;
+    width: 73%;
+    margin-left: 1.5%
+  }
+  .quiz-area{
+    /* height:40vh;
+    overflow:scroll;
+    max-width:100%;
+    overflow-x:hidden;
+    border-width: 2vh;
+    border-color: black;
+    color:black;
+    background-color:lightgray;
+    padding:1vh */
+    /* height: 10%; */
+    overflow: scroll;
+    max-width: 75%;
+    overflow-x: hidden;
+    width: 75%;
+    height:500px;
+    background-color:white;
+    
+  }
+  .profile-btn{
+    width: 7%;
+    background-color: #76323f;  
+    color: white;
+    margin: 1%;
+    /* margin-right: 1%;
+    margin-top: 2%; */
+    
+   
+   }
+   .box1{
+     border:1px solid black
+   }
+  
+  .radio-mcq{
+    width: 50px;
+    height:100px;
+    border: 1px solid blue;
+  }
+  
+  .mcq-label{
+    width: 30%;
+    height: 30%;
+    border: 1px solid red;
+  }
+  .mcq-radio-btn{
+    width: 30%;
+    height: 30%;
+    border: 1px solid green;
+  }
+
+  /* namreen */
+
+  .document-create-header{
+    /* border: 1px solid black; */
+    padding: 15px;
+    margin: 15px;
+  }
+
+  .document-create-header input{
+    display: inline-block;
+    width: 200px;
+    margin: 15px;
+  }
+
+  .document-questions-view{
+    border: 1px solid black;
+    padding: 20px;
+    margin: 15px 45px 15px 45px;
+    height: 500px;
+    overflow-y: scroll;
+  }
+
+  .document-question {
+    /* border: 1px solid black; */
+    margin-bottom: 25px;
+  }
+
+  .document-question-name {
+    font-size: 18px;
+    float: left;
+  }
+
+  .document-question-choices {
+    font-size: 17px;
+    clear: both
+  }
+
+  .document-question-options {
+    /* border: 1px solid black; */
+    float: right;
+  }
+
+  .document-question-answer {
+    font-size: 18px;
+  }
+
+  .document-questions-create {
+    /* border: 1px solid black; */
+    padding: 10px;
+    margin: 15px 35px 15px 35px;
+    height: 300px;
+  }
+
+  .document-questions-create textarea {
+    font-size: 16px;
+    resize: none;
+    width: 100%;
+    height: 80%;
+  }
+
+  .document-questions-create button {
+    margin-top: 15px;
+    margin-left: 10px;
+    float: right;
+  }
