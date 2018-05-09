@@ -22,8 +22,9 @@ const Instructors = createReactClass({
     getInitialState() {
         return {
             items: users.slice(0, 3),
-            documents: null,
-            submissions: null,
+            documents: [],
+            submissions: [],
+            studentsubmission: [],
             selectedcourse: null
         };
     },
@@ -52,23 +53,49 @@ const Instructors = createReactClass({
         this.setState({ selectedcourse: courseid })
 
         //get the documents for the course
-        let query = r.table('documents').innerJoin(r.table('courses').get(courseid)('contents'),
-            (action, doc) =>
-                action('id').eq(doc('docid'))).zip().distinct()
+        let query = r.table('documents').innerJoin(
+            r.table('contents').innerJoin(r.table('courses').get(courseid)('contents'),
+                (action, content) =>
+                    action('id').eq(content('contentid'))).zip().distinct(),
+            (action, document) =>
+                action('id').eq(document('docid'))).zip().distinct()
         ReactRethinkdb.DefaultSession.runQuery(query).then(
             (res) => {
-                this.setState({ documents: [...res] })
+                console.log(res)
+                this.setState({ documents: res })
             }
         )
     },
     handleSelectedDocument(docid) {
-        console.log("DID" + docid)
         //get submissions for the document
-        let query = r.table('courses').get(this.state.selectedcourse)('contents').filter({ docid: docid })('submissions')
+        let submissions = []
+        this.state.documents.filter((doc) => doc.docid == docid)[0].submissions.map(
+            (submission) => submissions.push(submission.submissionid)
+        )
+        let query = r.table("submissions").filter(
+            (doc) => {
+                return r.expr(submissions).contains(doc("id"));
+            }
+        )
 
         ReactRethinkdb.DefaultSession.runQuery(query).then(
             (res) => {
-                this.setState({ submissions: [...res] })
+                res.toArray((err, results) => {
+                    this.setState({ submissions: results })
+                });
+            }
+        )
+
+    },
+    handleSelectedSubmission(submissionid) {
+        console.log("sd  " + submissionid)
+        let query = r.table('questions').innerJoin(r.table('submissions').get('8c2b1b4f-6fd8-47dd-9f95-039927a46de4')('answers'),
+            (question, submission) =>
+                question('id').eq(submission('questionid'))).zip().distinct()
+        ReactRethinkdb.DefaultSession.runQuery(query).then(
+            (res) => {
+                console.log(res)
+                this.setState({ studentsubmission: res })
             }
         )
 
@@ -86,7 +113,7 @@ const Instructors = createReactClass({
                         (c) =>
                             <p style={{ paddingLeft: '20px' }}>
                                 <input class="uk-checkbox" type="checkbox" onClick={() => this.handleSelectedCourse(c.id)} /> {c.name}
-                                {c.sections.map((section) => <p style={{ paddingLeft: '40px' }}> {section.sectionNo}</p>)}
+                                {c.sections.map((section) => <p style={{ paddingLeft: '40px' }}> {section.sectionid}</p>)}
                             </p>
 
                     )
@@ -97,9 +124,9 @@ const Instructors = createReactClass({
                     <table >
                         {
                             this.state.documents.map(
-                                (doc) =>
-                                    <tr>
-                                        <th onClick={() => this.handleSelectedDocument(doc.id)} >{doc.name}</th>
+                                (doc, i) =>
+                                    <tr key={i}>
+                                        <td onClick={() => this.handleSelectedDocument(doc.docid)} >{doc.name}</td>
                                     </tr>
                             )
                         }
@@ -112,15 +139,34 @@ const Instructors = createReactClass({
                     <table >
                         {
                             this.state.submissions.map(
-                                (sub) =>
-                                    <tr>
-                                        <th onClick={() => this.handleSelectedSubmission(sub.id)} >{sub.studentid}</th>
+                                (sub, i) =>
+                                    <tr key={i}>
+                                        <td onClick={() => this.handleSelectedSubmission(sub.id)} >{sub.studentid}</td>
                                     </tr>
                             )
                         }
                     </table>
 
                 }
+                <br />
+                {
+                    this.state.studentsubmission
+                    &&
+                    this.state.studentsubmission.map(
+                        (sub, i) =>
+                            <div key={i}>
+                                <h4>{sub.question}</h4>
+                                <h4>{sub.answer}</h4>
+                                <h5>{sub.feedback}</h5>
+                                <h5>{sub.grade}</h5>
+                                <hr/>
+
+                            </div>
+                    )
+
+
+                }
+
             </div>
         )
         // return (
