@@ -25,7 +25,7 @@ export const Single = createReactClass({
     observe(props, state) {
         return {
             messages: new ReactRethinkdb.QueryRequest({
-                query: r.table('users').get("c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a"),
+                query: r.table('users').get("f9724abf-3990-42ea-b3ca-846818fd3f46"),
                 changes: true,
                 initial: [],
             })
@@ -42,7 +42,7 @@ export const Single = createReactClass({
         }
 
         // get the user id from the session
-        let query = r.table('users').get('c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a').update({
+        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
             messages: r.row('messages').append(tempMessage)
         });
 
