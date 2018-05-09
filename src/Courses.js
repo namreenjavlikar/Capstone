@@ -123,13 +123,36 @@ export const Create = createReactClass({
         return {}
     },
 
-    handleSubmit() {
+    async addSections(i) {
+        let sectionsIds = []
+        let secQuery = r.table("sections").insert({ sectionNo: i + 1, students: [] })
+        await ReactRethinkdb.DefaultSession.runQuery(secQuery, { return_changes: true }).then(res => {
+            sectionsIds.push(res.generated_keys[0])
+            console.log("SEC0", sectionsIds)
+        })
+        return sectionsIds
+    },
+
+    async handleSubmit() {
         if (this.state.name.trim() !== "" && this.state.selectedInstructors.length > 0) {
-            console.log(this.state.selectedInstructors)
-            let sections = []
-            this.state.selectedInstructors.map((inst, i) => sections.push({  sectionNo: i + 1, instructorId: inst.id, students: [] }))
-            let query = r.table('courses').insert({ name: this.state.name, sections: sections, contents: [] })
-            ReactRethinkdb.DefaultSession.runQuery(query)
+            //insert the secions and store the id's to use as FK
+            let sectionsIds = []
+            this.state.selectedInstructors.map(async (inst, i) => {
+                await sectionsIds.push(this.addSections(i))
+            })
+            // let sectionsIds = await this.addSections()
+            console.log("OUT", sectionsIds)
+            //insert into the courses table and the users table after inserting the course so all instructors will have FK courseId
+            console.log("SEC2", sectionsIds)
+            let query = r.table('courses').insert({ name: this.state.name, sections: sectionsIds, contents: [] })
+
+            ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
+                let insertedCourseId = res.generated_keys[0]
+                this.state.selectedInstructors.map((inst, i) => {
+                    let queryInst = r.table("users").get(inst.id).update({ courses: r.row("courses").append(insertedCourseId) })
+                    ReactRethinkdb.DefaultSession.runQuery(queryInst)
+                })
+            })
         } else {
             this.setState({ error: "Invalid Input" })
         }
@@ -166,7 +189,7 @@ export const Create = createReactClass({
                         <hr class="uk-divider-icon" />
                         <div class="ui form">
                             <p>name</p>
-                            <input type={"text"} value={this.state.name} onChange={(event) => this.setState({ name: event.target.value, error: ""  })} />
+                            <input type={"text"} value={this.state.name} onChange={(event) => this.setState({ name: event.target.value, error: "" })} />
                             <p>Instructors</p>
                             <select class="ui search dropdown" placeholder={"Select Instructor"} onChange={this.handleSelectInstructor}>
                                 <option value="">Select Instructor</option>
