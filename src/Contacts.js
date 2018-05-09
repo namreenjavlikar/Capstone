@@ -13,7 +13,8 @@ export const All = createReactClass({
 
     getInitialState() {
         return {
-            contacts: []
+            contacts: [],
+            txtUsername: ""
         };
     },
 
@@ -30,16 +31,23 @@ export const All = createReactClass({
         };
     },
 
-    // handleSubmit() {
-    //     let query = r.table('questions').insert({ name: this.state.name, content: this.state.content, answer: this.state.answer });
-    //     ReactRethinkdb.DefaultSession.runQuery(query);
-    //     this.setState({ name: '', content: '', answer: '' })
-    // },
+    handleAddContact() {
 
-    // handleDelete(val) {
-    //     let query = r.table('questions').get(val).delete();
-    //     ReactRethinkdb.DefaultSession.runQuery(query);
-    // },
+        if(this.state.txtMessage = ""){
+            return
+        }
+
+
+        let query = r.table('users').get('6f6ed3b6-ea31-4a4b-b140-a0e892254cf8').update({
+            contacts: r.row('contacts').append({userid : this.state.txtUsername})
+        });
+
+        ReactRethinkdb.DefaultSession.runQuery(query);
+        this.setState({ txtUsername: '' })
+    },
+
+
+
 
     render() {
         return (
@@ -63,7 +71,7 @@ export const All = createReactClass({
                                         return <tr key={item.userid}>
                                             <td>{item.userid}</td>
                                             <td>
-                                                <button disabled onClick={() => this.handleSubmit(item.userid)}>Message</button>
+                                                <button onClick={() => this.props.history.push("/Messages/" + item.userid)}>Message</button>
                                             </td>
                                         </tr>;
                                     })
@@ -73,7 +81,16 @@ export const All = createReactClass({
 
                         </tbody>
                     </table >
+                    <div style={{ padding: 10 }}>
+                        <div class="four wide field">
+                            <input type="text" value={this.state.txtUsername} onChange={(event) => this.setState({ txtUsername: event.target.value })} />
+                        </div>
+                        <button onClick={() => this.handleAddContact()}>add new contact</button>
+                    </div>
+
                 </center>
+
+
             </div>
         )
 
