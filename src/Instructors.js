@@ -22,10 +22,10 @@ const Instructors = createReactClass({
     getInitialState() {
         return {
             items: users.slice(0, 3),
-            documents: [],
+            documents: null,
             submissions: [],
             studentsubmission: [],
-            selectedcourse: null
+            selectedcourses: [],
         };
     },
     observe(props, state) {
@@ -48,23 +48,44 @@ const Instructors = createReactClass({
     handleRemove() {
         this.setState({ items: this.state.items.slice(0, -1) })
     },
-    handleSelectedCourse(courseid) {
+    async handleSelectedCourse(courseid) {
 
-        this.setState({ selectedcourse: courseid })
+        //selecting multiple courses
+        let courseIdIndex = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse == courseid)
+        if (courseIdIndex == -1) {
+            await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
+            console.log("Selected Courses 1 ", this.state.selectedcourses)
+        }
+        else {
+            let selectedcourses = this.state.selectedcourses
+            selectedcourses.splice(courseIdIndex, 1)
+            await this.setState({ selectedcourses })
+            console.log("Selected Courses 2 ", this.state.selectedcourses)
 
-        //get the documents for the course
-        let query = r.table('documents').innerJoin(
-            r.table('contents').innerJoin(r.table('courses').get(courseid)('contents'),
-                (action, content) =>
-                    action('id').eq(content('contentid'))).zip().distinct(),
-            (action, document) =>
-                action('id').eq(document('docid'))).zip().distinct()
-        ReactRethinkdb.DefaultSession.runQuery(query).then(
-            (res) => {
-                console.log(res)
-                this.setState({ documents: res })
-            }
-        )
+        }
+        //get the documents for the course(s)
+        // let documents = []
+        this.setState({documents: []})
+        this.state.selectedcourses.map(async (course, i) => {
+            let query = r.table('documents').innerJoin(
+                r.table('contents').innerJoin(r.table('courses').get(course)('contents'),
+                    (action, content) =>
+                        action('id').eq(content('contentid'))).zip().distinct(),
+                (action, document) =>
+                    action('id').eq(document('docid'))).zip().distinct()
+            await ReactRethinkdb.DefaultSession.runQuery(query).then(
+                (res) => {
+                    console.log("sdfgdg", res)
+                    res.map((r) => this.setState({documents: [...this.state.documents, r]}))
+
+                }
+            )
+        })
+        // console.log("sdfgdg 3", documents)
+        // this.setState({ documents: documents })
+        console.log("STATE :", this.state.documents)
+
+
     },
     handleSelectedDocument(docid) {
         //get submissions for the document
@@ -88,7 +109,6 @@ const Instructors = createReactClass({
 
     },
     handleSelectedSubmission(submissionid) {
-        console.log("sd  " + submissionid)
         let query = r.table('questions').innerJoin(r.table('submissions').get('8c2b1b4f-6fd8-47dd-9f95-039927a46de4')('answers'),
             (question, submission) =>
                 question('id').eq(submission('questionid'))).zip().distinct()
@@ -102,6 +122,7 @@ const Instructors = createReactClass({
 
     },
     render() {
+
         return (
             <div style={{ padding: '20px' }}>
                 <h2>Courses</h2>
@@ -159,7 +180,7 @@ const Instructors = createReactClass({
                                 <h4>{sub.answer}</h4>
                                 <h5>{sub.feedback}</h5>
                                 <h5>{sub.grade}</h5>
-                                <hr/>
+                                <hr />
 
                             </div>
                     )
