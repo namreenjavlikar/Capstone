@@ -42,7 +42,7 @@ const App = createReactClass({
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
         <Route path="/documents2/:id" component={Documents2.Details} />
-        <Route path="/documents/create" component={Documents.Create} />
+        {/* <Route path="/documents/create" component={Documents.Create} /> */}
         <Route path="/enroll" component={Students.Enroll} />
         <Route path="/exams/:id" component={Exams.Details} />
         <Route path="/instructors" component={Instructors} />
