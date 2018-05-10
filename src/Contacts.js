@@ -148,8 +148,6 @@ export const Groups = createReactClass({
             "messages": []
         })
 
-        console.log(this.data.user.value().groups)
-
 
         this.data.user.value().groups.map((item) =>{
             if(item.groupid == this.state.txtGroupName){
