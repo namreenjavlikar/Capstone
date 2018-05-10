@@ -96,8 +96,13 @@ export const Enroll = createReactClass({
 
             let query = r.table('courses').get(courseId).getField("sections").filter({ sectionNo: parseInt(sectionNum) }).getField("students")
             //.filter({sectionNo: sectionNum}).update({students: r.row("students").append({studentId: studentId})  })
+            //getField("students").append({studentId: studentId})
             ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
                 console.log("RES", res)
+                // res.toArray((err, array) => {
+                //     console.log("ARR", array)
+                //     array[0]
+                // })
             })
         })
     },
