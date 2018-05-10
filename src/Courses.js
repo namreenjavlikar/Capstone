@@ -19,22 +19,22 @@ export const All = createReactClass({
     },
 
     async componentWillMount() {
-        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
-            this.props.history.push("/")
-        } else {
-            let query = r.table('users').filter({ role: "Instructor" })
+        // if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
+        //     this.props.history.push("/")
+        // } else {
+        let query = r.table('users').filter({ role: "Instructor" })
 
-            let users = {}
-            await ReactRethinkdb.DefaultSession.runQuery(query).then(
-                (res) => {
-                    res.toArray((err, results) => {
-                        console.log("All Insts", results);
-                        users = results
-                    })
+        let users = {}
+        await ReactRethinkdb.DefaultSession.runQuery(query).then(
+            (res) => {
+                res.toArray((err, results) => {
+                    console.log("All Insts", results);
+                    users = results
                 })
-            this.setState({ allInstructors: users })
-            console.log("ALL ", users)
-        }
+            })
+        this.setState({ allInstructors: users })
+        console.log("ALL ", users)
+        // }
     },
 
     observe(props, state) {
@@ -101,63 +101,51 @@ export const Create = createReactClass({
     },
 
     async componentWillMount() {
-        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
-            this.props.history.push("/")
-        } else {
-            let query = r.table('users').filter({ role: "Instructor" })
+        // if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
+        //     this.props.history.push("/")
+        // } else {
+        let query = r.table('users').filter({ role: "Instructor" })
 
-            let users = {}
-            await ReactRethinkdb.DefaultSession.runQuery(query).then(
-                (res) => {
-                    res.toArray((err, results) => {
-                        console.log("All Insts", results);
-                        users = results
-                    })
+        let users = {}
+        await ReactRethinkdb.DefaultSession.runQuery(query).then(
+            (res) => {
+                res.toArray((err, results) => {
+                    console.log("All Insts", results);
+                    users = results
                 })
-            this.setState({ allInstructors: users })
-            console.log("ALL ", users)
-        }
+            })
+        this.setState({ allInstructors: users })
+        console.log("ALL ", users)
+        // }
     },
 
     observe(props, state) {
         return {}
     },
 
-    async addSections(i) {
-        let sectionsIds = []
-        let secQuery = r.table("sections").insert({ sectionNo: i + 1, students: [] })
-        await ReactRethinkdb.DefaultSession.runQuery(secQuery, { return_changes: true }).then(res => {
-            sectionsIds.push(res.generated_keys[0])
-            console.log("SEC0", sectionsIds)
-        })
-        return sectionsIds
-    },
-
-    async handleSubmit() {
+   
+    handleSubmit() {
         if (this.state.name.trim() !== "" && this.state.selectedInstructors.length > 0) {
-            //insert the secions and store the id's to use as FK
-            let sectionsIds = []
-            this.state.selectedInstructors.map(async (inst, i) => {
-                await sectionsIds.push(this.addSections(i))
-            })
-            // let sectionsIds = await this.addSections()
-            console.log("OUT", sectionsIds)
-            //insert into the courses table and the users table after inserting the course so all instructors will have FK courseId
-            console.log("SEC2", sectionsIds)
-            let query = r.table('courses').insert({ name: this.state.name, sections: sectionsIds, contents: [] })
+
+            let query = r.table('courses').insert({ name: this.state.name, sections: [], contents: [] })
 
             ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
                 let insertedCourseId = res.generated_keys[0]
                 this.state.selectedInstructors.map((inst, i) => {
                     let queryInst = r.table("users").get(inst.id).update({ courses: r.row("courses").append(insertedCourseId) })
                     ReactRethinkdb.DefaultSession.runQuery(queryInst)
+                    let secQuery = r.table("sections").insert({ sectionNo: i + 1, students: [] })
+                    ReactRethinkdb.DefaultSession.runQuery(secQuery, { return_changes: true }).then(res => {
+                        let insertedSectionId = res.generated_keys[0]
+                        let addSection = r.table("courses").get(insertedCourseId).update({ sections: r.row("sections").append(insertedSectionId) })
+                        ReactRethinkdb.DefaultSession.runQuery(addSection)
+                    })
                 })
             })
         } else {
             this.setState({ error: "Invalid Input" })
         }
     },
-
     handleSelectInstructor(event) {
         let id = event.target.value
         console.log("DI", id)
