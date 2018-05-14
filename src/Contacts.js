@@ -121,31 +121,62 @@ export const Groups = createReactClass({
                 query: r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46'),
                 changes: true,
                 initial: [],
-            })
+            }),
+            groupsArray: new ReactRethinkdb.QueryRequest({
+                query: r.table("groups").pluck("id"),
+                changes: true,
+                initial: [],
+            }),
         };
     },
     
     handleAddGroup() {
 
+        let isExist = false
+        let isAlreadyJoined = false
+
         if(this.state.txtGroupName == ""){
             return
         }
 
-        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
+        let addingGroup2UserQuery = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
             groups: r.row('groups').append({groupid : this.state.txtGroupName})
         });
 
-
-        // if the group doesnt exist 
-        let query2 = r.table('groups').insert({
+        let addingGroupQuery = r.table('groups').insert({
             "id": this.state.txtGroupName,
             "messages": []
         })
 
-        // dont forget to do it both ways
 
-        ReactRethinkdb.DefaultSession.runQuery(query);
-        ReactRethinkdb.DefaultSession.runQuery(query2);
+        this.data.user.value().groups.map((item) =>{
+            if(item.groupid == this.state.txtGroupName){
+                isAlreadyJoined= true  
+            }
+        })
+
+
+        // if the group doesnt exist
+        this.data.groupsArray.value().map((item) =>{
+            if(item.id == this.state.txtGroupName){
+                isExist= true  
+            }
+        })
+
+
+        if(isAlreadyJoined){
+            alert("You already joined in the group")
+            return
+        }else{
+            ReactRethinkdb.DefaultSession.runQuery(addingGroup2UserQuery);            
+        }
+
+        if(isExist){
+            console.log("the group exist")
+            
+        }else{
+            ReactRethinkdb.DefaultSession.runQuery(addingGroupQuery);
+        }
 
         this.setState({ txtGroupName: '' })
     },
@@ -157,9 +188,10 @@ export const Groups = createReactClass({
 
         let query2 = r.table('groups').get(value).delete()
 
-
         ReactRethinkdb.DefaultSession.runQuery(query);
-        ReactRethinkdb.DefaultSession.runQuery(query2);
+        // ReactRethinkdb.DefaultSession.runQuery(query2);
+        
+        
     },
 
     render() {
@@ -211,5 +243,3 @@ export const Groups = createReactClass({
 
     },
 });
-
-
