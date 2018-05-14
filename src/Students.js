@@ -11,13 +11,14 @@ export const Enroll = createReactClass({
 
     getInitialState() {
         return {
-            studentIdSearch: "60072692",
+            studentIdSearch: "66180672",
             searchedStudent: null,
             addedStudents: [],
             selectedCourse: "",
             changes: [],
             //students who has been added to a course (before commiting)
             students: [],
+            coursesList: [],
             error: ''
         };
     },
@@ -25,21 +26,31 @@ export const Enroll = createReactClass({
     componentWillMount() {
         if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
             this.props.history.push("/")
+        } else {
+            let query = r.table('courses')
+            ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
+                res.toArray((err, results) => {
+                    results.map(course => {
+                        course.sections.map(section => {
+                            let querySection = r.table('sections').get(section)
+                            ReactRethinkdb.DefaultSession.runQuery(querySection).then(resSec => {
+                                let courseData = { courseId: course.id, courseName: course.name, sectionNo: resSec.sectionNo, sectionId: resSec.id }
+                                this.setState({ coursesList: [...this.state.coursesList, courseData] })
+                                console.log("Record", courseData)
+                            })
+                        })
+                    })
+                })
+            })
         }
     },
 
     observe(props, state) {
-        return {
-            courses: new ReactRethinkdb.QueryRequest({
-                query: r.table('courses'),
-                changes: true,
-                initial: [],
-            })
-        };
+        return { }
     },
 
     handleSearchStudent() {
-        let query = r.table("users").filter({ collegeId: this.state.studentIdSearch, role: "Student" })
+        let query = r.table("users").filter({ number: this.state.studentIdSearch, role: "Student" })
         ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
             res.toArray((err, results) => {
                 if (results.length > 0) {
@@ -91,31 +102,29 @@ export const Enroll = createReactClass({
         this.state.changes.map(record => {
             let splitArray = record.split(" ")
             let courseId = splitArray[0]
-            let sectionNum = splitArray[1]
+            let sectionId = splitArray[1]
             let studentId = splitArray[2]
 
-            let query = r.table('courses').get(courseId).getField("sections").filter({ sectionNo: parseInt(sectionNum) }).getField("students")
-            //.filter({sectionNo: sectionNum}).update({students: r.row("students").append({studentId: studentId})  })
-            //getField("students").append({studentId: studentId})
-            ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
-                console.log("RES", res)
-                // res.toArray((err, array) => {
-                //     console.log("ARR", array)
-                //     array[0]
-                // })
+            let queryStudent = r.table('users').get(studentId).update({
+                courses: r.row('courses').append(courseId)
             })
+            let querySection = r.table('sections').get(sectionId).update({
+                students: r.row('students').append(studentId)
+            })
+            ReactRethinkdb.DefaultSession.runQuery(queryStudent);
+            ReactRethinkdb.DefaultSession.runQuery(querySection);
+
         })
     },
 
     render() {
         return (
-            this.data.courses.value() == []
+            this.state.coursesList === []
                 ?
                 <p>Loading...</p>
                 :
                 <div>
                     <div>
-
                     </div>
                     <center><h1>Enroll a Student</h1>
                     </center>
@@ -124,10 +133,8 @@ export const Enroll = createReactClass({
                     <select class="ui search dropdown" onChange={this.handleSelectCourseSection}>
                         <option value="">Select Course</option>
                         {
-                            this.data.courses.value().map(course =>
-                                course.sections.map(section =>
-                                    <option value={course.id + " " + section.sectionNo}>{course.name} - s{section.sectionNo}</option>
-                                )
+                            this.state.coursesList.map(record =>
+                                <option value={record.courseId + " " + record.sectionId}>{record.courseName} - s{record.sectionNo}</option>
                             )
                         }
                     </select>
@@ -142,7 +149,7 @@ export const Enroll = createReactClass({
                         <div>
                             <p style={{ marginTop: 20 }}>-Changes Made:</p>
                             {this.state.changes.map(item =>
-                                <p>{this.state.students.find(c => c.id === item.split(" ")[2]).name} - {this.data.courses.value().find(c => c.id === item.split(" ")[0]).name}- section: {item.split(" ")[1]} <button onClick={() => this.handleRemoveChange(item)}>Undo</button></p>
+                                <p>{this.state.students.find(c => c.id === item.split(" ")[2]).number} - {this.state.coursesList.find(c => c.sectionId === item.split(" ")[1]).courseName}- section: {this.state.coursesList.find(c => c.sectionId === item.split(" ")[1]).sectionNo} <button onClick={() => this.handleRemoveChange(item)}>Undo</button></p>
                             )}
                             <button onClick={this.handleSubmit}>Commit</button>
                         </div>
