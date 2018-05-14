@@ -11,7 +11,7 @@ export const Enroll = createReactClass({
 
     getInitialState() {
         return {
-            studentIdSearch: "60072692",
+            studentIdSearch: "60082612",
             searchedStudent: null,
             addedStudents: [],
             selectedCourse: "",
