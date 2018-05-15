@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
-import showdown from 'showdown';
-import ReactMarkdown from 'react-markdown'
+// import showdown from 'showdown';
+// import ReactMarkdown from 'react-markdown'
 
 let r = ReactRethinkdb.r;
-let converter = new showdown.Converter();
+// let converter = new showdown.Converter();
 
 
 /// need a param for from and to in order to be complete

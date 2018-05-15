@@ -6,9 +6,18 @@ import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import $ from 'jquery'
 import Question from './Question'
+// import FroalaEditor from 'react-froala-wysiwyg';
 const r = ReactRethinkdb.r;
 
+
 const EditDocument = createReactClass({
+    // config :{
+    //     placeholderText: 'Edit Your Content Here!',
+    //     charCounterCount: false,
+    //     height: 300,
+    //     toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'outdent', 'indent', 'clearFormatting', 'insertTable', 'html']
+    // },
+
     mixins: [ReactRethinkdb.DefaultMixin],
 
     componentDidMount() {
@@ -75,13 +84,19 @@ const EditDocument = createReactClass({
                         <BS.FormControl type="datetime-local" value={this.data.document.value().endDate} placeholder="Enter End Date" onChange={(e) => this.setState({ endDate: e.target.value })} />
                     </div>
 
-                    <div className="document-questions-view"  uk-sortable="handle: .uk-card">
+                    <div className="document-questions-view">
                         {
-                            this.data.document.value().questions.map( (question, index) => 
+                            this.data.document.value().questions.map((question, index) =>
                                 <Question questionId={question} key={index} />
                             )
                         }
                     </div>
+                    {/* <div class="document-questions-create">
+                        <FroalaEditor 
+                            tag='textarea' 
+                            config={this.config}
+                        />
+                    </div> */}
                 </div>
         )
     },

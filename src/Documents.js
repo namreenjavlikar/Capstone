@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import $ from 'jquery'
+
 const r = ReactRethinkdb.r;
 
 export const Create = createReactClass({
