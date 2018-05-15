@@ -2,11 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
-import showdown from 'showdown';
-import ReactMarkdown from 'react-markdown'
+import Userinfo from './Userinfo'
 
 let r = ReactRethinkdb.r;
-let converter = new showdown.Converter();
 
 export const Single = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
@@ -14,15 +12,16 @@ export const Single = createReactClass({
     getInitialState() {
         return {
             contacts: [],
-            txtUsername: ""
+            txtUsername: "",
+            userid: sessionStorage.getItem("user_id")
         };
     },
 
     observe(props, state) {
+       
         return {
             user: new ReactRethinkdb.QueryRequest({
-                // get the id from the session cookie later
-                query: r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46'),
+                query: r.table('users').get(sessionStorage.getItem("user_id")),
                 changes: true,
                 initial: [],
             })
@@ -30,23 +29,38 @@ export const Single = createReactClass({
     },
 
     handleAddContact() {
-
-        if(this.state.txtGroupName = ""){
+        if (this.state.txtGroupName == "") {
             return
         }
-        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
-            contacts: r.row('contacts').append({userid : this.state.txtUsername})
-        });
 
-        // dont forget to do it both ways
+        if (this.state.txtGroupName == this.state.userid) {
+            alert("invalid user")
+            return
+        }
 
-        ReactRethinkdb.DefaultSession.runQuery(query);
-        this.setState({ txtUsername: '' })
+        let findUserquery = r.table('users').get(this.state.txtUsername)
+
+        ReactRethinkdb.DefaultSession.runQuery(findUserquery).then(
+            (res) => {
+                if (res) {
+                    let query1 = r.table('users').get(this.state.userid).update({
+                        contacts: r.row('contacts').append({ userid: this.state.txtUsername })
+                    });
+                    let query2 = r.table('users').get(this.state.txtUsername).update({
+                        contacts: r.row('contacts').append({ userid: this.state.userid })
+                    });
+                    ReactRethinkdb.DefaultSession.runQuery(query1);
+                    ReactRethinkdb.DefaultSession.runQuery(query2);
+                } else {
+                    alert("invalid user")
+                }
+            })
+        
     },
 
     handleDeleteContact(value) {
-        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
-            contacts: r.row('contacts').difference([{userid: value}])
+        let query = r.table('users').get(this.state.userid).update({
+            contacts: r.row('contacts').difference([{ userid: value }])
         })
         ReactRethinkdb.DefaultSession.runQuery(query);
     },
@@ -61,29 +75,35 @@ export const Single = createReactClass({
                 </div>
                 <center><h1>Contacts page</h1>
                 </center>
+
+
                 <br />
                 <center>
                     <table striped bordered condensed hover style={{ width: '70%' }} >
                         <thead>
                             <tr><th>Name</th></tr>
+                            {
+                                console.log(sessionStorage.getItem("user_id"))
+                            }
                         </thead>
                         <tbody>
                             {
-                                this.data.user.value().contacts
-                                    ?
-                                    this.data.user.value().contacts.map((item) => {
-                                        return <tr key={item.userid}>
-                                            <td>{item.userid}</td>
-                                            <td>
-                                                <button onClick={() => this.props.history.push("/Messages/" + item.userid)}>Message</button>
-                                                <button onClick={() => this.handleDeleteContact(item.userid)}>Remove</button>
-
-                                            </td>
-                                        </tr>;
-                                    })
-                                    :
-                                    <p>Loading</p>
+                                    this.data.user.value().contacts
+                                        ?
+                                        this.data.user.value().contacts.map((item) => {
+                                            return <tr key={item.userid}>
+                                                <td><Userinfo id={item.userid} /></td>
+                                                <td>
+                                                    <button onClick={() => this.props.history.push("/Messages/" + item.userid)}>Message</button>
+                                                    <button onClick={() => this.handleDeleteContact(item.userid)}>Remove</button>
+                                                </td>
+                                            </tr>;
+                                        })
+                                        :
+                                        <p>Empty</p>
+                                    
                             }
+
 
                         </tbody>
                     </table >
@@ -110,7 +130,8 @@ export const Groups = createReactClass({
     getInitialState() {
         return {
             groups: [],
-            txtGroupName: ""
+            txtGroupName: "",
+            userid: sessionStorage.getItem("user_id")
         };
     },
 
@@ -118,48 +139,80 @@ export const Groups = createReactClass({
         return {
             user: new ReactRethinkdb.QueryRequest({
                 // get the id from the session cookie later
-                query: r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46'),
+                query: r.table('users').get(sessionStorage.getItem("user_id")),
                 changes: true,
                 initial: [],
-            })
+            }),
+            groupsArray: new ReactRethinkdb.QueryRequest({
+                query: r.table("groups").pluck("id"),
+                changes: true,
+                initial: [],
+            }),
         };
     },
-    
+
     handleAddGroup() {
 
-        if(this.state.txtGroupName == ""){
+        let isExist = false
+        let isAlreadyJoined = false
+
+        if (this.state.txtGroupName == "") {
             return
         }
 
-        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
-            groups: r.row('groups').append({groupid : this.state.txtGroupName})
+        let addingGroup2UserQuery = r.table('users').get(this.state.userid).update({
+            groups: r.row('groups').append({ groupid: this.state.txtGroupName })
         });
 
-
-        // if the group doesnt exist 
-        let query2 = r.table('groups').insert({
+        let addingGroupQuery = r.table('groups').insert({
             "id": this.state.txtGroupName,
             "messages": []
         })
 
-        // dont forget to do it both ways
 
-        ReactRethinkdb.DefaultSession.runQuery(query);
-        ReactRethinkdb.DefaultSession.runQuery(query2);
+        this.data.user.value().groups.map((item) => {
+            if (item.groupid == this.state.txtGroupName) {
+                isAlreadyJoined = true
+            }
+        })
+
+
+        // if the group doesnt exist
+        this.data.groupsArray.value().map((item) => {
+            if (item.id == this.state.txtGroupName) {
+                isExist = true
+            }
+        })
+
+
+        if (isAlreadyJoined) {
+            alert("You already joined in the group")
+            return
+        } else {
+            ReactRethinkdb.DefaultSession.runQuery(addingGroup2UserQuery);
+        }
+
+        if (isExist) {
+            console.log("the group exist")
+
+        } else {
+            ReactRethinkdb.DefaultSession.runQuery(addingGroupQuery);
+        }
 
         this.setState({ txtGroupName: '' })
     },
 
     handleDeleteContact(value) {
-        let query = r.table('users').get('f9724abf-3990-42ea-b3ca-846818fd3f46').update({
-            groups: r.row('groups').difference([{groupid: value}])
+        let query = r.table('users').get(this.state.userid).update({
+            groups: r.row('groups').difference([{ groupid: value }])
         })
 
         let query2 = r.table('groups').get(value).delete()
 
-
         ReactRethinkdb.DefaultSession.runQuery(query);
-        ReactRethinkdb.DefaultSession.runQuery(query2);
+        // ReactRethinkdb.DefaultSession.runQuery(query2);
+
+
     },
 
     render() {
@@ -211,5 +264,3 @@ export const Groups = createReactClass({
 
     },
 });
-
-
