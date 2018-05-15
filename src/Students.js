@@ -32,9 +32,9 @@ export const Enroll = createReactClass({
                 res.toArray((err, results) => {
                     results.map(course => {
                         course.sections.map(section => {
-                            let querySection = r.table('sections').get(section.sectionId)
+                            let querySection = r.table('sections').get(section.sectionid)
                             ReactRethinkdb.DefaultSession.runQuery(querySection).then(resSec => {
-                                let courseData = { courseId: course.id, courseName: course.name, sectionNo: resSec.sectionNo, sectionId: resSec.id }
+                                let courseData = { courseid: course.id, courseName: course.name, sectionNo: resSec.sectionNo, sectionid: resSec.id }
                                 this.setState({ coursesList: [...this.state.coursesList, courseData] })
                                 console.log("Record", courseData)
                             })
@@ -108,16 +108,18 @@ export const Enroll = createReactClass({
             let studentId = splitArray[2]
 
             let queryStudent = r.table('users').get(studentId).update({
-                courses: r.row('courses').append({ courseId: courseId })
+                courses: r.row('courses').append({ courseid: courseId })
             })
             let querySection = r.table('sections').get(sectionId).update({
-                students: r.row('students').append({ studentId: studentId })
+                students: r.row('students').append({ studentid: studentId })
             })
             ReactRethinkdb.DefaultSession.runQuery(queryStudent);
             ReactRethinkdb.DefaultSession.runQuery(querySection);
 
         })
     },
+
+
 
     render() {
         return (
@@ -136,7 +138,7 @@ export const Enroll = createReactClass({
                         <option value="">Select Course</option>
                         {
                             this.state.coursesList.map(record =>
-                                <option value={record.courseId + " " + record.sectionId}>{record.courseName} - s{record.sectionNo}</option>
+                                <option value={record.courseId + " " + record.sectionid}>{record.courseName} - s{record.sectionNo}</option>
                             )
                         }
                     </select>
@@ -151,7 +153,7 @@ export const Enroll = createReactClass({
                         <div>
                             <p style={{ marginTop: 20 }}>-Changes Made:</p>
                             {this.state.changes.map(item =>
-                                <p>{this.state.students.find(c => c.id === item.split(" ")[2]).number} - {this.state.coursesList.find(c => c.sectionId === item.split(" ")[1]).courseName}- section: {this.state.coursesList.find(c => c.sectionId === item.split(" ")[1]).sectionNo} <button onClick={() => this.handleRemoveChange(item)}>Undo</button></p>
+                                <p>{this.state.students.find(c => c.id === item.split(" ")[2]).number} - {this.state.coursesList.find(c => c.sectionid === item.split(" ")[1]).courseName}- section: {this.state.coursesList.find(c => c.sectionid === item.split(" ")[1]).sectionNo} <button onClick={() => this.handleRemoveChange(item)}>Undo</button></p>
                             )}
                             <button onClick={this.handleSubmit}>Commit</button>
                         </div>
@@ -168,8 +170,10 @@ export const Home = createReactClass({
 
     getInitialState() {
         return {
-            student: null,
-            courses: [],
+            documents: null,
+            selectedcourses: [],
+            questions: [],
+            answers: []
         };
     },
 
@@ -179,7 +183,6 @@ export const Home = createReactClass({
         }
         // else {
         //     let query = r.table('users').get(sessionStorage.getItem("user_id"))
-
         //     ReactRethinkdb.DefaultSession.runQuery(query).then(
         //         (res) => {
         //             this.setState({ student: res })
@@ -189,26 +192,161 @@ export const Home = createReactClass({
     },
 
     observe(props, state) {
+        //this.setState({ messageToUser: "Invalid Input" })
         return {
+            courses: new ReactRethinkdb.QueryRequest({
+                query: r.table('courses')
+                    .innerJoin(r.table('users').get(sessionStorage.getItem("user_id"))('courses'),
+                        (action, user) =>
+                            action('id').eq(user('courseid'))).zip(),
+                changes: false,
+                initial: null,
+            }),
             student: new ReactRethinkdb.QueryRequest({
                 query: r.table('users').get(sessionStorage.getItem("user_id")),
                 changes: true,
                 initial: null,
-            })
+            }),
         };
+    },
+
+    async handleSelectedCourse(courseid) {
+        console.log("S1 IN")
+        let courseIdIndex = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse == courseid)
+        if (courseIdIndex == -1) {
+            await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
+            console.log("Selected Courses 1 ", this.state.selectedcourses)
+        }
+        else {
+            let selectedcourses = this.state.selectedcourses
+            selectedcourses.splice(courseIdIndex, 1)
+            await this.setState({ selectedcourses })
+            console.log("Selected Courses 2 ", this.state.selectedcourses)
+
+        }
+        this.setState({ documents: [] })
+        this.state.selectedcourses.map(async (course, i) => {
+            let query = r.table('documents').innerJoin(
+                r.table('contents').innerJoin(r.table('courses').get(course)('contents'),
+                    (action, content) =>
+                        action('id').eq(content('contentid'))).zip().distinct(),
+                (action, document) =>
+                    action('id').eq(document('docid'))).zip().distinct()
+            await ReactRethinkdb.DefaultSession.runQuery(query).then(
+                (res) => {
+                    console.log("sdfgdg", res)
+                    res.map((r) => this.setState({ documents: [...this.state.documents, r] }))
+
+                }
+            )
+        })
+    },
+
+    handleSelectedDocument(docid) {
+        //get submissions for the document
+        let questions = []
+        let answers = []
+        let query = r.table('questions').innerJoin(
+            r.table('documents').get(docid)('questions'),
+            (question, documents) => question('id').eq(documents('questionid'))).zip()
+
+        ReactRethinkdb.DefaultSession.runQuery(query).then(
+            (res) => {
+                res.toArray((err, results) => {
+                    results.map(res => answers.push(""))
+                    this.setState({ questions: results, answers })
+                });
+            }
+        )
+        // let submissions = []
+        // this.state.documents.filter((doc) => doc.docid == docid)[0].submissions.map(
+        //     (submission) => submissions.push(submission.submissionid)
+        // )
+        // let query = r.table("submissions").filter(
+        //     (doc) => {
+        //         return r.expr(submissions).contains(doc("id"));
+        //     }
+        // )
+
+        // ReactRethinkdb.DefaultSession.runQuery(query).then(
+        //     (res) => {
+        //         res.toArray((err, results) => {
+        //             this.setState({ submissions: results })
+        //         });
+        //     }
+        // )
+
+    },
+
+    handleAnswer(e, i) {
+        let text = e.target.value
+        let updated = this.state.answers
+        updated[i] = text
+        this.setState({answers: updated})
+    },
+
+    handleSubmitContent() {
+        let answers = []
+        this.state.answers.map((ans, i) => {
+            answers.push({
+                answer: ans,
+                questionid: this.state.questions[i].id
+            })
+        })
+        let query = r.table("submissions").insert({studentid: sessionStorage.getItem("user_id"), answers: answers})
+        ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
     render() {
         return (
-            this.data.student.value()
-            ?
             <div>
-                <div style={{ marginLeft: 130, marginRight: 5 }}>
-                    <p>Welcome {this.data.student.value().name}, </p>
-                </div>
+                {
+                    this.data.student.value() != null
+                    &&
+                    <h3>Welcome {this.data.student.value().name}</h3>
+                }
+                {
+                    this.data.courses.value() != null
+                    &&
+                    this.data.courses.value().map(
+                        (c) =>
+                            <p style={{ paddingLeft: '20px' }}>
+                                <input class="uk-checkbox" type="checkbox" onClick={() => this.handleSelectedCourse(c.id)} /> {c.name}
+                            </p>
+                    )
+                }
+                {
+                    this.state.documents
+                    &&
+                    <table >
+                        {
+                            this.state.documents.map(
+                                (doc, i) =>
+                                    <tr key={i}>
+                                        <td onClick={() => this.handleSelectedDocument(doc.docid)}>{doc.name}</td>
+                                    </tr>
+                            )
+                        }
+                    </table>
+                }
+                {
+                    this.state.questions.length > 0
+                    &&
+                    <div style={{ marginTop: 20 }}>
+                        {
+                            this.state.questions.map(
+                                (q, i) =>
+                                    <p key={i}>
+                                        <h4>{q.question}</h4><br />
+                                        <input type={"text"} value={this.state.answers[i]} onChange={(e) => this.handleAnswer(e, i)}/>
+                                    </p>
+                            )
+                        }
+                        <button onClick={() => this.handleSubmitContent()}>Submit</button>
+                    </div>
+                }
             </div>
-            :
-            <p>Loading</p>
+
         );
     },
 });
