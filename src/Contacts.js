@@ -21,7 +21,6 @@ export const Single = createReactClass({
        
         return {
             user: new ReactRethinkdb.QueryRequest({
-
                 query: r.table('users').get(sessionStorage.getItem("user_id")),
                 changes: true,
                 initial: [],
@@ -30,8 +29,12 @@ export const Single = createReactClass({
     },
 
     handleAddContact() {
+        if (this.state.txtGroupName == "") {
+            return
+        }
 
-        if (this.state.txtGroupName = "") {
+        if (this.state.txtGroupName == this.state.userid) {
+            alert("invalid user")
             return
         }
 
@@ -39,20 +42,19 @@ export const Single = createReactClass({
 
         ReactRethinkdb.DefaultSession.runQuery(findUserquery).then(
             (res) => {
-                console.log(res)
                 if (res) {
-                    let query = r.table('users').get(this.state.userid).update({
+                    let query1 = r.table('users').get(this.state.userid).update({
                         contacts: r.row('contacts').append({ userid: this.state.txtUsername })
                     });
-                    ReactRethinkdb.DefaultSession.runQuery(query);
+                    let query2 = r.table('users').get(this.state.txtUsername).update({
+                        contacts: r.row('contacts').append({ userid: this.state.userid })
+                    });
+                    ReactRethinkdb.DefaultSession.runQuery(query1);
+                    ReactRethinkdb.DefaultSession.runQuery(query2);
                 } else {
                     alert("invalid user")
                 }
-
             })
-
-        // dont forget to do it both ways
-
         
     },
 
@@ -129,7 +131,7 @@ export const Groups = createReactClass({
         return {
             groups: [],
             txtGroupName: "",
-            userid: "f9724abf-3990-42ea-b3ca-846818fd3f46"
+            userid: sessionStorage.getItem("user_id")
         };
     },
 
@@ -137,7 +139,7 @@ export const Groups = createReactClass({
         return {
             user: new ReactRethinkdb.QueryRequest({
                 // get the id from the session cookie later
-                query: r.table('users').get(this.state.userid),
+                query: r.table('users').get(sessionStorage.getItem("user_id")),
                 changes: true,
                 initial: [],
             }),
