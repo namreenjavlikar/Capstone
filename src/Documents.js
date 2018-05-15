@@ -36,9 +36,9 @@ export const Create = createReactClass({
     async changeOrder(e) {
         const id = e.originalEvent.detail[1].id
         console.log("id", id)
-        const order = Array.from(e.target.childNodes).map((item) => { return item.id })
-        console.log("order", order)
-        await this.setState({ order })
+        // const order = Array.from(e.target.childNodes).map((item) => { return item.id })
+        // console.log("order", order)
+        // await this.setState({ order })
     },
 
     async handleAddQuestion() {
