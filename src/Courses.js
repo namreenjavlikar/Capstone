@@ -19,9 +19,9 @@ export const All = createReactClass({
     },
 
     async componentWillMount() {
-        // if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
-        //     this.props.history.push("/")
-        // } else {
+        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
+            this.props.history.push("/")
+        } else {
         let query = r.table('users').filter({ role: "Instructor" })
 
         let users = {}
@@ -34,7 +34,7 @@ export const All = createReactClass({
             })
         this.setState({ allInstructors: users })
         console.log("ALL ", users)
-        // }
+        }
     },
 
     observe(props, state) {
@@ -132,12 +132,12 @@ export const Create = createReactClass({
             ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
                 let insertedCourseId = res.generated_keys[0]
                 this.state.selectedInstructors.map((inst, i) => {
-                    let queryInst = r.table("users").get(inst.id).update({ courses: r.row("courses").append(insertedCourseId) })
+                    let queryInst = r.table("users").get(inst.id).update({ courses: r.row("courses").append({courseId: insertedCourseId}) })
                     ReactRethinkdb.DefaultSession.runQuery(queryInst)
                     let secQuery = r.table("sections").insert({ sectionNo: i + 1, students: [] })
                     ReactRethinkdb.DefaultSession.runQuery(secQuery, { return_changes: true }).then(res => {
                         let insertedSectionId = res.generated_keys[0]
-                        let addSection = r.table("courses").get(insertedCourseId).update({ sections: r.row("sections").append(insertedSectionId) })
+                        let addSection = r.table("courses").get(insertedCourseId).update({ sections: r.row("sections").append({sectionId: insertedSectionId}) })
                         ReactRethinkdb.DefaultSession.runQuery(addSection)
                     })
                 })
@@ -159,9 +159,15 @@ export const Create = createReactClass({
             this.setState({ dropDownSelection: id })
             let instructor = this.state.allInstructors.find((inst) => inst.id === id)
             this.setState({ selectedInstructors: [...this.state.selectedInstructors, instructor] })
-            this.setState({ dropDownSelection: '' })
             console.log("IN", instructor)
         }
+    },
+
+    handleRemoveInstructor(instructor) {
+        let index = this.state.selectedInstructors.findIndex(x => x === instructor)
+        let newInstructorsList = this.state.selectedInstructors
+        newInstructorsList.splice(index, 1)
+        this.setState({ selectedInstructors: newInstructorsList })
     },
 
     render() {
@@ -188,7 +194,7 @@ export const Create = createReactClass({
                                 }
                             </select>
                             <button onClick={this.handleAddInstructor}>Add Instructor</button><br />
-                            Selected Instructors: {this.state.selectedInstructors.map(inst => <p>{inst.name}</p>)}<br />
+                            Selected Instructors: {this.state.selectedInstructors.map(inst => <p>{inst.name} <button onClick={() => this.handleRemoveInstructor(inst)}>Undo</button></p>)}<br />
                             <button onClick={this.handleSubmit}>Submit</button>
                             <br />
                             {this.state.error}

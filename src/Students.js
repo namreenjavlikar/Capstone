@@ -11,7 +11,7 @@ export const Enroll = createReactClass({
 
     getInitialState() {
         return {
-            studentIdSearch: "60082612",
+            studentIdSearch: "60083589",
             searchedStudent: null,
             addedStudents: [],
             selectedCourse: "",
@@ -32,7 +32,7 @@ export const Enroll = createReactClass({
                 res.toArray((err, results) => {
                     results.map(course => {
                         course.sections.map(section => {
-                            let querySection = r.table('sections').get(section)
+                            let querySection = r.table('sections').get(section.sectionId)
                             ReactRethinkdb.DefaultSession.runQuery(querySection).then(resSec => {
                                 let courseData = { courseId: course.id, courseName: course.name, sectionNo: resSec.sectionNo, sectionId: resSec.id }
                                 this.setState({ coursesList: [...this.state.coursesList, courseData] })
@@ -46,11 +46,11 @@ export const Enroll = createReactClass({
     },
 
     observe(props, state) {
-        return { }
+        return {}
     },
 
     handleSearchStudent() {
-        let query = r.table("users").filter({ number: this.state.studentIdSearch, role: "Student" })
+        let query = r.table("users").filter({ collegeId: this.state.studentIdSearch, role: "Student" })
         ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
             res.toArray((err, results) => {
                 if (results.length > 0) {
@@ -66,7 +66,7 @@ export const Enroll = createReactClass({
     handleSelectCourseSection(event) {
         console.log(event.target.value)
         let course = event.target.value
-        //split by space (" ") to get the course id in pos 0 and section num in pos 1
+        //split by space (" ") to get the course id in pos 0 and section id in pos 1
         this.setState({ selectedCourse: course, error: "" })
     },
 
@@ -78,8 +78,12 @@ export const Enroll = createReactClass({
             console.log("Item", item)
 
             if (this.state.changes.findIndex(x => x === item) === -1) {
-                this.setState({ changes: [...this.state.changes, item], students: [...this.state.students, this.state.searchedStudent] })
-                console.log("SSS", this.state.changes)
+                if (this.state.changes.findIndex(x => x.split(" ")[0] === item.split(" ")[0] && x.split(" ")[2] === item.split(" ")[2]) === -1 ) {
+                    this.setState({ changes: [...this.state.changes, item], students: [...this.state.students, this.state.searchedStudent] })
+                    console.log("SSS", this.state.changes)
+                } else {
+                    this.setState({ error: "student already in one section" })
+                }
             } else {
                 this.setState({ error: "duplicate" })
             }
@@ -90,8 +94,6 @@ export const Enroll = createReactClass({
     },
 
     handleRemoveChange(record) {
-        console.log("REC", record)
-        console.log("Whole", this.state.changes)
         let index = this.state.changes.findIndex(x => x === record)
         let newChangesList = this.state.changes
         newChangesList.splice(index, 1)
@@ -106,10 +108,10 @@ export const Enroll = createReactClass({
             let studentId = splitArray[2]
 
             let queryStudent = r.table('users').get(studentId).update({
-                courses: r.row('courses').append(courseId)
+                courses: r.row('courses').append({ courseId: courseId })
             })
             let querySection = r.table('sections').get(sectionId).update({
-                students: r.row('students').append(studentId)
+                students: r.row('students').append({ studentId: studentId })
             })
             ReactRethinkdb.DefaultSession.runQuery(queryStudent);
             ReactRethinkdb.DefaultSession.runQuery(querySection);
@@ -161,36 +163,26 @@ export const Enroll = createReactClass({
     },
 });
 
-export const SomethingElse = createReactClass({
+export const Home = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     getInitialState() {
         return {
-            name: "",
-            semester: "",
-            allInstructors: [],
-            selectedInstructors: [],
-            dropDownSelection: "",
-            error: ""
+            student: null,
+            courses: [],
         };
     },
 
     async componentWillMount() {
-        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
+        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Student") {
             this.props.history.push("/")
         } else {
-            let query = r.table('users').filter({ role: "Instructor" })
+            let query = r.table('users').get(sessionStorage.getItem("user_id"))
 
-            let users = {}
             await ReactRethinkdb.DefaultSession.runQuery(query).then(
                 (res) => {
-                    res.toArray((err, results) => {
-                        console.log("All Insts", results);
-                        users = results
-                    })
+                    this.setState({ student: res })
                 })
-            this.setState({ allInstructors: users })
-            console.log("ALL ", users)
         }
     },
 
