@@ -46,6 +46,7 @@ const App = createReactClass({
         <Route exact path="/documents/create" component={Documents.Create} />
         <Route exact path="/documents/:id" component={EditDocument} />
         <Route path="/enroll" component={Students.Enroll} />
+        <Route path="/studenthome" component={Students.Home} />
         <Route path="/exams/:id" component={Exams.Details} />
         <Route path="/instructors" component={Instructors} />
         {/* <Route path="/Contacts" component={Contacts.All} />

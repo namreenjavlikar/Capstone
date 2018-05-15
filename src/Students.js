@@ -78,7 +78,7 @@ export const Enroll = createReactClass({
             console.log("Item", item)
 
             if (this.state.changes.findIndex(x => x === item) === -1) {
-                if (this.state.changes.findIndex(x => x.split(" ")[0] === item.split(" ")[0] && x.split(" ")[2] === item.split(" ")[2]) === -1 ) {
+                if (this.state.changes.findIndex(x => x.split(" ")[0] === item.split(" ")[0] && x.split(" ")[2] === item.split(" ")[2]) === -1) {
                     this.setState({ changes: [...this.state.changes, item], students: [...this.state.students, this.state.searchedStudent] })
                     console.log("SSS", this.state.changes)
                 } else {
@@ -173,80 +173,42 @@ export const Home = createReactClass({
         };
     },
 
-    async componentWillMount() {
+    componentWillMount() {
         if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Student") {
             this.props.history.push("/")
-        } else {
-            let query = r.table('users').get(sessionStorage.getItem("user_id"))
-
-            await ReactRethinkdb.DefaultSession.runQuery(query).then(
-                (res) => {
-                    this.setState({ student: res })
-                })
         }
+        // else {
+        //     let query = r.table('users').get(sessionStorage.getItem("user_id"))
+
+        //     ReactRethinkdb.DefaultSession.runQuery(query).then(
+        //         (res) => {
+        //             this.setState({ student: res })
+        //             console.log("here", res)
+        //         })
+        // }
     },
 
     observe(props, state) {
-        return {}
-    },
-
-    handleSubmit() {
-        // let query = r.table('courses').insert({ name: this.state.name, semester: this.state.semester, instructors: instructors, exams: [] });
-        // ReactRethinkdb.DefaultSession.runQuery(query);
-    },
-
-    handleSelectInstructor(event) {
-        let id = event.target.value
-        console.log("DI", id)
-        this.setState({ dropDownSelection: id, error: "" })
-    },
-
-    handleAddInstructor() {
-        let id = this.state.dropDownSelection
-        console.log("ID", id)
-        if (id !== "" && !this.state.selectedInstructors.find(x => x.id === id)) {
-            this.setState({ dropDownSelection: id })
-            let instructor = this.state.allInstructors.find((inst) => inst.id === id)
-            this.setState({ selectedInstructors: [...this.state.selectedInstructors, instructor] })
-            this.setState({ dropDownSelection: '' })
-            console.log("IN", instructor)
-        }
+        return {
+            student: new ReactRethinkdb.QueryRequest({
+                query: r.table('users').get(sessionStorage.getItem("user_id")),
+                changes: true,
+                initial: null,
+            })
+        };
     },
 
     render() {
         return (
+            this.data.student.value()
+            ?
             <div>
-
                 <div style={{ marginLeft: 130, marginRight: 5 }}>
-
-                    <div class="ui raised very padded text container segment" style={{ height: '100vh' }}>
-                        <center>
-                            <h2 class="ui  header">Create a Course</h2>
-                        </center>
-                        <hr class="uk-divider-icon" />
-                        <div class="ui form">
-                            <p>name</p>
-                            <input type={"text"} value={this.state.name} onChange={(event) => this.setState({ name: event.target.value, error: "" })} />
-                            <p>semester</p>
-                            <input type={"text"} value={this.state.semester} onChange={(event) => this.setState({ semester: event.target.value, error: "" })} />
-                            <p>Instructors</p>
-                            <select class="ui search dropdown" placeholder={"Select Instructor"} onChange={this.handleSelectInstructor}>
-                                <option value="">Select Instructor</option>
-                                {
-                                    this.state.allInstructors.map(instructor =>
-                                        <option value={instructor.id}>{instructor.name}</option>
-                                    )
-                                }
-                            </select>
-                            <button onClick={this.handleAddInstructor}>Add Instructor</button><br />
-                            Selected Instructors: {this.state.selectedInstructors.map(inst => <p>{inst.name}</p>)}<br />
-                            <button onClick={this.handleSubmit}>Submit</button>
-                            <br />
-                            {this.state.error}
-                        </div>
-                    </div>
+                    <p>Welcome {this.data.student.value().name}, </p>
                 </div>
             </div>
+            :
+            <p>Loading</p>
         );
     },
 });
