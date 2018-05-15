@@ -18,6 +18,7 @@ import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom
 import * as Contacts  from './Contacts'
 import * as Messages  from './Messages'
 import EditDocument from './EditDocument'
+import Question from './Question'
 
 let r = ReactRethinkdb.r
 
