@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { Button, Image, List, Transition, Form } from 'semantic-ui-react'
 import * as BS from 'react-bootstrap'
 import React from 'react';
@@ -6,7 +5,7 @@ import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import $ from 'jquery'
-let r = ReactRethinkdb.r;
+const r = ReactRethinkdb.r;
 
 export const Create = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
@@ -35,12 +34,9 @@ export const Create = createReactClass({
     },
 
     async changeOrder(e) {
-        let id = e.originalEvent.detail[1].id
+        const id = e.originalEvent.detail[1].id
         console.log("id", id)
-        let order = []
-        for (let i = 0; i < e.target.childNodes.length; i++) {
-            order.push(e.target.childNodes[i].id)
-        }
+        const order = Array.from(e.target.childNodes).map((item) => { return item.id })
         console.log("order", order)
         await this.setState({ order })
     },
@@ -51,44 +47,46 @@ export const Create = createReactClass({
 
         let questions = []
         let question = null
-        for (let i = 0; i < lines.length; i++) {
-            if (lines[i] !== "") {
-                if (lines[i].startsWith('Title:')) {
+        lines.forEach(line => {
+            if (line !== "") {
+                if (line.startsWith('Title:')) {
                     question != null && questions.push(question)
                     question = {}
-                    question.title = lines[i].split(":")[1].trim()
+                    question.title = line.split(":")[1].trim()
                 }
                 else if (question.title && !question.question) {
-                    question.question = lines[i]
+                    question.question = line
                     question.choices = []
                 }
                 else if (question.title && question.question) {
-                    if (lines[i].startsWith("*")) {
-                        if (lines[i].includes(")")) {
-                            question.answer = lines[i].split(")")[1].trim()
+                    if (line.startsWith("*")) {
+                        if (line.includes(")")) {
+                            question.answer = line.split(")")[1].trim()
                         }
                         else {
-                            question.answer = lines[i].substring(1)
+                            question.answer = line.substring(1)
                         }
                     }
-                    if (lines[i].includes(")")) {
-                        question.choices.push(lines[i].split(")")[1].trim())
+                    if (line.includes(")")) {
+                        question.choices.push(line.split(")")[1].trim())
                     }
                 }
             }
-        }
+        });
 
         question != null && questions.push(question)
         console.log("questions", questions)
 
-        let newQuestions = this.state.questions;
-        let newOrder = this.state.order
-        questions.map((question) => {
-            newQuestions.push(question)
-            newOrder.push(newOrder.length + "");
+        // make a new array of number/strings starting at this.state.order.length of size questions.length
+        console.log("order1", this.state.order)
+        await this.setState({
+            questions: [...this.state.questions, ...questions],
+            content: "",
+            order: [
+                ...this.state.order,
+                ...Array.from({ length: questions.length },(item, index) => this.state.order.length + index)
+            ]
         })
-
-        await this.setState({ questions: newQuestions, content: "", order: newOrder })
         console.log("newOrder", this.state.order)
     },
 
@@ -99,7 +97,7 @@ export const Create = createReactClass({
         newOrder.splice(newOrder.findIndex((item) => item == id), 1)
         newQuestions.splice(newQuestions.findIndex((item) => item == question), 1)
         await this.setState({ questions: newQuestions, order: newOrder })
-        console.log("newOrder", this.state.order)
+        console.log("deleteorder", this.state.order)
     },
 
     handleSelectType(eventKey) {
@@ -116,7 +114,7 @@ export const Create = createReactClass({
         else {
             content = "Title: " + question.title + "\n" +
                 question.question + "\n"
-            question.choices.map((choice, index) => {
+            question.choices.forEach((choice, index) => {
                 if (choice == question.answer) {
                     content += "*" + (index + 1) + ") " + choice + "\n"
                 }
@@ -147,8 +145,9 @@ export const Create = createReactClass({
             newQuestions.push(this.state.questions[parseInt(item)])
         })
 
+        // loop through questions, 
         let questionIds = []
-        for (let i =0; i < newQuestions.length; i++) {
+        for (let i = 0; i < newQuestions.length; i++) {
             let query = r.table('questions').insert({
                 title: newQuestions[i].title,
                 question: newQuestions[i].question,
@@ -176,7 +175,7 @@ export const Create = createReactClass({
 
     async getQuestionIds(newQuestions) {
         let questionIds = []
-        newQuestions.map( (question) => {
+        newQuestions.map((question) => {
             let query = r.table('questions').insert({
                 title: question.title,
                 question: question.question,
@@ -190,6 +189,21 @@ export const Create = createReactClass({
             })
         })
         return questionIds
+    },
+
+    handleCreateDocument() {
+        let query = r.table('documents').insert({
+            type: "Quiz",
+            name: "New Document",
+            startDate: "",
+            endDate: "",
+            dueDate: "",
+            questions: []
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
+            this.props.history.push(`/documents/${res.generated_keys[0]}`)
+            console.log("gen", res.generated_keys[0])
+        })
     },
 
     render() {
@@ -247,12 +261,14 @@ export const Create = createReactClass({
                         }
                     </div>
                 </div>
+
                 <div className="document-questions-create">
                     <BS.FormControl componentClass="textarea" placeholder="Enter Questions" value={this.state.content} onChange={(e) => this.setState({ content: e.target.value })} />
                     <BS.Button bsStyle="primary" onClick={() => this.handleCreate()}>Done</BS.Button>
                     <BS.Button bsStyle="primary">Upload</BS.Button>
                     <BS.Button bsStyle="primary" onClick={() => this.handleAddQuestion()}>Add Question</BS.Button>
                     <BS.Button bsStyle="primary" onClick={() => this.handleEditQuestion()}>Edit Question</BS.Button>
+                    <BS.Button bsStyle="primary" onClick={() => this.handleCreateDocument()}>Create Document</BS.Button>
                 </div>
             </div>
         )
