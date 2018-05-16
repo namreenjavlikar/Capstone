@@ -24,9 +24,9 @@ export const Enroll = createReactClass({
     },
 
     componentWillMount() {
-        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
-            this.props.history.push("/")
-        } else {
+        // if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
+        //     this.props.history.push("/")
+        // } else {
             let query = r.table('courses')
             ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
                 res.toArray((err, results) => {
@@ -42,7 +42,7 @@ export const Enroll = createReactClass({
                     })
                 })
             })
-        }
+        // }
     },
 
     observe(props, state) {
@@ -90,7 +90,6 @@ export const Enroll = createReactClass({
         } else {
             this.setState({ error: "select a course" })
         }
-
     },
 
     handleRemoveChange(record) {
@@ -138,7 +137,7 @@ export const Enroll = createReactClass({
                         <option value="">Select Course</option>
                         {
                             this.state.coursesList.map(record =>
-                                <option value={record.courseId + " " + record.sectionid}>{record.courseName} - s{record.sectionNo}</option>
+                                <option value={record.courseid + " " + record.sectionid}>{record.courseName} - s{record.sectionNo}</option>
                             )
                         }
                     </select>
@@ -178,9 +177,9 @@ export const Home = createReactClass({
     },
 
     componentWillMount() {
-        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Student") {
-            this.props.history.push("/")
-        }
+        // if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Student") {
+        //     this.props.history.push("/")
+        // }
         // else {
         //     let query = r.table('users').get(sessionStorage.getItem("user_id"))
         //     ReactRethinkdb.DefaultSession.runQuery(query).then(

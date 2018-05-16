@@ -28,7 +28,12 @@ export const Single = createReactClass({
                 query: r.table('users').get("f9724abf-3990-42ea-b3ca-846818fd3f46"),
                 changes: true,
                 initial: [],
-            })
+            }),
+            user: new ReactRethinkdb.QueryRequest({
+                query: r.table('users').get(sessionStorage.getItem("user_id")),
+                changes: true,
+                initial: [],
+            }),
         };
     },
 
@@ -99,9 +104,15 @@ export const Group = createReactClass({
 
     getInitialState() {
         return {
-            user: "TestUser",
+            userid: sessionStorage.getItem("user_id"),
             txtMessage: "",
         };
+    },
+
+    async componentWillMount() {
+        if (!sessionStorage.getItem("token") ) {
+            this.props.history.push("/")
+        } 
     },
 
     observe(props, state) {
@@ -110,25 +121,32 @@ export const Group = createReactClass({
                 query: r.table('groups').get(this.props.match.params.id),
                 changes: true,
                 initial: [],
-            })
+            }),
+            user: new ReactRethinkdb.QueryRequest({
+                query: r.table('users').get(sessionStorage.getItem("user_id")),
+                changes: true,
+                initial: [],
+            }),
         };
     },
 
     handleSend() {
 
         let tempMessage = {
-            from: this.state.user,
+            from: this.data.user.value().name,
             to: "all",
             date: new Date(),
             content: this.state.txtMessage
         }
 
-        // get the user id from the session
-        let query = r.table('groups').get(this.props.match.params.id).update({
+        let sendMessageQuery = r.table('groups').get(this.props.match.params.id).update({
             messages: r.row('messages').append(tempMessage)
         });
 
-        ReactRethinkdb.DefaultSession.runQuery(query);
+        ReactRethinkdb.DefaultSession.runQuery(sendMessageQuery);
+
+        
+        
         this.setState({ txtMessage: '' })
     },
 
