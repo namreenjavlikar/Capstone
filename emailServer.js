@@ -84,18 +84,13 @@ app.post('/fileUpload', upload.single('file'), (req, res) => {
 		console.log("yup")
 		r.table('users').insert({ imagePath: req.file.path }).run(conn, (err, data) => {
 			console.log("nope")
-			res.json({ link: 'public\\uploads\\divergent.jpg' })
+			res.json({ link: 'http://localhost:3001/' + req.file.path })
 		})
 	})
 });
 
-app.get('/uploadimages', (req, res) => {
-	console.log("yes2")
-	//res.sendFile(__dirname + '/public/uploads/divergent.jpg');
-
-	res.json([
-		{
-		  "url": "http://localhost:3001/uploads"
-		}
-	  ])
+app.get('/public/uploads/:filelink', (req, res) => {
+	console.log("yes2", req.params.filelink)
+	res.sendFile(__dirname + '/public/uploads/' + req.params.filelink);
 });
+

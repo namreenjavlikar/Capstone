@@ -6,18 +6,10 @@ import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import $ from 'jquery'
 import Question from './Question'
-// import FroalaEditor from 'react-froala-wysiwyg';
 const r = ReactRethinkdb.r;
 
 
 const EditDocument = createReactClass({
-    // config :{
-    //     placeholderText: 'Edit Your Content Here!',
-    //     charCounterCount: false,
-    //     height: 300,
-    //     toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'outdent', 'indent', 'clearFormatting', 'insertTable', 'html']
-    // },
-
     mixins: [ReactRethinkdb.DefaultMixin],
 
     componentDidMount() {
@@ -64,6 +56,23 @@ const EditDocument = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
+    handleNewQuestion() {
+        let query = r.table('questions').insert({
+            answer: "",
+            choices: [],
+            question: "",
+            title: "",
+            htmlcode: ""
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
+            console.log("gen", res.generated_keys[0])
+            let query = r.table('documents').get(this.props.match.params.id).update({
+                questions: r.row('questions').append(res.generated_keys[0])
+            })
+            ReactRethinkdb.DefaultSession.runQuery(query)
+        })
+    },
+
     render() {
         return (
             this.data.document.value() == true
@@ -90,13 +99,12 @@ const EditDocument = createReactClass({
                                 <Question questionId={question} key={index} />
                             )
                         }
+                        <BS.Button bsStyle="primary" onClick={() => this.handleNewQuestion()}>New Question</BS.Button>
                     </div>
-                    {/* <div class="document-questions-create">
-                        <FroalaEditor 
-                            tag='textarea' 
-                            config={this.config}
-                        />
-                    </div> */}
+
+                    <div className="document-questions-create">
+                        <BS.FormControl componentClass="textarea" placeholder="Add new questions" value={this.state.content} onChange={(e) => this.setState({ content: e.target.value })} />
+                    </div>
                 </div>
         )
     },

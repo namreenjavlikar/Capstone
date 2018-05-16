@@ -19,6 +19,7 @@ import * as Contacts  from './Contacts'
 import * as Messages  from './Messages'
 import EditDocument from './EditDocument'
 import Question from './Question'
+import CheerioTest from './CheerioTest';
 
 let r = ReactRethinkdb.r
 
@@ -46,6 +47,7 @@ const App = createReactClass({
         <Route path="/documents2/:id" component={Documents2.Details} />
         <Route exact path="/documents/create" component={Documents.Create} />
         <Route exact path="/documents/:id" component={EditDocument} />
+        <Route exact path="/cheerio/:id" component={CheerioTest} />
         <Route path="/enroll" component={Students.Enroll} />
         <Route path="/studenthome" component={Students.Home} />
         <Route path="/exams/:id" component={Exams.Details} />

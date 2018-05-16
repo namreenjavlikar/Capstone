@@ -14,31 +14,20 @@ const Question = createReactClass({
         charCounterCount: false,
         toolbarVisibleWithoutSelection: true,
         toolbarInline: true,
-        toolbarButtons: ['undo', 'redo', '|', 'insertImage', 'insertFile', 'insertTable', 'insertLink', 'fullscreen', 'html'],
+        toolbarButtons: ['undo', 'redo', '|', 'insertImage', 'insertFile', 'insertTable', 'insertLink', 'html'],
         imageDefaultDisplay: 'inline',
         imageDefaultAlign: 'left',
         imageEditButtons: ['imageReplace', 'imageAlign', 'imageCaption', 'imageRemove', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove', '-', 'imageDisplay', 'imageAlt', 'imageSize'],
         imageInsertButtons: ['imageUpload', 'imageByURL'],
         imageUploadURL: 'http://localhost:3001/fileUpload',
-        imageManagerLoadURL: "http://localhost:3001/uploadimages",
         events: {
             'froalaEditor.image.uploaded': async (e, editor, response) => {
                 console.log('upload!')
 
                 response = JSON.parse(response)
-                //console.dir(e)
                 console.log(response)
 
-                //   editor.image.insert('http://localhost:8082/api/story/uploadImage', true, null, editor.image.get(),(e)=>{console.log(e)} );
-                //   // const data = await axios({
-                //   //   method:'POST',
-                //   //   url:'http://localhost:8082/api/story/uploadImage',
-                //   //   data: {
-                //   //     url: response.link
-                //   //   }
-                //   //   })
-                //   //   console.log(data)
-                //   }
+                editor.image.insert(response.link, true, null, editor.image.get(),(e)=>{ console.log(e) } );
             },
             'froalaEditor.image.error': (e, editor, error, response) => {
                 console.log("err", error)
@@ -79,13 +68,6 @@ const Question = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
-    async handleGetMethod() {
-        console.log("yupuu")
-        const response = await fetch('http://localhost:3001/uploadimages')
-        const json = await response.json()
-        console.log("j",json)
-    },
-
     render() {
         return (
             this.data.question.value() == true
@@ -93,7 +75,6 @@ const Question = createReactClass({
                 <div>Loading</div>
                 :
                 <div className="document-question-content">
-    <button onClick={() => this.handleGetMethod()}>rr</button>
                     <div id={this.data.question.value().id} className="document-question" class="uk-card uk-card-default uk-card-body">
                         {
                             <FroalaEditor
