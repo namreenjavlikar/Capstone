@@ -132,9 +132,6 @@ export const Group = createReactClass({
 
     handleSend() {
 
-        console.log(this.data.user.value().name)
-
-
         let tempMessage = {
             from: this.data.user.value().name,
             to: "all",
