@@ -12,9 +12,15 @@ export const Single = createReactClass({
     getInitialState() {
         return {
             contacts: [],
-            txtUsername: "",
+            txtUserId: "",
             userid: sessionStorage.getItem("user_id")
         };
+    },
+
+    async componentWillMount() {
+        if (!sessionStorage.getItem("token") ) {
+            this.props.history.push("/")
+        } 
     },
 
     observe(props, state) {
@@ -29,11 +35,15 @@ export const Single = createReactClass({
     },
 
     handleAddContact() {
-        if (this.state.txtGroupId == "") {
+        if (this.state.txtUserId == "") {
             return
         }
 
-        if (this.state.txtGroupId == this.state.userid) {
+        console.log("First: " + this.state.txtUserId )
+        console.log("second: " + this.state.userid )
+
+        if (this.state.txtUserId == this.state.userid) {
+            
             alert("invalid user")
             return
         }
@@ -71,7 +81,7 @@ export const Single = createReactClass({
         return (
             <div>
                 <div>
-
+                    Hello <Userinfo id={this.state.userid} />
                 </div>
                 <center><h1>Contacts page</h1>
                 </center>
@@ -101,7 +111,6 @@ export const Single = createReactClass({
                                     })
                                     :
                                     <p>Empty</p>
-
                             }
 
 
@@ -109,7 +118,7 @@ export const Single = createReactClass({
                     </table >
                     <div style={{ padding: 10 }}>
                         <div class="four wide field">
-                            <input type="text" value={this.state.txtUsername} onChange={(event) => this.setState({ txtUsername: event.target.value })} />
+                            <input type="text" value={this.state.txtUserId} onChange={(event) => this.setState({ txtUserId: event.target.value })} />
                         </div>
                         <button onClick={() => this.handleAddContact()}>add new contact</button>
                     </div>
@@ -134,6 +143,13 @@ export const Groups = createReactClass({
             userid: sessionStorage.getItem("user_id")
         };
     },
+
+    async componentWillMount() {
+        if (!sessionStorage.getItem("token") ) {
+            this.props.history.push("/")
+        } 
+    },
+
 
     observe(props, state) {
         return {
