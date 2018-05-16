@@ -176,6 +176,14 @@ export const Groups = createReactClass({
             return
         }
 
+        if(!this.data.user.value().groups){
+            let addGroupField = r.table('users').get(this.state.userid).update({
+                "groups": []
+            });
+            ReactRethinkdb.DefaultSession.runQuery(addGroupField);
+        }
+
+
         let addingGroupQuery = r.table('groups').insert({
             "name": this.state.txtGroupName,
             "messages": [],
@@ -209,6 +217,15 @@ export const Groups = createReactClass({
             return
         }
 
+        if(!this.data.user.value().groups){
+            let addGroupField = r.table('users').get(this.state.userid).update({
+                "groups": []
+            });
+            ReactRethinkdb.DefaultSession.runQuery(addGroupField);
+        }
+
+        
+
         let addingGroup2UserQuery = r.table('users').get(this.state.userid).update({
             groups: r.row('groups').append({ groupid: this.state.txtGroupId })
         });
@@ -226,7 +243,7 @@ export const Groups = createReactClass({
         })
 
 
-        // if the group doesnt exist
+        
         this.data.groupsArray.value().map((item) => {
             if (item.id == this.state.txtGroupId) {
                 isExist = true
@@ -281,7 +298,7 @@ export const Groups = createReactClass({
                                         </tr>;
                                     })
                                     :
-                                    <p>Loading</p>
+                                    <p>Loading...</p>
                             }
                         </tbody>
                     </table >
