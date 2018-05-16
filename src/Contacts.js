@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import Userinfo from './Userinfo'
-
+import GroupInfo from './GroupInfo'
 let r = ReactRethinkdb.r;
 
 export const Single = createReactClass({
@@ -18,7 +18,7 @@ export const Single = createReactClass({
     },
 
     observe(props, state) {
-       
+
         return {
             user: new ReactRethinkdb.QueryRequest({
                 query: r.table('users').get(sessionStorage.getItem("user_id")),
@@ -29,11 +29,11 @@ export const Single = createReactClass({
     },
 
     handleAddContact() {
-        if (this.state.txtGroupName == "") {
+        if (this.state.txtGroupId == "") {
             return
         }
 
-        if (this.state.txtGroupName == this.state.userid) {
+        if (this.state.txtGroupId == this.state.userid) {
             alert("invalid user")
             return
         }
@@ -55,7 +55,7 @@ export const Single = createReactClass({
                     alert("invalid user")
                 }
             })
-        
+
     },
 
     handleDeleteContact(value) {
@@ -88,20 +88,20 @@ export const Single = createReactClass({
                         </thead>
                         <tbody>
                             {
-                                    this.data.user.value().contacts
-                                        ?
-                                        this.data.user.value().contacts.map((item) => {
-                                            return <tr key={item.userid}>
-                                                <td><Userinfo id={item.userid} /></td>
-                                                <td>
-                                                    <button onClick={() => this.props.history.push("/Messages/" + item.userid)}>Message</button>
-                                                    <button onClick={() => this.handleDeleteContact(item.userid)}>Remove</button>
-                                                </td>
-                                            </tr>;
-                                        })
-                                        :
-                                        <p>Empty</p>
-                                    
+                                this.data.user.value().contacts
+                                    ?
+                                    this.data.user.value().contacts.map((item) => {
+                                        return <tr key={item.userid}>
+                                            <td><Userinfo id={item.userid} /></td>
+                                            <td>
+                                                <button onClick={() => this.props.history.push("/Messages/" + item.userid)}>Message</button>
+                                                <button onClick={() => this.handleDeleteContact(item.userid)}>Remove</button>
+                                            </td>
+                                        </tr>;
+                                    })
+                                    :
+                                    <p>Empty</p>
+
                             }
 
 
@@ -116,7 +116,6 @@ export const Single = createReactClass({
 
                 </center>
 
-
             </div>
         )
 
@@ -130,6 +129,7 @@ export const Groups = createReactClass({
     getInitialState() {
         return {
             groups: [],
+            txtGroupId: "",
             txtGroupName: "",
             userid: sessionStorage.getItem("user_id")
         };
@@ -151,7 +151,7 @@ export const Groups = createReactClass({
         };
     },
 
-    handleAddGroup() {
+    handleCreateGroup() {
 
         let isExist = false
         let isAlreadyJoined = false
@@ -160,18 +160,51 @@ export const Groups = createReactClass({
             return
         }
 
-        let addingGroup2UserQuery = r.table('users').get(this.state.userid).update({
-            groups: r.row('groups').append({ groupid: this.state.txtGroupName })
-        });
-
         let addingGroupQuery = r.table('groups').insert({
-            "id": this.state.txtGroupName,
-            "messages": []
+            "name": this.state.txtGroupName,
+            "messages": [],
+            "groupAdmin": { userid: this.state.userid },
         })
 
 
+        ReactRethinkdb.DefaultSession.runQuery(addingGroupQuery).then(
+            (res) => {
+                if (res) {
+                    console.log(res.generated_keys[0])
+                    let addingGroup2UserQuery = r.table('users').get(this.state.userid).update({
+                        groups: r.row('groups').append({ groupid: res.generated_keys[0] })
+                    });
+                    ReactRethinkdb.DefaultSession.runQuery(addingGroup2UserQuery);
+
+                } else {
+                    alert("invalid user")
+                }
+            })
+
+        this.setState({ txtGroupName: '' })
+    },
+
+    handleJoinGroup() {
+
+        let isExist = false
+        let isAlreadyJoined = false
+
+        if (this.state.txtGroupId == "") {
+            return
+        }
+
+        let addingGroup2UserQuery = r.table('users').get(this.state.userid).update({
+            groups: r.row('groups').append({ groupid: this.state.txtGroupId })
+        });
+
+        // let addingGroupQuery = r.table('groups').insert({
+        //     "id": this.state.txtGroupId,
+        //     "messages": []
+        // })
+
+
         this.data.user.value().groups.map((item) => {
-            if (item.groupid == this.state.txtGroupName) {
+            if (item.groupid == this.state.txtGroupId) {
                 isAlreadyJoined = true
             }
         })
@@ -179,47 +212,36 @@ export const Groups = createReactClass({
 
         // if the group doesnt exist
         this.data.groupsArray.value().map((item) => {
-            if (item.id == this.state.txtGroupName) {
+            if (item.id == this.state.txtGroupId) {
                 isExist = true
             }
         })
-
 
         if (isAlreadyJoined) {
             alert("You already joined in the group")
             return
         } else {
-            ReactRethinkdb.DefaultSession.runQuery(addingGroup2UserQuery);
+            if (isExist) {
+                console.log("the group exist")
+                ReactRethinkdb.DefaultSession.runQuery(addingGroup2UserQuery);
+            }else{
+                alert("The group does not exist")
+            }
         }
-
-        if (isExist) {
-            console.log("the group exist")
-
-        } else {
-            ReactRethinkdb.DefaultSession.runQuery(addingGroupQuery);
-        }
-
-        this.setState({ txtGroupName: '' })
+        this.setState({ txtGroupId: '' })
     },
 
-    handleDeleteContact(value) {
+    handleLeaveGroup(value) {
         let query = r.table('users').get(this.state.userid).update({
             groups: r.row('groups').difference([{ groupid: value }])
         })
-
-        let query2 = r.table('groups').get(value).delete()
-
         ReactRethinkdb.DefaultSession.runQuery(query);
-        // ReactRethinkdb.DefaultSession.runQuery(query2);
-
-
     },
 
     render() {
         return (
             <div>
                 <div>
-
                 </div>
                 <center><h1>My Groups page</h1>
                 </center>
@@ -235,25 +257,31 @@ export const Groups = createReactClass({
                                     ?
                                     this.data.user.value().groups.map((item) => {
                                         return <tr key={item.groupid}>
-                                            <td>{item.groupid}</td>
+                                            <td><GroupInfo id={item.groupid} /></td>
                                             <td>
                                                 <button onClick={() => this.props.history.push("/GroupMessages/" + item.groupid)}>Message</button>
-                                                <button onClick={() => this.handleDeleteContact(item.groupid)}>Remove</button>
-
+                                                <button onClick={() => this.handleLeaveGroup(item.groupid)}>Leave</button>
                                             </td>
                                         </tr>;
                                     })
                                     :
                                     <p>Loading</p>
                             }
-
                         </tbody>
                     </table >
                     <div style={{ padding: 10 }}>
                         <div class="four wide field">
                             <input type="text" value={this.state.txtGroupName} onChange={(event) => this.setState({ txtGroupName: event.target.value })} />
                         </div>
-                        <button onClick={() => this.handleAddGroup()}>add new contact</button>
+                        <button onClick={() => this.handleCreateGroup()}>Create group</button>
+
+
+                        <div class="four wide field">
+                            <input type="text" value={this.state.txtGroupId} onChange={(event) => this.setState({ txtGroupId: event.target.value })} />
+                        </div>
+
+                        <button onClick={() => this.handleJoinGroup()}>Join group</button>
+
                     </div>
 
                 </center>
