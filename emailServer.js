@@ -89,8 +89,26 @@ app.post('/fileUpload', upload.single('file'), (req, res) => {
 	})
 });
 
+app.post('/fileUploadLink', upload.single('file'), (req, res) => {
+	console.log("yes file")
+	db.then(conn => {
+		console.log("yup")
+		r.table('users').insert({ filePath: req.file.path }).run(conn, (err, data) => {
+			console.log("nope")
+			res.json({ link: 'http://localhost:3001/file/' + req.file.path })
+		})
+	})
+});
+
 app.get('/public/uploads/:filelink', (req, res) => {
 	console.log("yes2", req.params.filelink)
 	res.sendFile(__dirname + '/public/uploads/' + req.params.filelink);
 });
+
+
+app.get('/file/public/uploads/:filelink', (req, res) => {
+	console.log("yes3", req.params.filelink)
+	res.download(__dirname + '/public/uploads/' + req.params.filelink);
+});
+
 
