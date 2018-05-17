@@ -93,6 +93,8 @@ export const Single = createReactClass({
 
             })
 
+            this.setState({ txtUserId: '' })
+
     },
 
     handleDeleteContact(value) {
