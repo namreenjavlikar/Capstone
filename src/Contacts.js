@@ -53,19 +53,44 @@ export const Single = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(findUserquery).then(
             (res) => {
                 if (res) {
-                    let query1 = r.table('users').get(this.state.userid).update({
-                        contacts: r.row('contacts').append({ userid: this.state.txtUserId, status: "accepted" })
-                    });
+                    // let queryAdd2Contacts = r.table('users').get(this.state.userid).update({
+                    //     contacts: r.row('contacts').append({ userid: this.state.txtUserId, status: "accepted" })
+                    // });
+                    // ReactRethinkdb.DefaultSession.runQuery(queryAdd2Contacts);
 
-                    // check for the other user if he has a contact
-                    let query2 = r.table('users').get(this.state.txtUserId).update({
-                        contacts: r.row('contacts').append({ userid: this.state.userid, status: "pending" })
-                    });
-                    ReactRethinkdb.DefaultSession.runQuery(query1);
-                    ReactRethinkdb.DefaultSession.runQuery(query2);
+                    let queryCheckMyContacts = r.table('users').get(this.state.userid)("contacts").filter({ "userid": this.state.txtUserId })
+                    ReactRethinkdb.DefaultSession.runQuery(queryCheckMyContacts).then(
+                        (res) => {
+                            if (res.length == 0) {
+                                console.log(res)
+                                let queryAdd2Contacts = r.table('users').get(this.state.userid).update({
+                                    contacts: r.row('contacts').append({ userid: this.state.txtUserId, status: "accepted" })
+                                });
+                                ReactRethinkdb.DefaultSession.runQuery(queryAdd2Contacts);
+                            } else {
+                                console.log("you already added the user")
+                            }
+
+                        })
+
+                    let queryCheckOtherContacts = r.table('users').get(this.state.txtUserId)("contacts").filter({ "userid": this.state.userid })
+                    ReactRethinkdb.DefaultSession.runQuery(queryCheckOtherContacts).then(
+                        (res) => {
+                            if (res.length == 0) {
+                                console.log(res)
+                                let query2 = r.table('users').get(this.state.txtUserId).update({
+                                    contacts: r.row('contacts').append({ userid: this.state.userid, status: "pending" })
+                                });
+                                ReactRethinkdb.DefaultSession.runQuery(query2);
+
+                            } else {
+                                console.log("The other user has already added you")
+                            }
+                        })
                 } else {
                     alert("invalid user")
                 }
+
             })
 
     },
@@ -145,7 +170,7 @@ export const Single = createReactClass({
                                                     :
                                                     <td>
                                                         <button onClick={() => this.props.history.push("/Messages/" + item.userid)}>Message</button>
-                                                        {/* <button onClick={() => this.handleDeleteContact(item.userid)}>Unfriend</button> */}
+                                                        <button onClick={() => this.handleDeleteContact(item.userid)}>Unfriend</button>
                                                         <button onClick={() => this.handleBlockContact(item.userid)}>Block</button>
                                                     </td>
                                             }
