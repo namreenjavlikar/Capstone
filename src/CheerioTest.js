@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import FroalaEditor from 'react-froala-wysiwyg';
+import cheerio from 'cheerio';
 import $ from 'jquery'
 const r = ReactRethinkdb.r;
 
@@ -15,7 +16,7 @@ const CheerioTest = createReactClass({
         toolbarVisibleWithoutSelection: true,
         toolbarInline: true,
         toolbarButtons: ['undo', 'redo', '|', 'insertImage', 'insertFile', 'insertTable', 'insertLink', 'html'],
-        imageDefaultDisplay: 'inline',
+        //imageDefaultDisplay: 'inline',
         imageDefaultAlign: 'left',
         imageEditButtons: ['imageReplace', 'imageAlign', 'imageCaption', 'imageRemove', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove', '-', 'imageDisplay', 'imageAlt', 'imageSize'],
         imageInsertButtons: ['imageUpload', 'imageByURL'],
@@ -62,7 +63,10 @@ const CheerioTest = createReactClass({
     },
 
     handleEdit(model) {
-        console.log("m", model)
+        const $ = cheerio.load(model);
+        $('p').addClass('title')
+        //$.html()
+        console.log("m", $.html())
     },
 
     render() {
