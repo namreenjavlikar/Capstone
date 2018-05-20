@@ -93,7 +93,7 @@ export const Single = createReactClass({
 
             })
 
-            this.setState({ txtUserId: '' })
+        this.setState({ txtUserId: '' })
 
     },
 
@@ -120,6 +120,19 @@ export const Single = createReactClass({
     handleUnBlockContact(value) {
         let queryRemove = r.table('users').get(this.state.userid).update({
             contacts: r.row('contacts').difference([{ userid: value, status: "blocked" }])
+        })
+        ReactRethinkdb.DefaultSession.runQuery(queryRemove);
+
+        let queryBlocked = r.table('users').get(this.state.userid).update({
+            contacts: r.row('contacts').append({ userid: value, status: "accepted" })
+        });
+
+        ReactRethinkdb.DefaultSession.runQuery(queryBlocked);
+    },
+
+    handleAcceptContact(value) {
+        let queryRemove = r.table('users').get(this.state.userid).update({
+            contacts: r.row('contacts').difference([{ userid: value, status: "pending" }])
         })
         ReactRethinkdb.DefaultSession.runQuery(queryRemove);
 
@@ -170,11 +183,18 @@ export const Single = createReactClass({
                                                         <button onClick={() => this.handleUnBlockContact(item.userid)}>UnBlock</button>
                                                     </td>
                                                     :
-                                                    <td>
-                                                        <button onClick={() => this.props.history.push("/Messages/" + item.userid)}>Message</button>
-                                                        <button onClick={() => this.handleDeleteContact(item.userid)}>Unfriend</button>
-                                                        <button onClick={() => this.handleBlockContact(item.userid)}>Block</button>
-                                                    </td>
+                                                    item.status == "pending"
+                                                        ?
+                                                        <td>
+                                                            <button onClick={() => this.handleAcceptContact(item.userid)}>Accept</button>
+                                                        </td>
+                                                        :
+
+                                                        <td>
+                                                            <button onClick={() => this.props.history.push("/Messages/" + item.userid)}>Message</button>
+                                                            <button onClick={() => this.handleDeleteContact(item.userid)}>Unfriend</button>
+                                                            <button onClick={() => this.handleBlockContact(item.userid)}>Block</button>
+                                                        </td>
                                             }
 
                                         </tr>;
