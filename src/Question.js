@@ -97,8 +97,8 @@ const Question = createReactClass({
                 ?
                 <div>Loading</div>
                 :
-                <div className="document-question-content">
-                    <div id={this.data.question.value().id} className="document-question" class="uk-card uk-card-default uk-card-body">
+                <div className="document-question-content" id={this.data.question.value().id}>
+                    <div id={this.data.question.value().id} className="document-question" class="uk-card uk-card-default uk-card-body" onClick={()=>this.props.handleChangeEdit(this.props.questionId)}>
                         {
                             <div>
                                 <FroalaEditor

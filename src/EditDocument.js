@@ -4,34 +4,34 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
-import $ from 'jquery'
 import Question from './Question'
+import $ from 'jquery'
+require('jquery-ui');
+require('jquery-ui/ui/widgets/sortable');
+require('jquery-ui/ui/disable-selection');
 const r = ReactRethinkdb.r;
-
 
 const EditDocument = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     componentDidMount() {
-        $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
+        // $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
     },
 
     getInitialState() {
         return {
-
+            sort: false,
+            editing: null
         };
     },
 
     changeOrder(e) {
-        const id = e.originalEvent.detail[1].id
-        console.log("id", e)
         const order = Array.from(e.target.childNodes).map((item) => { return item.id })
         console.log("order", order)
-        let currentQuestions = r.table('documents').get(this.props.match.params.id)('questions')
-        // let query = r.table('documents').get(this.props.match.params.id).update({
-        //     questions: newValue
-        // })
-        // ReactRethinkdb.DefaultSession.runQuery(query)
+        let query = r.table('documents').get(this.props.match.params.id).update({
+            questions: order
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
     observe(props, state) {
@@ -47,6 +47,10 @@ const EditDocument = createReactClass({
 
     handleSelectType(eventKey) {
         this.handleEditField(eventKey, 'type')
+    },
+
+    handleSelectStatus(eventKey) {
+        this.handleEditField(eventKey, 'status')
     },
 
     handleEditField(newValue, fieldName) {
@@ -73,7 +77,42 @@ const EditDocument = createReactClass({
         })
     },
 
+    async handleChangeEdit(question) {
+        await this.setState({ editing: question })
+        console.log("editing", this.state.editing)
+    },
+
+    async handleSortQuestion() {
+        // $('#parent').sortable({ disabled: true });
+        // await this.setState({ sort: !this.state.sort })
+        // if ($('#parent').sortable("option", "disabled"))
+        //     $('#parent').sortable("enable");
+        // else
+        //     $('#parent').sortable('disable');
+        // if (this.state.sort) {
+        //     console.log("sorting")
+        //     //$("#parent").sortable({
+        //     //    update: e => {
+        //     //        this.changeOrder(e)
+        //     //    }
+        //     //});
+        //     //$("#parent").sortable( "option", "disabled", false );
+        // }
+        // else {
+        //     console.log("sorting disabled")
+        //     //$("parent").sortable("destroy");
+        // }
+    },
+
     render() {
+        // $(() => {
+        //     $("#parent").sortable({
+        //         update: e => {
+        //             this.changeOrder(e)
+        //         }
+        //     });
+        //     // $("#parent").disableSelection();
+        // });
         return (
             this.data.document.value() == true
                 ?
@@ -91,20 +130,26 @@ const EditDocument = createReactClass({
                         <BS.FormControl type="datetime-local" value={this.data.document.value().startDate} placeholder="Enter Start Date" onChange={(e) => this.setState({ startDate: e.target.value })} />
                         <BS.FormControl type="datetime-local" value={this.data.document.value().dueDate} placeholder="Enter Due Date" onChange={(e) => this.setState({ dueDate: e.target.value })} />
                         <BS.FormControl type="datetime-local" value={this.data.document.value().endDate} placeholder="Enter End Date" onChange={(e) => this.setState({ endDate: e.target.value })} />
+                        <BS.DropdownButton style={{ margin: 15 }} id="status" title={this.data.document.value().status} onSelect={this.handleSelectStatus}>
+                            <BS.MenuItem key="Draft" eventKey="Draft" value="Draft">Draft</BS.MenuItem>
+                            <BS.MenuItem key="Publish" eventKey="Publish" value="Publish">Publish</BS.MenuItem>
+                        </BS.DropdownButton>
+                        <BS.Button bsStyle="primary" onClick={() => this.handleNewQuestion()}>New Question</BS.Button>
+                        <BS.Button bsStyle="primary" onClick={() => this.handleSortQuestion()}>{this.state.sort ? "Finish Sort" : "Sort Questions"}</BS.Button>
                     </div>
 
-                    <div className="document-questions-view">
+                    <div className="document-questions-view" id="parent">
                         {
                             this.data.document.value().questions.map((question, index) =>
-                                <Question questionId={question} key={index} />
+                                <Question questionId={question} key={index} handleChangeEdit={this.handleChangeEdit} />
                             )
                         }
-                        <BS.Button bsStyle="primary" onClick={() => this.handleNewQuestion()}>New Question</BS.Button>
                     </div>
 
                     <div className="document-questions-create">
                         <BS.FormControl componentClass="textarea" placeholder="Add new questions" value={this.state.content} onChange={(e) => this.setState({ content: e.target.value })} />
                     </div>
+                    {this.state.editing}
                 </div>
         )
     },

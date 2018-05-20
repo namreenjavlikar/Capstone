@@ -5,14 +5,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
-import showdown from 'showdown';
-import ReactMarkdown from 'react-markdown'
 import $ from 'jquery'
 require('jquery-ui');
 require('jquery-ui/ui/widgets/sortable');
 require('jquery-ui/ui/disable-selection');
 let r = ReactRethinkdb.r;
-let converter = new showdown.Converter();
 
 export const Create = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
@@ -36,14 +33,14 @@ export const Create = createReactClass({
 
         // $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
 
-        $( () => {
-            $( "#sortable" ).sortable({
+        $(() => {
+            $("#sortable").sortable({
                 update: e => {
                     this.changeOrder(e)
                 }
             });
-            $( "#sortable" ).disableSelection();
-          } );
+            $("#sortable").disableSelection();
+        });
     },
 
     getInitialState() {
@@ -185,7 +182,7 @@ export const Create = createReactClass({
 
     render() {
         let displayQuestions = []
-        this.state.questions.map( (question) => {
+        this.state.questions.map((question) => {
             displayQuestions.push(question)
         })
         return (
@@ -198,7 +195,7 @@ export const Create = createReactClass({
                     <BS.FormControl type="datetime-local" value={this.state.endDate} placeholder="Enter End Date" onChange={(e) => this.setState({ endDate: e.target.value })} />
                 </div>
 
-                <div className="document-questions-view" id="sortable">
+                <div className="document-questions-view">
                     {
                         displayQuestions.map((question, index) =>
                             <div key={index} id={index} className="document-question" class="uk-card uk-card-default uk-card-body">
@@ -273,7 +270,10 @@ export const Create = createReactClass({
                         <p className="document-question-answer">A. Hyper Text Markup Language</p>
                     </div> */}
                 </div>
-
+                <div  id="sortable">
+                    <div>fff</div>
+                    <div>ffffff</div>
+                </div>
                 <div className="document-questions-create">
                     <BS.FormControl componentClass="textarea" placeholder="Enter Questions" value={this.state.content} onChange={(e) => this.setState({ content: e.target.value })} />
                     <BS.Button bsStyle="primary">Done</BS.Button>
@@ -284,7 +284,7 @@ export const Create = createReactClass({
 
                 <div>
                     {
-                        this.state.questions.map( (question, index) => 
+                        this.state.questions.map((question, index) =>
                             <p key={index}>{question.question}</p>
                         )
                     }
