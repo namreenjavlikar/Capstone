@@ -1,4 +1,4 @@
-import { Button, Image, List, Transition, Form } from 'semantic-ui-react'
+import { Button, Image, List, Transition, Form, Segment } from 'semantic-ui-react'
 import * as BS from 'react-bootstrap'
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -13,6 +13,7 @@ const r = ReactRethinkdb.r;
 
 const EditDocument = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
+    //editing: "",
 
     componentDidMount() {
         // $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
@@ -20,8 +21,7 @@ const EditDocument = createReactClass({
 
     getInitialState() {
         return {
-            sort: false,
-            editing: null
+            sort: false
         };
     },
 
@@ -66,7 +66,8 @@ const EditDocument = createReactClass({
             choices: [],
             question: "",
             title: "",
-            htmlcode: ""
+            htmlcode: "",
+            editor: ""
         })
         ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
             console.log("gen", res.generated_keys[0])
@@ -77,9 +78,35 @@ const EditDocument = createReactClass({
         })
     },
 
-    async handleChangeEdit(question) {
-        await this.setState({ editing: question })
-        console.log("editing", this.state.editing)
+    handleChangeEdit(question) {
+        let user = this.data.document.value().collaborators.find(collaborator => collaborator.user == "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4")
+        console.log("gggg", user)
+        if (user && user.question!=question) {
+            let removeQuery = r.table('documents').get(this.props.match.params.id).update({
+                collaborators: r.row('collaborators').difference([{ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: user.question }])
+            })
+            ReactRethinkdb.DefaultSession.runQuery(removeQuery)
+            console.log("nope")
+        }
+        let documentQuery = r.table('documents').get(this.props.match.params.id).update({
+            collaborators: r.row('collaborators').append({ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: question})
+        })
+        ReactRethinkdb.DefaultSession.runQuery(documentQuery)
+
+
+        // if (this.editing && this.editing!=question) {
+        //     let query = r.table('questions').get(this.editing).update({
+        //         editor: ""
+        //     })
+        //     ReactRethinkdb.DefaultSession.runQuery(query)
+        //     console.log("1")
+        // }
+        //this.editing = question
+        // let query = r.table('questions').get(question).update({
+        //     editor: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4"
+        // })
+        // await ReactRethinkdb.DefaultSession.runQuery(query)
+        // console.log("editing", question)
     },
 
     async handleSortQuestion() {
@@ -141,7 +168,7 @@ const EditDocument = createReactClass({
                     <div className="document-questions-view" id="parent">
                         {
                             this.data.document.value().questions.map((question, index) =>
-                                <Question questionId={question} key={index} handleChangeEdit={this.handleChangeEdit} />
+                                <Question questionId={question} key={index} document={this.props.match.params.id} handleChangeEdit={this.handleChangeEdit} />
                             )
                         }
                     </div>

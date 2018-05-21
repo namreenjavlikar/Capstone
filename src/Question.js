@@ -1,4 +1,4 @@
-import { Button, Image, List, Transition, Form } from 'semantic-ui-react'
+import { Button, Image, List, Transition, Form, Rail, Segment, Popup } from 'semantic-ui-react'
 import * as BS from 'react-bootstrap'
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -7,6 +7,7 @@ import createReactClass from 'create-react-class';
 import FroalaEditor from 'react-froala-wysiwyg';
 import $ from 'jquery'
 import * as FroalaConfiguration from './FroalaConfiguration'
+import profile from './profile.png';
 const r = ReactRethinkdb.r;
 
 const Question = createReactClass({
@@ -75,13 +76,28 @@ const Question = createReactClass({
             title: model
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
+        this.props.handleChangeEdit(this.props.questionId)
     },
 
     handleEditQuestion(model) {
         let query = r.table('questions').get(this.props.questionId).update({
-            question: model
+            question: model,
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
+        this.props.handleChangeEdit(this.props.questionId)
+        
+        // let user = this.data.document.value().collaborators.filter(collaborator => collaborator == "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4")
+        // console.log("gggg", user)
+        // if (user) {
+        //     let removeQuery = r.table('documents').get(this.props.document).update({
+        //         collaborators: r.row('collaborators').difference([{ name: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: user.question }])
+        //     })
+        //     ReactRethinkdb.DefaultSession.runQuery(removeQuery)
+        // }
+        // let documentQuery = r.table('documents').get(this.props.document).update({
+        //     collaborators: r.row('collaborators').append({ name: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: this.props.questionId })
+        // })
+        // ReactRethinkdb.DefaultSession.runQuery(documentQuery)
     },
 
     handleEditAnswer(model) {
@@ -89,6 +105,7 @@ const Question = createReactClass({
             answer: model
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
+        this.props.handleChangeEdit(this.props.questionId)
     },
 
     render() {
@@ -98,7 +115,9 @@ const Question = createReactClass({
                 <div>Loading</div>
                 :
                 <div className="document-question-content" id={this.data.question.value().id}>
-                    <div id={this.data.question.value().id} className="document-question" class="uk-card uk-card-default uk-card-body" onClick={()=>this.props.handleChangeEdit(this.props.questionId)}>
+                    <div id={this.data.question.value().id} className="document-question"
+                        style={{ backgroundColor: this.data.question.value().editor ? '#D5F5E3' : 'white' }}
+                        class="uk-card uk-card-default uk-card-body">
                         {
                             <div>
                                 <FroalaEditor
@@ -108,7 +127,7 @@ const Question = createReactClass({
                                     model={('html.set', this.data.question.value().title)}
                                     onModelChange={this.handleEditTitle}
                                 />
-                                <br/>
+                                <br />
                                 <FroalaEditor
                                     id="question"
                                     tag='textarea'
@@ -124,23 +143,17 @@ const Question = createReactClass({
                                     model={('html.set', this.data.question.value().answer)}
                                     onModelChange={this.handleEditAnswer}
                                 />
+                                {
+                                    this.data.question.value().editor
+                                    &&
+                                    <Rail attached internal position='right' style={{ width: 50, margin: 20 }}>
+                                        <Popup
+                                            trigger={<Image src={profile} avatar />}
+                                            content={'Namreen is editing this question'}
+                                        />
+                                    </Rail>
+                                }
                             </div>
-
-                            //     <div className="document-question-header">
-                            //         <p className="document-question-name">{this.data.question.value().question}</p>
-                            //     </div>
-                            //     {
-                            //         this.data.question.value().choices.length !== 0
-                            //         &&
-                            //         <ol type="a" className="document-question-choices">
-                            //             {
-                            //                 this.data.question.value().choices.map((choice, index) =>
-                            //                     <li key={index}>{choice}</li>
-                            //                 )
-                            //             }
-                            //         </ol>
-                            //     }
-                            //     <p className="document-question-answer">A. {this.data.question.value().answer}</p>
                         }
                     </div>
                 </div>
