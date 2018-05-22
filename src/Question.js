@@ -4,14 +4,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
-<<<<<<< HEAD
-import FroalaEditor from 'react-froala-wysiwyg';
-import $ from 'jquery'
-import * as FroalaConfiguration from './FroalaConfiguration'
-import * as Utils from './Utils'
-import profile from './profile.png';
-=======
->>>>>>> 9814dd4f2353c546b41a60069955b6c5412432aa
+// import FroalaEditor from 'react-froala-wysiwyg';
+// import $ from 'jquery'
+// import * as FroalaConfiguration from './FroalaConfiguration'
+// import * as Utils from './Utils'
+// import profile from './profile.png';
 const r = ReactRethinkdb.r;
 
 const Question = createReactClass({
@@ -88,13 +85,13 @@ const Question = createReactClass({
                             this.data.question.value().choices.length !== 0
                             &&
                             <ol type="a" className="document-question-choices">
-                                {
+                                {/* {
                                     this.data.question.value().editor
                                     &&
                                     <Rail attached internal position='right' style={{ width: 50, margin: 20 }}>
                                         <Utils.UserPopup userId={this.data.question.value().editor} />
                                     </Rail>
-                                }
+                                } */}
                             </ol>
                         }
                         <p className="document-question-answer">A. {this.data.question.value().answer}</p>

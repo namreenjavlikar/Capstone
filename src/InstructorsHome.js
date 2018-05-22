@@ -49,7 +49,8 @@ const Instructor = createReactClass({
             expandLeft: true,
             iconLeft: false ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5",
             cal: 0,
-            selectedcourses: []
+            selectedcourses: [],
+            selectedsections: []
         }
     },
 
@@ -188,25 +189,51 @@ const Instructor = createReactClass({
         this.setState({ open: false })
     },
 
-    handleSelectCourse(courseid) {
+    handleSelectSection(sectionid) {
+        console.log("HERE ID", sectionid)
+        let item = document.getElementById(sectionid)
+        if (item) {
+            let checked = item.checked
+            if (checked) {
+                this.setState({ selectedsections: [...this.state.selectedsections, sectionid] })
+            } else {
+                let selectedsections = this.state.selectedsections
+                selectedsections.splice(this.state.selectedsections.findIndex((selectedsection) => selectedsection === sectionid), 1)
+                this.setState({ selectedsections })
+            }
+        }
+        // let sectionIdIndex = this.state.selectedsections.findIndex((selectedsection) => selectedsection === sectionid)
+        // if (sectionIdIndex == -1) {
+        //     this.setState({ selectedsections: [...this.state.selectedsections, sectionid] })
+        // } else {
+        //     let selectedsections = this.state.selectedsections
+        //     selectedsections.splice(sectionIdIndex, 1)
+        //     this.setState({selectedsections})
+        // }
+    },
+
+    async handleSelectCourse(courseid) {
         if (courseid === "All") {
             let checked = document.getElementById("nav_check_all").checked
+            this.setState({ selectedcourses: [] })
             if (checked) {
                 this.data.user.value()
                 let selectedcourses = []
                 this.data.user.value().courses.map(course => selectedcourses.push(course))
-                this.setState({ selectedcourses })
-
+                await this.setState({ selectedcourses })
+                await this.setState({ selectedcourses })
                 let allsections = document.getElementsByClassName("Nav_check")
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = true
+                    await this.handleSelectSection(allsections[i].id)
                 }
             } else {
-                this.setState({ selectedcourses: [] })
+
 
                 let allsections = document.getElementsByClassName("Nav_check")
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = false
+                    await this.handleSelectSection(allsections[i].id)
                 }
             }
         } else {
@@ -217,16 +244,21 @@ const Instructor = createReactClass({
                 let allsections = document.getElementsByClassName(courseid)
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = true
+                    // console.log("HERE ID", allsections[i].id)
+                    await this.handleSelectSection(allsections[i].id)
                 }
             }
             else {
                 let selectedcourses = this.state.selectedcourses
+
                 selectedcourses.splice(courseIdIndex, 1)
                 let allsections = document.getElementsByClassName(courseid)
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = false
+                    this.handleSelectSection(allsections[i].id)
                 }
-                this.setState({ selectedcourses })
+                await this.setState({ selectedcourses })
+                await this.setState({ selectedcourses })
             }
         }
     },
@@ -246,13 +278,13 @@ const Instructor = createReactClass({
 
                 } */}
 
-                    <NavInstructor2 handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} />
+                    <NavInstructor2 handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} handleSelectSection={(id) => this.handleSelectSection(id)} />
                 </div>
                 <div className={this.state.changeClass}>
                     <span class={this.state.leftButton} uk-icon={this.state.iconLeft} onClick={() => this.handleExpandLeft()}>
                     </span>
 
-                    <InstructorContent selectedcourses={this.state.selectedcourses} />
+                    <InstructorContent selectedcourses={this.state.selectedcourses} selectedsections={this.state.selectedsections} />
 
                     <span class={this.state.rightButton}
                         uk-icon={this.state.iconRight}

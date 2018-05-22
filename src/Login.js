@@ -95,7 +95,7 @@ const Login = createReactClass({
                 overflow: 'hidden',
             }}>
                 <center>
-                    <div class="uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20 }}>
+                    <div class="login_card uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20 }}>
                         <img src={logo} style={{ width: 200, height: 150 }} />
                         <hr />
                         <h3 class="login-title"><strong>Username.Password</strong></h3>

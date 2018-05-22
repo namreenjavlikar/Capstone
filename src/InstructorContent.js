@@ -190,7 +190,7 @@ const Instructor = createReactClass({
     // contentid : null,
     async handleSaveContentId(id) {
         await this.setState({ contentid: null })
-        await this.setState({ contentid: id })
+        await this.setState({ contentid: id, listofdocs: [] })
     },
 
     async handleNextWork() {
@@ -239,20 +239,13 @@ const Instructor = createReactClass({
     },
 
     render() {
-        // console.log("DDD", this.props.selectedcourses)
         const { items, value, activeIndex, visible, open } = this.state
         return (
             <div className="container">
-
-
-
                 <div class="main USD ">
                     <div class="uk-section-default USD">
-
                         <ul uk-accordion="multiple: true " className='simplemargin5'>
-
                             <li class="uk-open ">
-
                                 <div class="navcss">
                                     <a href="#" uk-icon="chevron-left"></a>
                                     <a href="#" uk-icon="chevron-right"></a>
@@ -318,7 +311,7 @@ const Instructor = createReactClass({
                                             {
                                                 this.state.contentid
                                                 &&
-                                                <ContentShowSub id={this.state.contentid} />
+                                                <ContentShowSub id={this.state.contentid} sections={this.props.selectedsections} />
                                             }
                                         </tbody>
                                     </table>
@@ -600,7 +593,7 @@ const ContentShowSub = createReactClass({
             &&
             this.data.content.value().submissions.map(
                 (submission) =>
-                    <Submission id={submission} />
+                    <Submission id={submission} sections={this.props.sections} />
             )
 
         )
@@ -697,6 +690,40 @@ const Submission = createReactClass({
             }),
         };
     },
+    getInitialState() {
+        return {
+            show: false
+        };
+    },
+    async componentWillReceiveProps() {
+        // console.log("BEFFFFFFFFFFFFFFFFFFF", this.props.sections)
+        // if (this.data.submissions.value()) {
+        this.props.sections.map(async sec => {
+            let query = r.table("sections").get(sec)
+            await ReactRethinkdb.DefaultSession.runQuery(query).then(
+                res => {
+                    res.students.map(
+                        async studentCid => {
+                            let studentQuery = r.table("users").filter({ collegeId: studentCid })
+                            await ReactRethinkdb.DefaultSession.runQuery(studentQuery).then(
+                                resStu => {
+                                    resStu.toArray((err, stuArray) => {
+                                        console.log("RESSSSSSSSS", stuArray)
+                                        if (stuArray.findIndex(stu => stu.collegeId === this.data.submissions.value().studentid)) {
+                                            this.setState({ show: true })
+                                        } else {
+                                            this.setState({ show: false })
+                                        }
+                                    })
+                                })
+                        })
+
+                }
+            )
+        })
+        // }
+    },
+
     handleSelectedSubmission() {
         let allrows = document.querySelectorAll(".selectedrow1")
         for (let i = 0; i < allrows.length; i++)
@@ -704,7 +731,10 @@ const Submission = createReactClass({
         document.getElementById(this.data.submissions.value().id).classList.add("selectedrow1")
     },
     render() {
+        console.log("SHOW", this.state.show)
         return (
+            this.state.show
+            &&
             this.data.submissions.value()
             &&
             <tr id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
