@@ -1,37 +1,44 @@
-import { Button, Image, List, Transition, Form, Segment } from 'semantic-ui-react'
+import { Button, Image, List, Transition, Form } from 'semantic-ui-react'
 import * as BS from 'react-bootstrap'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
-import Question from './Question'
 import $ from 'jquery'
-require('jquery-ui');
-require('jquery-ui/ui/widgets/sortable');
-require('jquery-ui/ui/disable-selection');
+import Question from './Question'
 const r = ReactRethinkdb.r;
 
 const EditDocument = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
+<<<<<<< HEAD
     editing: null,
+=======
+>>>>>>> 9814dd4f2353c546b41a60069955b6c5412432aa
 
     componentDidMount() {
-        // $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
+        $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
     },
 
     getInitialState() {
         return {
+<<<<<<< HEAD
             sort: false,
+=======
+
+>>>>>>> 9814dd4f2353c546b41a60069955b6c5412432aa
         };
     },
 
     changeOrder(e) {
+        const id = e.originalEvent.detail[1].id
+        console.log("id", e)
         const order = Array.from(e.target.childNodes).map((item) => { return item.id })
         console.log("order", order)
-        let query = r.table('documents').get(this.props.match.params.id).update({
-            questions: order
-        })
-        ReactRethinkdb.DefaultSession.runQuery(query)
+        let currentQuestions = r.table('documents').get(this.props.match.params.id)('questions')
+        // let query = r.table('documents').get(this.props.match.params.id).update({
+        //     questions: newValue
+        // })
+        // ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
     observe(props, state) {
@@ -47,10 +54,6 @@ const EditDocument = createReactClass({
 
     handleSelectType(eventKey) {
         this.handleEditField(eventKey, 'type')
-    },
-
-    handleSelectStatus(eventKey) {
-        this.handleEditField(eventKey, 'status')
     },
 
     handleEditField(newValue, fieldName) {
@@ -79,7 +82,7 @@ const EditDocument = createReactClass({
     },
 
     async handleChangeEdit(question) {
-        console.log("something")
+        //console.log("something")
         let currentUser = sessionStorage.getItem('user_id')
         console.log("curr", currentUser)
         if (this.editing && this.editing != question) {
@@ -139,14 +142,6 @@ const EditDocument = createReactClass({
     },
 
     render() {
-        // $(() => {
-        //     $("#parent").sortable({
-        //         update: e => {
-        //             this.changeOrder(e)
-        //         }
-        //     });
-        //     // $("#parent").disableSelection();
-        // });
         return (
             this.data.document.value() == true
                 ?
@@ -164,26 +159,15 @@ const EditDocument = createReactClass({
                         <BS.FormControl type="datetime-local" value={this.data.document.value().startDate} placeholder="Enter Start Date" onChange={(e) => this.setState({ startDate: e.target.value })} />
                         <BS.FormControl type="datetime-local" value={this.data.document.value().dueDate} placeholder="Enter Due Date" onChange={(e) => this.setState({ dueDate: e.target.value })} />
                         <BS.FormControl type="datetime-local" value={this.data.document.value().endDate} placeholder="Enter End Date" onChange={(e) => this.setState({ endDate: e.target.value })} />
-                        <BS.DropdownButton style={{ margin: 15 }} id="status" title={this.data.document.value().status} onSelect={this.handleSelectStatus}>
-                            <BS.MenuItem key="Draft" eventKey="Draft" value="Draft">Draft</BS.MenuItem>
-                            <BS.MenuItem key="Publish" eventKey="Publish" value="Publish">Publish</BS.MenuItem>
-                        </BS.DropdownButton>
-                        <BS.Button bsStyle="primary" onClick={() => this.handleNewQuestion()}>New Question</BS.Button>
-                        <BS.Button bsStyle="primary" onClick={() => this.handleSortQuestion()}>{this.state.sort ? "Finish Sort" : "Sort Questions"}</BS.Button>
                     </div>
 
-                    <div className="document-questions-view" id="parent">
+                    <div className="document-questions-view"  uk-sortable="handle: .uk-card">
                         {
-                            this.data.document.value().questions.map((question, index) =>
-                                <Question questionId={question} key={index} document={this.props.match.params.id} handleChangeEdit={this.handleChangeEdit} />
+                            this.data.document.value().questions.map( (question, index) => 
+                                <Question questionId={question} key={index} />
                             )
                         }
                     </div>
-
-                    <div className="document-questions-create">
-                        <BS.FormControl componentClass="textarea" placeholder="Add new questions" value={this.state.content} onChange={(e) => this.setState({ content: e.target.value })} />
-                    </div>
-                    {this.state.editing}
                 </div>
         )
     },

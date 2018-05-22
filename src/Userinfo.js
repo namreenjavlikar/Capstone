@@ -28,30 +28,23 @@ const Userinfo = createReactClass({
     },
 
 
-
-
-
     render() {
         return (
-            <div>
+            <span>
 
                 {
                     this.data.user.value()
                         ?
                         this.data.user.value()
                             ?
-                            this.data.user.value().name
+                            <span >{this.data.user.value().name}</span>
                             :
                             <div></div>
                         :
                         <div></div>
                 }
 
-
-
-
-
-            </div>
+            </span>
         )
 
     },

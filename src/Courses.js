@@ -123,7 +123,6 @@ export const Create = createReactClass({
         return {}
     },
 
-   
     handleSubmit() {
         if (this.state.name.trim() !== "" && this.state.selectedInstructors.length > 0) {
 
@@ -132,12 +131,12 @@ export const Create = createReactClass({
             ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
                 let insertedCourseId = res.generated_keys[0]
                 this.state.selectedInstructors.map((inst, i) => {
-                    let queryInst = r.table("users").get(inst.id).update({ courses: r.row("courses").append({courseId: insertedCourseId}) })
+                    let queryInst = r.table("users").get(inst.id).update({ courses: r.row("courses").append(insertedCourseId) })
                     ReactRethinkdb.DefaultSession.runQuery(queryInst)
                     let secQuery = r.table("sections").insert({ sectionNo: i + 1, students: [] })
                     ReactRethinkdb.DefaultSession.runQuery(secQuery, { return_changes: true }).then(res => {
                         let insertedSectionId = res.generated_keys[0]
-                        let addSection = r.table("courses").get(insertedCourseId).update({ sections: r.row("sections").append({sectionId: insertedSectionId}) })
+                        let addSection = r.table("courses").get(insertedCourseId).update({ sections: r.row("sections").append( insertedSectionId) })
                         ReactRethinkdb.DefaultSession.runQuery(addSection)
                     })
                 })

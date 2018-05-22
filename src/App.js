@@ -6,20 +6,19 @@ import Login from './Login'
 import Register from './Register'
 import * as Questions from './Questions'
 import * as Documents from './Documents'
-import * as Documents3 from './Documents3'
+import * as Documents2 from './Documents2'
 import * as Exams from './Exams'
 import ResetPassword from './ResetPassword'
 import SyntaxHighlightTest from './SyntaxHighlightTest'
 import ForgotPassword from './ForgotPassword'
 import * as Courses from './Courses'
 import * as Students from './Students'
-import Instructors from './Instructors'
+import InstructorsHome from './InstructorsHome'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import * as Contacts  from './Contacts'
 import * as Messages  from './Messages'
 import EditDocument from './EditDocument'
 import Question from './Question'
-import CheerioTest from './CheerioTest';
 
 let r = ReactRethinkdb.r
 
@@ -44,14 +43,13 @@ const App = createReactClass({
         <Route path="/allquestions" component={Questions.All} />
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
-        <Route path="/documents3/:id" component={Documents3.Create} />
+        <Route path="/documents2/:id" component={Documents2.Details} />
         <Route exact path="/documents/create" component={Documents.Create} />
         <Route exact path="/documents/:id" component={EditDocument} />
-        <Route exact path="/cheerio/:id" component={CheerioTest} />
         <Route path="/enroll" component={Students.Enroll} />
         <Route path="/studenthome" component={Students.Home} />
         <Route path="/exams/:id" component={Exams.Details} />
-        <Route path="/instructors" component={Instructors} />
+        <Route path="/instructors" component={InstructorsHome} />
         {/* <Route path="/Contacts" component={Contacts.All} />
         <Route path="/AddContacts" component={Contacts.Create} /> */}
         {/* <Route path="/Messages" component={Messages.All} /> */}
