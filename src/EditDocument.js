@@ -13,7 +13,7 @@ const r = ReactRethinkdb.r;
 
 const EditDocument = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
-    //editing: "",
+    editing: null,
 
     componentDidMount() {
         // $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
@@ -21,7 +21,7 @@ const EditDocument = createReactClass({
 
     getInitialState() {
         return {
-            sort: false
+            sort: false,
         };
     },
 
@@ -78,35 +78,42 @@ const EditDocument = createReactClass({
         })
     },
 
-    handleChangeEdit(question) {
-        let user = this.data.document.value().collaborators.find(collaborator => collaborator.user == "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4")
-        console.log("gggg", user)
-        if (user && user.question!=question) {
-            let removeQuery = r.table('documents').get(this.props.match.params.id).update({
-                collaborators: r.row('collaborators').difference([{ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: user.question }])
+    async handleChangeEdit(question) {
+        console.log("something")
+        let currentUser = sessionStorage.getItem('user_id')
+        console.log("curr", currentUser)
+        if (this.editing && this.editing != question) {
+            let query = r.table('questions').get(this.editing).update({
+                editor: ""
             })
-            ReactRethinkdb.DefaultSession.runQuery(removeQuery)
-            console.log("nope")
+            await ReactRethinkdb.DefaultSession.runQuery(query)
+            console.log("1" + currentUser)
         }
-        let documentQuery = r.table('documents').get(this.props.match.params.id).update({
-            collaborators: r.row('collaborators').append({ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: question})
-        })
-        ReactRethinkdb.DefaultSession.runQuery(documentQuery)
+        if (this.editing != question) {
+            this.editing = question
+            let query = r.table('questions').get(question).update({
+                editor: currentUser
+            })
+            await ReactRethinkdb.DefaultSession.runQuery(query)
+            console.log("editing", question)
+            console.log("2"+ currentUser)
+        }
+       
 
-
-        // if (this.editing && this.editing!=question) {
-        //     let query = r.table('questions').get(this.editing).update({
-        //         editor: ""
+        // let user = this.data.document.value().collaborators.find(collaborator => collaborator.user == "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4")
+        // console.log("gggg", user)
+        // if (user && user.question != question) {
+        //     let removeQuery = r.table('documents').get(this.props.match.params.id).update({
+        //         collaborators: r.row('collaborators').difference([{ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: user.question }])
         //     })
-        //     ReactRethinkdb.DefaultSession.runQuery(query)
-        //     console.log("1")
+        //     ReactRethinkdb.DefaultSession.runQuery(removeQuery).then(res => {
+        //         let documentQuery = r.table('documents').get(this.props.match.params.id).update({
+        //             collaborators: r.row('collaborators').append({ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: question })
+        //         })
+        //         ReactRethinkdb.DefaultSession.runQuery(documentQuery)
+        //     })
+        //     console.log("nope")
         // }
-        //this.editing = question
-        // let query = r.table('questions').get(question).update({
-        //     editor: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4"
-        // })
-        // await ReactRethinkdb.DefaultSession.runQuery(query)
-        // console.log("editing", question)
     },
 
     async handleSortQuestion() {

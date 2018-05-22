@@ -64,6 +64,7 @@ const Login = createReactClass({
                                     console.log('Success')
                                     sessionStorage.setItem("token", result.token)
                                     sessionStorage.setItem("user_id", result.user.id)
+                                    sessionStorage.setItem("user_name", result.user.name)
                                     sessionStorage.setItem("role", result.user.role)
                                     console.log(sessionStorage.getItem("token"))
                                     console.log(sessionStorage.getItem("user_id"))
