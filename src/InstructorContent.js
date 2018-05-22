@@ -11,6 +11,7 @@ import _ from 'lodash'
 import { Rating } from 'semantic-ui-react'
 import NavInstructor2 from './NavInstructor2'
 import Chat from './Chat'
+import './App.css';
 
 let r = ReactRethinkdb.r
 
@@ -184,9 +185,10 @@ const Instructor = createReactClass({
     handleClose() {
         this.setState({ open: false })
     },
-
-    handleSaveContentId(id) {
-        this.setState({ contentid: id })
+    // contentid : null,
+    async handleSaveContentId(id) {
+        await this.setState({ contentid: null })
+        await this.setState({ contentid: id })
     },
 
     render() {
@@ -475,19 +477,19 @@ const Content = createReactClass({
     },
 
     handleSelectedDocument() {
-        // this.setState({ filteredsubmissions: this.data.content.value().submissions })
-        // this.setState({ list: !this.state.list })
-        // console.log("CONTENT ", this.data.content.value().id)
-        // let submissionids = 
         this.props.handleSaveContentId(this.data.content.value().id)
+        let allrows = document.querySelectorAll(".selectedrow")
+        for(let i = 0; i < allrows.length; i++ )
+          allrows[i].classList.remove("selectedrow")
+        document.getElementById(this.data.content.value().docid).classList.add("selectedrow")
+        
     },
 
     render() {
-        console.log("Content", this.data.content.value())
         return (
             this.data.content.value()
             &&
-            <tr onClick={() => this.handleSelectedDocument()}>
+            <tr id={this.data.content.value().docid} onClick={() => this.handleSelectedDocument()}>
                 <td>{this.props.coursename}</td>
                 <td><Document id={this.data.content.value().docid} /> </td>
                 <td>A</td>
@@ -497,25 +499,43 @@ const Content = createReactClass({
                 <td>A</td>
                 <td>A</td>
 
-                {
-                    // this.state.list
-                    // &&
-                    // this.data.content.value().submissions.map(
-                    //     (submission) =>
-                    //         this.props.handleSaveSubmissionIds(submission.submissionid)
-                    // )
-                }
+              
             </tr>
         )
     },
 });
+
+const ContentShowSub2 = createReactClass({
+
+    mixins: [ReactRethinkdb.DefaultMixin],
+    observe(props, state) {
+        return {}
+    },
+
+    componentWillMount() {
+        console.log("WILL MOUNT", this.props.id)
+    },
+
+    getInitialState() {
+        return {
+            id: this.props.id
+        };
+    },
+
+    render() {
+        console.log("BETWEEN", this.state.id)
+        return(
+            <ContentShowSub2 id={this.state.id}/>
+        )
+    },
+})
 
 const ContentShowSub = createReactClass({
 
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        console.log("SDF", this.props.id)
+        console.log("SFFFDF BF", this.props.id)
 
         return {
             content: new ReactRethinkdb.QueryRequest({
@@ -526,16 +546,11 @@ const ContentShowSub = createReactClass({
         };
     },
 
-    getInitialState() {
-        return {
-            filteredsubmissions: [],
-            list: false
-        };
-    },
-
     render() {
-        console.log("Content", this.data.content.value())
-        return (
+        console.log("Contentsssss",this.props.id)
+        return ( 
+            this.data.content.value()
+            &&
             this.data.content.value().submissions.map(
                 (submission) =>
                     <Submission id={submission} />
@@ -635,12 +650,18 @@ const Submission = createReactClass({
             }),
         };
     },
-
+    handleSelectedSubmission()
+    {
+        let allrows = document.querySelectorAll(".selectedrow1")
+        for(let i = 0; i < allrows.length; i++ )
+          allrows[i].classList.remove("selectedrow1")
+        document.getElementById( this.data.submissions.value().id).classList.add("selectedrow1")
+    },
     render() {
         return (
             this.data.submissions.value()
             &&
-            <tr>
+            <tr id = { this.data.submissions.value().id} onClick = { () => this.handleSelectedSubmission()}>
                 <td>{ this.data.submissions.value().studentid} </td>
                 <td>B</td>
                 <td>B</td>

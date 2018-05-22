@@ -21,6 +21,7 @@ const NavInstructor = createReactClass({
         }
     },
 
+  
     observe(props, state) {
         return {
             user: new ReactRethinkdb.QueryRequest({
@@ -38,51 +39,8 @@ const NavInstructor = createReactClass({
         this.setState({ activeIndex: newIndex })
     },
 
-    // async handleSelectedCourse(courseid) {
-
-    //     console.log("METHOD CALLED ", courseid)
-    //     //selecting multiple courses
-    //     let courseIdIndex = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse == courseid)
-    //     if (courseIdIndex == -1) {
-    //         sessionStorage.setItem("selectedcourses",[...this.state.selectedcourses, courseid] )
-    //         await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
-    //         //select all sections under course
-    //         let allsections = document.getElementsByClassName(courseid)
-    //         for (let i = 0; i < allsections.length; i++) {
-    //             allsections[i].checked = true
-    //         }
-    //     }
-    //     else {
-    //         let selectedcourses = this.state.selectedcourses
-    //         selectedcourses.splice(courseIdIndex, 1)
-    //         let allsections = document.getElementsByClassName(courseid)
-    //         for (let i = 0; i < allsections.length; i++) {
-    //             allsections[i].checked = false
-    //         }
-    //         await this.setState({ selectedcourses })
-    //          sessionStorage.setItem("selectedcourses", selectedcourses )
-
-    //     }
-
-    //     //get the documents for the course(s)
-    //     this.setState({ documents: [] })
-    //     this.state.selectedcourses.map(async (course, i) => {
-    //         let query = r.table('documents').innerJoin(
-    //             r.table('contents').innerJoin(r.table('courses').get(course)('contents'),
-    //                 (action, content) =>
-    //                     action('id').eq(content('contentid'))).zip().distinct(),
-    //             (action, document) =>
-    //                 action('id').eq(document('docid'))).zip().distinct()
-    //         await ReactRethinkdb.DefaultSession.runQuery(query).then(
-    //             (res) => {
-    //                 res.map((r) => this.setState({ documents: [...this.state.documents, r] }))
-    //             }
-    //         )
-    //     })
-    // },
-
     render() {
-        console.log("SSSSSSSSSSSSS", sessionStorage.getItem("selectedcourses"))
+        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", sessionStorage.getItem("user_id"))
         const { items, activeIndex } = this.state
         return (
 
@@ -106,9 +64,9 @@ const NavInstructor = createReactClass({
 
                         </div>
                         <div className='user-data'>
-                            {this.data.user.value().name}
+                            {this.data.user.value() && this.data.user.value().name}
                             <br />
-                            {this.data.user.value().number}
+                            {this.data.user.value() && this.data.user.value().number}
                             <br />
                             <a uk-tooltip="title: My profile page; pos: bottom-right">
                                 My Profile
@@ -134,32 +92,7 @@ const NavInstructor = createReactClass({
                                 <p>{<Course id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} />}</p>
                         )
                     }
-                    {/* <Accordion inverted className="nav-box1">
-                        <span className="nav-course-checkbox"><input class="uk-checkbox" type="checkbox" /></span>
-                        <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick} className="nav-term-course">
-                            <span className="nav-font"> CP1801 </span>
-                            <span className="nav-dropdown-icon" > <Icon name='dropdown' /></span>
-                        </Accordion.Title>
-                        <Accordion.Content active={activeIndex === 0}>
-                            <span className="nav-section-checkbox"><input class="uk-checkbox" type="checkbox" />
-                            </span>
-                            <span className="nav-section-img">
-                                <img class="ui avatar image" src={userpic} />
-                            </span>
-                            <span className="nav-sections" style={{ color: 'white' }}>
-                                Section 1 - Wagdi
-                                        </span>
-                            <br />
-                            <span className="nav-section-checkbox"><input class="uk-checkbox" type="checkbox" />
-                            </span>
-                            <span className="nav-section-img">
-                                <img class="ui avatar image" src={userpic} />
-                            </span>
-                            <span className="nav-sections" style={{ color: 'white' }}>
-                                Section 1 - Wagdi
-                                        </span>
-                        </Accordion.Content>
-                    </Accordion> */}
+                   
 
                 </div>
                 <hr />

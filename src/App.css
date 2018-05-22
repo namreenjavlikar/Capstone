@@ -514,8 +514,7 @@ tbody td:last-child, thead th:last-child {
 
   background-color: white;
   margin-left: 15px;
-
-   margin-right:15px;
+margin-right:15px;
     /* margin: 5px; */
 
 }
@@ -523,8 +522,8 @@ tbody td:last-child, thead th:last-child {
   margin-top: 15px;
   background-color: white;
   margin-left: 15px;
-width: 50%;
-   margin-right:15px;
+  width: 50%;
+  margin-right:15px;
     /* margin: 5px; */
 }
 
@@ -537,139 +536,147 @@ width: 50%;
   margin-top:4.5px;
 
   }
-  .navcss2{
+.navcss2{
     align-content:center; 
     float: right;
     margin-right: 20px;
     margin-top: 10px;
-    }
-    .simplemargin{
-      margin-left:25px;
-    }
-    .simplemargin1{
-      margin-left:5px;
-    }
-    .simplemargin2{
-      margin-left:50px;
-    }
-    .simplemargin3{
-      margin-left:70px;
-    }
-    .simplemargin4{
-      margin-left:15px;
-      
-    }
-    .simplemargin5{
-      margin-left:10px;
-      margin-right:10px;
-      
-    }
-    
-    .navstyle{
-      float: right;
-      margin-top: 0.25vh;
-      font-size: 2vh;
-      margin-left: 50%;
-      
-    }
+}
+.simplemargin{
+  margin-left:25px;
+}
+.simplemargin1{
+  margin-left:5px;
+}
+.simplemargin2{
+  margin-left:50px;
+}
+.simplemargin3{
+  margin-left:70px;
+}
+.simplemargin4{
+  margin-left:15px;
+  
+}
+.simplemargin5{
+  margin-left:10px;
+  margin-right:10px;
+  
+}
 
-    Table.scroll td  {
-      text-align: center;   
-      font-size: 1.25em;
-      
-    }
-    Table.scroll1 td  {
-      text-align: center;   
-      font-size: 1.25em;
-      
-    }
-    
-    
-    Table.scroll1 th  {
-      color: #ffffff;
-      font-weight: bold;
-      text-align: center;
-      font-size: 1em;
-    }
-    
+.navstyle{
+  float: right;
+  margin-top: 0.25vh;
+  font-size: 2vh;
+  margin-left: 50%;
+  
+}
+
+Table.scroll td  {
+  text-align: center;   
+  font-size: 1.25em;
+  
+}
+Table.scroll1 td  {
+  text-align: center;   
+  font-size: 1.25em;
+  
+}
+
+
+Table.scroll1 th  {
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1em;
+}
+
 .tablestyle{
   width: 100%;
   text-align: center;
   }
-  
-  table.scroll {
-   border-spacing: 0;
-   /* border: 1px solid black; */
-   text-align: center;
-  }
-  
-  table.scroll tbody,
-  table.scroll thead tr { display: block; }
-  
-  table.scroll tbody {
-   height: 105px;
-  
-   overflow-y: auto;
-   overflow-x: hidden;
-  }
-  
-  table.scroll tbody td,
-  table.scroll thead th {
-   width: 280px;
-   /* border-right: 1px solid black; */
-  
-  }
-  
 
-  table thead th {
+table.scroll {
+  border-spacing: 0;
+  /* border: 1px solid black; */
+  text-align: center;
+}
+
+table.scroll tbody,
+table.scroll thead tr { display: block; }
+
+table.scroll tbody {
+  height: 105px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+table.scroll tbody td,
+table.scroll thead th {
+  width: 280px;
+  /* border-right: 1px solid black; */
+
+}
+
+
+table thead th {
+
+background-color: #76323f;
+font-family: 'Roboto', sans-serif;
+  color: white;
+  font-size: 1.25em;
+  text-align: center; 
+  font-style: bold;
+  /* border-block-end: 1px solid black; */
+  }
   
+  table tbody td {
+    font-family: 'Roboto', sans-serif;
+  color: black;
+  text-align: center;
+
+    /* border-block-end: 1px solid black; */
+  }
+
+  .header-style{
+  background-color:#E9E9E9;
+  }
+  .img{
+  width: 70px;
+  height:70px;
+  margin-top: 20px;
+  }
+  
+  .h2-header{
+  color: #76323f;
+  font-size: 70px;
+  margin-top: 20px;
+  font-weight: bold;
+  }
+  
+  .divider{
   background-color: #76323f;
-  font-family: 'Roboto', sans-serif;
-   color: white;
-   font-size: 1.25em;
-   text-align: center; 
-   font-style: bold;
-   /* border-block-end: 1px solid black; */
-   }
-   
-   table tbody td {
-     font-family: 'Roboto', sans-serif;
-    color: black;
-    text-align: center;
-  
-     /* border-block-end: 1px solid black; */
-   }
-  
-   .header-style{
-   background-color:#E9E9E9;
-   }
-   .img{
-    width: 70px;
-    height:70px;
-    margin-top: 20px;
-   }
-   
-   .h2-header{
-    color: #76323f;
-    font-size: 70px;
-    margin-top: 20px;
-    font-weight: bold;
-   }
-   
-   .divider{
-    background-color: #76323f;
-    opacity: 1;
+  opacity: 1;
 
-   }
-   .checkbx2{
+  }
+  .checkbx2{
+  margin-left:12px;
+  font-size:1.1em;
+  size: 10px;  font-family: 'Roboto', sans-serif;
+  
+  }
+
+  .checkbx{
     margin-left:12px;
-    font-size:1.1em;
-    size: 10px;  font-family: 'Roboto', sans-serif;
-    
-    }
-
-    .checkbx{
-      margin-left:12px;
-      font-family: 'Roboto', sans-serif;
-      
-      }
+    font-family: 'Roboto', sans-serif;
+}
+.selectedrow{
+  background-color: aquamarine;
+}
+.selectedrow1{
+  background-color: yellow;
+}
+.hide{
+  display: none;
+}

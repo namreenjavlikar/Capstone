@@ -12,6 +12,7 @@ import { Rating } from 'semantic-ui-react'
 import NavInstructor2 from './NavInstructor2'
 import Chat from './Chat'
 import InstructorContent from './InstructorContent'
+import './App.css';
 
 let r = ReactRethinkdb.r
 
@@ -28,7 +29,7 @@ const Instructor = createReactClass({
             }),
         };
     },
-
+    
     getInitialState() {
         return {
             rightButton: 'chat-button',
@@ -40,7 +41,7 @@ const Instructor = createReactClass({
             changeClass: window.innerWidth >= 500 ? "container-instructor-full" : "container-instructor-both",
             expandRight: false,
             iconRight: false ? "icon: chevron-right; ratio: 2.5" : "icon: chevron-left; ratio: 2.5",
-            expandLeft: false,
+            expandLeft: true,
             iconLeft: false ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5",
             cal: 0,
             selectedcourses: []
@@ -182,7 +183,7 @@ const Instructor = createReactClass({
         this.setState({ open: false })
     },
 
-    async handleSelectCourse(courseid) {
+    handleSelectCourse(courseid) {
         if (courseid === "All") {
             let checked = document.getElementById("nav_check_all").checked
             if (checked) {
@@ -206,7 +207,7 @@ const Instructor = createReactClass({
         } else {
             let courseIdIndex = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse == courseid)
             if (courseIdIndex == -1) {
-                await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
+                this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
                 //select all sections under course
                 let allsections = document.getElementsByClassName(courseid)
                 for (let i = 0; i < allsections.length; i++) {
@@ -220,26 +221,26 @@ const Instructor = createReactClass({
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = false
                 }
-                await this.setState({ selectedcourses })
+                this.setState({ selectedcourses })
             }
         }
     },
 
     render() {
-        console.log("DDD", sessionStorage.getItem("selectedcourses"))
+        // className={!this.state.expandLeft && "hide"}
         // window.onresize = () => this.handleSize() // to collpse on window resize
         const { items, value, activeIndex, visible, open } = this.state
         // const { activeIndex } = this.state
         return (
             <div className="container">
+            <div>
                 {
-                    // this.state.screen >= 500
-                    this.state.expandLeft//&&window.innerWidth>=305// collapsses when width is small
-                        ?
-                        <NavInstructor2 handleSelectedCourse={(id) => this.handleSelectCourse(id)} />
-                        :
-                        <span></span>
+                    this.state.expandLeft
+                    &&
+                    <NavInstructor2  handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} />
+
                 }
+             </div>
                 <div className={this.state.changeClass}>
                     <span class={this.state.leftButton} uk-icon={this.state.iconLeft} onClick={() => this.handleExpandLeft()}>
                     </span>
@@ -347,8 +348,8 @@ const Content = createReactClass({
         return (
             this.data.content.value()
             &&
-            <tr onClick={() => this.handleSelectedDocument()}>
-                <td >
+            <tr className=" selectedrow " onClick={() => this.handleSelectedDocument()} >
+                <td   >
                     {this.props.coursename}
                 </td>
                 <td >
