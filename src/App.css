@@ -680,3 +680,6 @@ font-family: 'Roboto', sans-serif;
 .hide{
   display: none;
 }
+.show{
+  display: inline-block;
+}

@@ -4,11 +4,8 @@ import createReactClass from 'create-react-class';
 import Userinfo from './Userinfo'
 import userpic from './Images/cat.jpg'
 import userpic1 from './Images/flower.jpg'
-import GroupInfo from './GroupInfo'
+// import GroupInfo from './GroupInfo'
 import { Accordion, Icon, Segment, Form, Button, Image, List, Transition, Dropdown, Menu, Rating } from 'semantic-ui-react'
-
-
-
 
 let r = ReactRethinkdb.r;
 

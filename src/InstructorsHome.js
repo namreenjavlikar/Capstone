@@ -29,7 +29,12 @@ const Instructor = createReactClass({
             }),
         };
     },
-    
+
+    async componentDidMount() {
+        await this.handleExpandLeft()
+        await this.handleExpandLeft()
+    },
+
     getInitialState() {
         return {
             rightButton: 'chat-button',
@@ -233,14 +238,16 @@ const Instructor = createReactClass({
         // const { activeIndex } = this.state
         return (
             <div className="container">
-            <div>
-                {
+                <div className={!this.state.expandLeft && "hide"}>
+                    {/* {
                     this.state.expandLeft
                     &&
                     <NavInstructor2  handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} />
 
-                }
-             </div>
+                } */}
+
+                    <NavInstructor2 handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} />
+                </div>
                 <div className={this.state.changeClass}>
                     <span class={this.state.leftButton} uk-icon={this.state.iconLeft} onClick={() => this.handleExpandLeft()}>
                     </span>

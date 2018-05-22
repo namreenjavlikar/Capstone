@@ -287,7 +287,7 @@ const Instructors1 = createReactClass({
             }),
         };
     },
-    
+
     async handleSelectedCourse(courseid) {
 
         //selecting multiple courses
@@ -469,8 +469,8 @@ const Course = createReactClass({
 
     handleSelectedCourse() {
         let checked = document.getElementById(this.data.course.value().id).checked
-        this.setState({list: checked})
-    },  
+        this.setState({ list: checked })
+    },
 
     handleSelectedSection() {
 
@@ -492,9 +492,9 @@ const Course = createReactClass({
                 {
                     this.state.list &&
                     this.data.course.value().contents.map(
-                    (content) => <p style={{ paddingLeft: "20px" }}>
-                        <Content id={content} /></p>
-                )}
+                        (content) => <p style={{ paddingLeft: "20px" }}>
+                            <Content id={content} /></p>
+                    )}
             </p>
         )
     },
@@ -525,7 +525,7 @@ const Content = createReactClass({
 
     handleSelectedDocument() {
         // this.setState({ filteredsubmissions: this.data.content.value().submissions })
-        this.setState({list: !this.state.list})
+        this.setState({ list: !this.state.list })
     },
 
     render() {
@@ -541,9 +541,9 @@ const Content = createReactClass({
                     this.state.list
                     &&
                     this.data.content.value().submissions.map(
-                    (submission) => <p style={{ paddingLeft: "20px" }}>
-                        <Submission id={submission} /></p>
-                )}
+                        (submission) => <p style={{ paddingLeft: "20px" }}>
+                            <Submission id={submission} /></p>
+                    )}
             </span>
         )
     },

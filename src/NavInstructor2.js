@@ -39,6 +39,11 @@ const NavInstructor = createReactClass({
         this.setState({ activeIndex: newIndex })
     },
 
+    handleLogout() {
+        sessionStorage.clear()
+        this.props.history.push("/")
+    },
+
     render() {
         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", sessionStorage.getItem("user_id"))
         const { items, activeIndex } = this.state
@@ -56,7 +61,7 @@ const NavInstructor = createReactClass({
                                     />
                                     <div class="uk-transition-slide-bottom uk-position-bottom uk-overlay uk-overlay-default" style={{ width: 100, height: 100, borderRadius: 50 }}>
                                         <div class="uk-position-center">
-                                            <div class="uk-transition-slide-bottom-small"><h4 class="uk-margin-remove">Logout</h4></div>
+                                            <div class="uk-transition-slide-bottom-small"><h4 class="uk-margin-remove" onClick={() => this.handleLogout()}>Logout</h4></div>
                                         </div>
                                     </div>
                                 </a>
