@@ -8,7 +8,6 @@ import $ from 'jquery'
 import Question from './Question'
 const r = ReactRethinkdb.r;
 
-
 const EditDocument = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
@@ -56,23 +55,6 @@ const EditDocument = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
-    handleNewQuestion() {
-        let query = r.table('questions').insert({
-            answer: "",
-            choices: [],
-            question: "",
-            title: "",
-            htmlcode: ""
-        })
-        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
-            console.log("gen", res.generated_keys[0])
-            let query = r.table('documents').get(this.props.match.params.id).update({
-                questions: r.row('questions').append(res.generated_keys[0])
-            })
-            ReactRethinkdb.DefaultSession.runQuery(query)
-        })
-    },
-
     render() {
         return (
             this.data.document.value() == true
@@ -93,17 +75,12 @@ const EditDocument = createReactClass({
                         <BS.FormControl type="datetime-local" value={this.data.document.value().endDate} placeholder="Enter End Date" onChange={(e) => this.setState({ endDate: e.target.value })} />
                     </div>
 
-                    <div className="document-questions-view">
+                    <div className="document-questions-view"  uk-sortable="handle: .uk-card">
                         {
-                            this.data.document.value().questions.map((question, index) =>
+                            this.data.document.value().questions.map( (question, index) => 
                                 <Question questionId={question} key={index} />
                             )
                         }
-                        <BS.Button bsStyle="primary" onClick={() => this.handleNewQuestion()}>New Question</BS.Button>
-                    </div>
-
-                    <div className="document-questions-create">
-                        <BS.FormControl componentClass="textarea" placeholder="Add new questions" value={this.state.content} onChange={(e) => this.setState({ content: e.target.value })} />
                     </div>
                 </div>
         )

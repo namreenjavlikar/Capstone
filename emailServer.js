@@ -6,11 +6,6 @@ var app = express()
 var multer = require('multer');
 
 app.use('/', express.static('assets'))
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
 var httpServer = http.createServer(app)
 
 httpServer.listen(3001)
@@ -78,37 +73,10 @@ app.get('/api/activate/:recovEmail/:key/:id', async (req, res) => {
 })
 
 
-app.post('/fileUpload', upload.single('file'), (req, res) => {
-	console.log("yes")
+app.post('/fileUpload', upload.single('file-to-upload'), (req, res) => {
 	db.then(conn => {
-		console.log("yup")
 		r.table('users').insert({ imagePath: req.file.path }).run(conn, (err, data) => {
-			console.log("nope")
-			res.json({ link: 'http://localhost:3001/' + req.file.path })
+			res.json({ 'message': 'File uploaded successfully' })
 		})
 	})
 });
-
-app.post('/fileUploadLink', upload.single('file'), (req, res) => {
-	console.log("yes file")
-	db.then(conn => {
-		console.log("yup")
-		r.table('users').insert({ filePath: req.file.path }).run(conn, (err, data) => {
-			console.log("nope")
-			res.json({ link: 'http://localhost:3001/file/' + req.file.path })
-		})
-	})
-});
-
-app.get('/public/uploads/:filelink', (req, res) => {
-	console.log("yes2", req.params.filelink)
-	res.sendFile(__dirname + '/public/uploads/' + req.params.filelink);
-});
-
-
-app.get('/file/public/uploads/:filelink', (req, res) => {
-	console.log("yes3", req.params.filelink)
-	res.download(__dirname + '/public/uploads/' + req.params.filelink);
-});
-
-

@@ -164,7 +164,7 @@ export const Group = createReactClass({
 
     getInitialState() {
         return {
-            userid: sessionStorage.getItem("user_id"),
+            user: "TestUser",
             txtMessage: "",
         };
     },
@@ -181,12 +181,7 @@ export const Group = createReactClass({
                 query: r.table('groups').get(this.props.id),
                 changes: true,
                 initial: [],
-            }),
-            user: new ReactRethinkdb.QueryRequest({
-                query: r.table('users').get(sessionStorage.getItem("user_id")),
-                changes: true,
-                initial: [],
-            }),
+            })
         };
     },
 

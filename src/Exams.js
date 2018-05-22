@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
-// import showdown from 'showdown';
-// import ReactMarkdown from 'react-markdown'
+import showdown from 'showdown';
+import ReactMarkdown from 'react-markdown'
 
 let r = ReactRethinkdb.r;
-// let converter = new showdown.Converter();
+let converter = new showdown.Converter();
 
 export const Details = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
@@ -111,9 +111,9 @@ export const Details = createReactClass({
     },
 
     async handleMarkdown(e) {
-        // await this.setState({ content: e.target.value })
-        // let html = converter.makeHtml(this.state.content)
-        // await this.setState({ htmlcode: html })
+        await this.setState({ content: e.target.value })
+        let html = converter.makeHtml(this.state.content)
+        await this.setState({ htmlcode: html })
     },
 
     async uploadFile(_id, password) {
