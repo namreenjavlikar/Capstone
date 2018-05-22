@@ -10,10 +10,7 @@ const r = ReactRethinkdb.r;
 
 const EditDocument = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
-<<<<<<< HEAD
     editing: null,
-=======
->>>>>>> 9814dd4f2353c546b41a60069955b6c5412432aa
 
     componentDidMount() {
         $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
@@ -21,11 +18,7 @@ const EditDocument = createReactClass({
 
     getInitialState() {
         return {
-<<<<<<< HEAD
             sort: false,
-=======
-
->>>>>>> 9814dd4f2353c546b41a60069955b6c5412432aa
         };
     },
 
