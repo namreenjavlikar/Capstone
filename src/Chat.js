@@ -15,8 +15,8 @@ import * as Message from './Messages'
 
 
 let r = ReactRethinkdb.r;
-let tempGroupId = "999"
-let tempContactId = "c8aabc5c-8eff-4aa7-b3bd-68ad1ae1aa2a"
+// let tempGroupId = ""
+let tempContactId = ""
 
 
 
@@ -37,7 +37,8 @@ export const Chat = createReactClass({
             iconLeft: false ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5",
             to: "none",
             txtMessage: "",
-            targetedChat: "contacts"
+            targetedChat: "contacts",
+            tempGroupId: ""
         };
     },
 
@@ -251,7 +252,7 @@ export const Chat = createReactClass({
 
     },
     selectGroup(id) {
-        tempGroupId = id
+        this.state.tempGroupId = id
         this.setState({ to: id, targetedChat: "group" })
     },
 
@@ -455,7 +456,7 @@ export const Chat = createReactClass({
                                 // it doenst work cause we are already observing user
                                 // <Message.Single id={tempContactId}  />
                                 :
-                                <Message.Group id={tempGroupId} />
+                                <Message.Group id={this.state.tempGroupId} />
 
 
 
