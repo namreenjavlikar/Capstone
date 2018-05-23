@@ -39,6 +39,11 @@ const NavInstructor = createReactClass({
         this.setState({ activeIndex: newIndex })
     },
 
+    handleLogout() {
+        sessionStorage.clear()
+        this.props.history.push("/")
+    },
+
     render() {
         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", sessionStorage.getItem("user_id"))
         const { items, activeIndex } = this.state
@@ -56,7 +61,7 @@ const NavInstructor = createReactClass({
                                     />
                                     <div class="uk-transition-slide-bottom uk-position-bottom uk-overlay uk-overlay-default" style={{ width: 100, height: 100, borderRadius: 50 }}>
                                         <div class="uk-position-center">
-                                            <div class="uk-transition-slide-bottom-small"><h4 class="uk-margin-remove">Logout</h4></div>
+                                            <div class="uk-transition-slide-bottom-small"><h4 class="uk-margin-remove" onClick={() => this.handleLogout()}>Logout</h4></div>
                                         </div>
                                     </div>
                                 </a>
@@ -89,7 +94,7 @@ const NavInstructor = createReactClass({
                         &&
                         this.data.user.value().courses.map(
                             (course) =>
-                                <p>{<Course id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} />}</p>
+                                <p>{<Course id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} handleSelectSection={(id) => this.props.handleSelectSection(id)} />}</p>
                         )
                     }
                    
@@ -165,14 +170,7 @@ const Course = createReactClass({
         let checked = document.getElementById(this.data.course.value().id).checked
         this.setState({ list: checked })
     },
-
-    handleSelectedSection() {
-
-    },
-
-    handleClickCourse() {
-
-    },
+    
 
     render() {
         const { items, activeIndex } = this.state
@@ -188,14 +186,19 @@ const Course = createReactClass({
                 <Accordion.Content active={activeIndex === 0}>
                     {
                         this.data.course.value().sections.map((section, i) =>
+                            
                             <div>
-                                <span className="nav-section-checkbox"><input className={this.data.course.value().id + " Nav_check " + "uk-checkbox"} type="checkbox" />
+                                <span className="nav-section-checkbox">
+                                    <input id={section} 
+                                        className={this.data.course.value().id + " Nav_check " + "uk-checkbox"} 
+                                        onClick={() => this.props.handleSelectSection(section)}
+                                        type="checkbox" />
                                 </span>
                                 <span className="nav-section-img">
                                     <img class="ui avatar image" src={userpic} />
                                 </span>
                                 <span className="nav-sections" style={{ color: 'white' }}>
-                                    <Section id={section} />
+                                    <Section id={section}  />
                                 </span>
                                 <br />
                             </div>

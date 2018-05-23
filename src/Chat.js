@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import Userinfo from './Userinfo'
-import GroupInfo from './GroupInfo'
+// import GroupInfo from './GroupInfo'
 import * as Contacts from './Contacts'
 import * as Message from './Messages'
 
@@ -344,7 +344,7 @@ export const Chat = createReactClass({
                                                 <img class="ui avatar image" src={userpic}
                                                 />
                                                 <div class="content">
-                                                    <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div>
+                                                    {/* <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div> */}
                                                 </div>
 
 

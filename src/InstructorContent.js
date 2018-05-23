@@ -48,7 +48,8 @@ const Instructor = createReactClass({
             expandLeft: false,
             iconLeft: false ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5",
             cal: 0,
-            contentid: null
+            contentid: null,
+            listofdocs: []
         }
     },
 
@@ -59,6 +60,7 @@ const Instructor = createReactClass({
     handleRemove() {
         this.setState({ items: this.state.items.slice(0, -1) })
     },
+
     handleClick(e, titleProps) {
         const { index } = titleProps
         const { activeIndex } = this.state
@@ -188,24 +190,62 @@ const Instructor = createReactClass({
     // contentid : null,
     async handleSaveContentId(id) {
         await this.setState({ contentid: null })
-        await this.setState({ contentid: id })
+        await this.setState({ contentid: id, listofdocs: [] })
+    },
+
+    async handleNextWork() {
+        if (this.state.listofdocs.length > 0) {
+            let index = this.state.listofdocs.findIndex(docid => docid === this.state.contentid)
+            index -= 1
+            if (index < 0) {
+                index = this.state.listofdocs.length - 1
+            }
+            await this.setState({ contentid: null })
+            await this.setState({ contentid: this.state.listofdocs[index] })
+
+            let allrows = document.querySelectorAll(".selectedrow")
+            if (allrows) {
+                for (let i = 0; i < allrows.length; i++)
+                    allrows[i].classList.remove("selectedrow")
+            }
+            document.getElementById(this.state.listofdocs[index]).classList.add("selectedrow")
+        }
+    },
+
+    async handlePreviousWork() {
+        if (this.state.listofdocs.length > 0) {
+
+            let index = this.state.listofdocs.findIndex(docid => docid === this.state.contentid)
+            index += 1
+            if (index > this.state.listofdocs.length - 1) {
+                index = 0
+            }
+            await this.setState({ contentid: null })
+            await this.setState({ contentid: this.state.listofdocs[index] })
+
+            let allrows = document.querySelectorAll(".selectedrow")
+            if (allrows) {
+                for (let i = 0; i < allrows.length; i++)
+                    allrows[i].classList.remove("selectedrow")
+            }
+            document.getElementById(this.state.listofdocs[index]).classList.add("selectedrow")
+        }
+    },
+
+    handleAddDocument(docid) {
+        if (!this.state.listofdocs.find(id => docid === id)) {
+            this.setState({ listofdocs: [...this.state.listofdocs, docid] })
+        }
     },
 
     render() {
-        // console.log("DDD", this.props.selectedcourses)
         const { items, value, activeIndex, visible, open } = this.state
         return (
             <div className="container">
-
-
-
                 <div class="main USD ">
                     <div class="uk-section-default USD">
-
                         <ul uk-accordion="multiple: true " className='simplemargin5'>
-
                             <li class="uk-open ">
-
                                 <div class="navcss">
                                     <a href="#" uk-icon="chevron-left"></a>
                                     <a href="#" uk-icon="chevron-right"></a>
@@ -214,10 +254,9 @@ const Instructor = createReactClass({
 
                                 <div class="uk-accordion-content" >
                                     <div>
-
                                         <table className="scroll " >
-                                            <thead  >
-                                                <tr  >
+                                            <thead>
+                                                <tr>
                                                     <th>Course</th>
                                                     <th>Type</th>
                                                     <th>Work</th>
@@ -225,8 +264,7 @@ const Instructor = createReactClass({
                                                     <th>Due</th>
                                                     <th>End</th>
                                                     <th>Submitted</th>
-                                                    <th>New
-                                                        </th>
+                                                    <th>New</th>
                                                 </tr>
                                             </thead>
                                             <tbody class='tbodystyle'>
@@ -235,7 +273,7 @@ const Instructor = createReactClass({
                                                     &&
                                                     this.props.selectedcourses.map(
                                                         (course) =>
-                                                            <Course id={course} handleSaveContentId={(id) => this.handleSaveContentId(id)} />
+                                                            <Course id={course} handleAddDocument={this.handleAddDocument} handleSaveContentId={(id) => this.handleSaveContentId(id)} />
                                                     )
                                                 }
                                             </tbody>
@@ -246,8 +284,8 @@ const Instructor = createReactClass({
                             </li>
                             <li class="uk-open">
                                 <div class="navcss">
-                                    <a href="#" uk-icon="chevron-left"></a>
-                                    <a href="#" uk-icon="chevron-right"></a>
+                                    <a href="#" onClick={() => this.handlePreviousWork()} uk-icon="chevron-left" ></a>
+                                    <a href="#" onClick={() => this.handleNextWork()} uk-icon="chevron-right"></a>
                                 </div>
                                 <a class="uk-accordion-title checkbx simplemargin4" href="#" ><strong>Work Submitted  </strong>  </a>
 
@@ -273,7 +311,7 @@ const Instructor = createReactClass({
                                             {
                                                 this.state.contentid
                                                 &&
-                                                <ContentShowSub id={this.state.contentid} />
+                                                <ContentShowSub id={this.state.contentid} sections={this.props.selectedsections} />
                                             }
                                         </tbody>
                                     </table>
@@ -283,8 +321,8 @@ const Instructor = createReactClass({
                         <div className='simplemargin5'>
                             <Transition visible={visible} animation='scale' duration={500}>
 
-
                                 <div class='togglestyle' >
+                                    <p>Here</p>
                                     <Form class="ui form" >
                                         <div class="ui dividing header ">
                                             <div><Form.Group inline >
@@ -447,7 +485,7 @@ const Course = createReactClass({
             &&
             this.data.course.value().contents.map(
                 (content) =>
-                    <Content id={content} coursename={this.data.course.value().name} handleSaveContentId={(id) => this.props.handleSaveContentId(id)} />
+                    <Content id={content} coursename={this.data.course.value().name} handleAddDocument={this.props.handleAddDocument} handleSaveContentId={(id) => this.props.handleSaveContentId(id)} />
             )
         )
     },
@@ -476,20 +514,24 @@ const Content = createReactClass({
         };
     },
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        this.props.handleAddDocument(prevProps.id)
+    },
+
     handleSelectedDocument() {
         this.props.handleSaveContentId(this.data.content.value().id)
         let allrows = document.querySelectorAll(".selectedrow")
-        for(let i = 0; i < allrows.length; i++ )
-          allrows[i].classList.remove("selectedrow")
-        document.getElementById(this.data.content.value().docid).classList.add("selectedrow")
-        
+        for (let i = 0; i < allrows.length; i++)
+            allrows[i].classList.remove("selectedrow")
+        document.getElementById(this.data.content.value().id).classList.add("selectedrow")
+
     },
 
     render() {
         return (
             this.data.content.value()
             &&
-            <tr id={this.data.content.value().docid} onClick={() => this.handleSelectedDocument()}>
+            <tr id={this.data.content.value().id} onClick={() => this.handleSelectedDocument()}>
                 <td>{this.props.coursename}</td>
                 <td><Document id={this.data.content.value().docid} /> </td>
                 <td>A</td>
@@ -498,8 +540,6 @@ const Content = createReactClass({
                 <td>A</td>
                 <td>A</td>
                 <td>A</td>
-
-              
             </tr>
         )
     },
@@ -524,8 +564,8 @@ const ContentShowSub2 = createReactClass({
 
     render() {
         console.log("BETWEEN", this.state.id)
-        return(
-            <ContentShowSub2 id={this.state.id}/>
+        return (
+            <ContentShowSub2 id={this.state.id} />
         )
     },
 })
@@ -547,13 +587,13 @@ const ContentShowSub = createReactClass({
     },
 
     render() {
-        console.log("Contentsssss",this.props.id)
-        return ( 
+        console.log("Contentsssss", this.props.id)
+        return (
             this.data.content.value()
             &&
             this.data.content.value().submissions.map(
                 (submission) =>
-                    <Submission id={submission} />
+                    <Submission id={submission} sections={this.props.sections} />
             )
 
         )
@@ -650,19 +690,49 @@ const Submission = createReactClass({
             }),
         };
     },
-    handleSelectedSubmission()
-    {
-        let allrows = document.querySelectorAll(".selectedrow1")
-        for(let i = 0; i < allrows.length; i++ )
-          allrows[i].classList.remove("selectedrow1")
-        document.getElementById( this.data.submissions.value().id).classList.add("selectedrow1")
+    getInitialState() {
+        return {
+            show: false
+        };
     },
+
+    async componentWillReceiveProps() {
+        await this.setState({ show: false })
+        this.props.sections.map(sec => {
+            let query = r.table("sections").get(sec)
+            ReactRethinkdb.DefaultSession.runQuery(query).then(
+                res => {
+                    res.students.map(
+                        studentCid => {
+                            let studentQuery = r.table("users").get(studentCid)
+                            ReactRethinkdb.DefaultSession.runQuery(studentQuery).then(
+                                async resStu => {
+                                    if (resStu.collegeId === (this.data.submissions.value().studentid) + "") {
+                                        await this.setState({ show: true })
+                                    }
+                                })
+                        })
+                }
+            )
+        })
+    },
+
+    handleSelectedSubmission() {
+        let allrows = document.querySelectorAll(".selectedrow1")
+        for (let i = 0; i < allrows.length; i++)
+            allrows[i].classList.remove("selectedrow1")
+        document.getElementById(this.data.submissions.value().id).classList.add("selectedrow1")
+    },
+    
     render() {
+        console.log("SHOW", this.state.show)
         return (
+            this.state.show
+            &&
             this.data.submissions.value()
             &&
-            <tr id = { this.data.submissions.value().id} onClick = { () => this.handleSelectedSubmission()}>
-                <td>{ this.data.submissions.value().studentid} </td>
+            <tr id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+                <td>{this.data.submissions.value().studentid} </td>
                 <td>B</td>
                 <td>B</td>
                 <td>B</td>

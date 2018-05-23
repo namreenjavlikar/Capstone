@@ -10,6 +10,7 @@ const r = ReactRethinkdb.r;
 
 const EditDocument = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
+    editing: null,
 
     componentDidMount() {
         $(document).on('moved', '.uk-sortable', (e) => this.changeOrder(e));
@@ -17,7 +18,7 @@ const EditDocument = createReactClass({
 
     getInitialState() {
         return {
-
+            sort: false,
         };
     },
 
@@ -53,6 +54,84 @@ const EditDocument = createReactClass({
             [fieldName]: newValue
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
+    },
+
+    handleNewQuestion() {
+        let query = r.table('questions').insert({
+            answer: "",
+            choices: [],
+            question: "",
+            title: "",
+            htmlcode: "",
+            editor: ""
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
+            console.log("gen", res.generated_keys[0])
+            let query = r.table('documents').get(this.props.match.params.id).update({
+                questions: r.row('questions').append(res.generated_keys[0])
+            })
+            ReactRethinkdb.DefaultSession.runQuery(query)
+        })
+    },
+
+    async handleChangeEdit(question) {
+        //console.log("something")
+        let currentUser = sessionStorage.getItem('user_id')
+        console.log("curr", currentUser)
+        if (this.editing && this.editing != question) {
+            let query = r.table('questions').get(this.editing).update({
+                editor: ""
+            })
+            await ReactRethinkdb.DefaultSession.runQuery(query)
+            console.log("1" + currentUser)
+        }
+        if (this.editing != question) {
+            this.editing = question
+            let query = r.table('questions').get(question).update({
+                editor: currentUser
+            })
+            await ReactRethinkdb.DefaultSession.runQuery(query)
+            console.log("editing", question)
+            console.log("2"+ currentUser)
+        }
+       
+
+        // let user = this.data.document.value().collaborators.find(collaborator => collaborator.user == "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4")
+        // console.log("gggg", user)
+        // if (user && user.question != question) {
+        //     let removeQuery = r.table('documents').get(this.props.match.params.id).update({
+        //         collaborators: r.row('collaborators').difference([{ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: user.question }])
+        //     })
+        //     ReactRethinkdb.DefaultSession.runQuery(removeQuery).then(res => {
+        //         let documentQuery = r.table('documents').get(this.props.match.params.id).update({
+        //             collaborators: r.row('collaborators').append({ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: question })
+        //         })
+        //         ReactRethinkdb.DefaultSession.runQuery(documentQuery)
+        //     })
+        //     console.log("nope")
+        // }
+    },
+
+    async handleSortQuestion() {
+        // $('#parent').sortable({ disabled: true });
+        // await this.setState({ sort: !this.state.sort })
+        // if ($('#parent').sortable("option", "disabled"))
+        //     $('#parent').sortable("enable");
+        // else
+        //     $('#parent').sortable('disable');
+        // if (this.state.sort) {
+        //     console.log("sorting")
+        //     //$("#parent").sortable({
+        //     //    update: e => {
+        //     //        this.changeOrder(e)
+        //     //    }
+        //     //});
+        //     //$("#parent").sortable( "option", "disabled", false );
+        // }
+        // else {
+        //     console.log("sorting disabled")
+        //     //$("parent").sortable("destroy");
+        // }
     },
 
     render() {

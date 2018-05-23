@@ -7,7 +7,6 @@ import '../node_modules/uikit/dist/css/uikit.css';
 import './App.css';
 import photo from './photo.png';
 import logo from './logo.png'
-
 import { sign } from 'jsonwebtoken'
 import bcrypt from "bcryptjs"
 
@@ -64,6 +63,7 @@ const Login = createReactClass({
                                     console.log('Success')
                                     sessionStorage.setItem("token", result.token)
                                     sessionStorage.setItem("user_id", result.user.id)
+                                    sessionStorage.setItem("user_name", result.user.name)
                                     sessionStorage.setItem("role", result.user.role)
                                     console.log(sessionStorage.getItem("token"))
                                     console.log(sessionStorage.getItem("user_id"))
@@ -95,7 +95,7 @@ const Login = createReactClass({
                 overflow: 'hidden',
             }}>
                 <center>
-                    <div class="uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20 }}>
+                    <div class="login_card uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20 }}>
                         <img src={logo} style={{ width: 200, height: 150 }} />
                         <hr />
                         <h3 class="login-title"><strong>Username.Password</strong></h3>
