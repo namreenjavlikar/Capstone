@@ -19,6 +19,7 @@ import * as Contacts  from './Contacts'
 import * as Messages  from './Messages'
 import EditDocument from './EditDocument'
 import Question from './Question'
+import Chat from './Chat'
 
 let r = ReactRethinkdb.r
 
@@ -57,6 +58,7 @@ const App = createReactClass({
         <Route path="/Contacts" component={Contacts.Single} />
         <Route path="/Messages/:id" component={Messages.Single} />
         <Route path="/GroupMessages/:id" component={Messages.Group} />
+        <Route path="/Chat/" component={Chat} />
 
       </div>
     </Router>
