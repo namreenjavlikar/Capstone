@@ -214,6 +214,7 @@ export const Group = createReactClass({
                 <div className="chat-head">
 
                     <span style={{ color: "#76323f" }} className="contacts">
+                    <strong> {this.props.groupname} </strong>
 
                     
 
@@ -225,6 +226,7 @@ export const Group = createReactClass({
                         // :
                         // <strong> Loading.. </strong>
                     }
+                    <strong> {this.props.groupName} </strong>
                     
             
                     </span>

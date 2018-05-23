@@ -25,23 +25,23 @@ export const Enroll = createReactClass({
 
     componentWillMount() {
         //if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
-          ///  this.props.history.push("/")
+        ///  this.props.history.push("/")
         //} else {
-            let query = r.table('courses')
-            ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
-                res.toArray((err, results) => {
-                    results.map(course => {
-                        course.sections.map(section => {
-                            let querySection = r.table('sections').get(section)
-                            ReactRethinkdb.DefaultSession.runQuery(querySection).then(resSec => {
-                                let courseData = { courseid: course.id, courseName: course.name, sectionNo: resSec.sectionNo, sectionid: resSec.id }
-                                this.setState({ coursesList: [...this.state.coursesList, courseData] })
-                                console.log("Record", courseData)
-                            })
+        let query = r.table('courses')
+        ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
+            res.toArray((err, results) => {
+                results.map(course => {
+                    course.sections.map(section => {
+                        let querySection = r.table('sections').get(section)
+                        ReactRethinkdb.DefaultSession.runQuery(querySection).then(resSec => {
+                            let courseData = { courseid: course.id, courseName: course.name, sectionNo: resSec.sectionNo, sectionid: resSec.id }
+                            this.setState({ coursesList: [...this.state.coursesList, courseData] })
+                            console.log("Record", courseData)
                         })
                     })
                 })
             })
+        })
         //}
     },
 
@@ -105,15 +105,15 @@ export const Enroll = createReactClass({
             let studentId = splitArray[2]
 
             let queryStudent = r.table('users').get(studentId).update({
-                courses: r.row('courses').append( courseId )
+                courses: r.row('courses').append(courseId)
             })
             let querySection = r.table('sections').get(sectionId).update({
-                students: r.row('students').append( studentId )
+                students: r.row('students').append(studentId)
             })
             ReactRethinkdb.DefaultSession.runQuery(queryStudent);
             ReactRethinkdb.DefaultSession.runQuery(querySection);
 
-            
+
         })
     },
 
@@ -177,17 +177,17 @@ export const Home = createReactClass({
     },
 
     componentWillMount() {
-        // if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Student") {
-        //     this.props.history.push("/")
-        // }
-        // else {
-        //     let query = r.table('users').get(sessionStorage.getItem("user_id"))
-        //     ReactRethinkdb.DefaultSession.runQuery(query).then(
-        //         (res) => {
-        //             this.setState({ student: res })
-        //             console.log("here", res)
-        //         })
-        // }
+        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Student") {
+            this.props.history.push("/")
+        }
+        else {
+            let query = r.table('users').get(sessionStorage.getItem("user_id"))
+            ReactRethinkdb.DefaultSession.runQuery(query).then(
+                (res) => {
+                    this.setState({ student: res })
+                    console.log("here", res)
+                })
+        }
     },
 
     observe(props, state) {
@@ -281,7 +281,7 @@ export const Home = createReactClass({
         let text = e.target.value
         let updated = this.state.answers
         updated[i] = text
-        this.setState({answers: updated})
+        this.setState({ answers: updated })
     },
 
     handleSubmitContent() {
@@ -292,11 +292,11 @@ export const Home = createReactClass({
                 questionid: this.state.questions[i].id
             })
         })
-        let query = r.table("submissions").insert({studentid: sessionStorage.getItem("user_id"), answers: answers})
+        let query = r.table("submissions").insert({ studentid: sessionStorage.getItem("user_id"), answers: answers })
         ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
             let insertedSubmissionId = res.generated_keys[0]
-            let query2 = r.table('contents').filter({docid: this.state.selectedDocId}).update({
-                submissions: r.row('submissions').append( insertedSubmissionId )
+            let query2 = r.table('contents').filter({ docid: this.state.selectedDocId }).update({
+                submissions: r.row('submissions').append(insertedSubmissionId)
             })
             ReactRethinkdb.DefaultSession.runQuery(query2);
         })
@@ -344,7 +344,7 @@ export const Home = createReactClass({
                                 (q, i) =>
                                     <p key={i}>
                                         <h4>{q.question}</h4><br />
-                                        <input type={"text"} value={this.state.answers[i]} onChange={(e) => this.handleAnswer(e, i)}/>
+                                        <input type={"text"} value={this.state.answers[i]} onChange={(e) => this.handleAnswer(e, i)} />
                                     </p>
                             )
                         }
