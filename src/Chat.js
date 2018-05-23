@@ -9,14 +9,14 @@ import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import Userinfo from './Userinfo'
-// import GroupInfo from './GroupInfo'
+import GroupInfo from './GroupInfo'
 import * as Contacts from './Contacts'
 import * as Message from './Messages'
 
 
 let r = ReactRethinkdb.r;
 // let tempGroupId = ""
-let tempContactId = ""
+// let tempContactId = ""
 
 
 
@@ -37,8 +37,10 @@ export const Chat = createReactClass({
             iconLeft: false ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5",
             to: "none",
             txtMessage: "",
-            targetedChat: "contacts",
-            tempGroupId: ""
+            targetedChat: "empty",
+            tempGroupId: "",
+            tempContactId: "",
+            testUserNameToggle: false
         };
     },
 
@@ -56,7 +58,7 @@ export const Chat = createReactClass({
                 changes: true,
                 initial: [],
             }),
-           
+
 
         };
     },
@@ -246,39 +248,41 @@ export const Chat = createReactClass({
 
     },
 
-    selectContact(id) {
-        tempContactId = id
-        this.setState({ to: id, targetedChat: "contacts" })
+    async selectContact(id) {
+        await this.setState({ tempContactId: id })
+        await this.setState({ targetedChat: "contacts" })
+
 
     },
-    selectGroup(id) {
-        this.state.tempGroupId = id
-        this.setState({ to: id, targetedChat: "group" })
+    async selectGroup(id) {
+        await this.setState({ tempGroupId: id })
+        await this.setState({ targetedChat: "group" })
+
     },
 
     handleSendContacts() {
-        
-                let tempMessage = {
-                    from: sessionStorage.getItem("user_id"),
-                    to: tempContactId,
-                    date: new Date(),
-                    content: this.state.txtMessage
-                }
-        
-                // get the user id from the session
-                let messageToSelfQuery = r.table('users').get(sessionStorage.getItem("user_id")).update({
-                    messages: r.row('messages').append(tempMessage)
-                });
-                ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
-        
-                let messageToOtherQuery = r.table('users').get(tempContactId).update({
-                    messages: r.row('messages').append(tempMessage)
-                });
-                ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
-        
-        
-                this.setState({ txtMessage: '' })
-            },
+
+        let tempMessage = {
+            from: sessionStorage.getItem("user_id"),
+            to: this.state.tempContactId,
+            date: new Date(),
+            content: this.state.txtMessage
+        }
+
+        // get the user id from the session
+        let messageToSelfQuery = r.table('users').get(sessionStorage.getItem("user_id")).update({
+            messages: r.row('messages').append(tempMessage)
+        });
+        ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
+
+        let messageToOtherQuery = r.table('users').get(this.state.tempContactId).update({
+            messages: r.row('messages').append(tempMessage)
+        });
+        ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
+
+
+        this.setState({ txtMessage: '' })
+    },
 
 
     /////////////////////////////////////////
@@ -334,7 +338,6 @@ export const Chat = createReactClass({
                         <Accordion.Content active={activeIndex === 0}>
                             <div class="ui middle aligned selection list chat-group-contacts">
 
-
                                 {
                                     this.data.user.value().groups
                                         ?
@@ -344,7 +347,7 @@ export const Chat = createReactClass({
                                                 <img class="ui avatar image" src={userpic}
                                                 />
                                                 <div class="content">
-                                                    {/* <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div> */}
+                                                    <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div>
                                                 </div>
 
 
@@ -353,8 +356,6 @@ export const Chat = createReactClass({
                                         :
                                         <p>Loading...</p>
                                 }
-
-
 
                             </div>
                         </Accordion.Content>
@@ -382,7 +383,7 @@ export const Chat = createReactClass({
                                         <img class="ui avatar image" src={userpic}
                                         />
                                         <span style={{ color: "#76323f" }} className="contacts">
-                                            <strong> <Userinfo id={tempContactId} /> </strong>
+                                            <strong> <Userinfo id={this.state.tempContactId} /> </strong>
                                             <span class="chat-online-status"></span>
                                         </span>
                                         <span style={{ marginLeft: '140px', paddingRight: '10px', borderRight: '1px solid #76323f' }}>
@@ -405,7 +406,7 @@ export const Chat = createReactClass({
                                                     this.data.user.value().messages.map((item) => {
                                                         return <div >
                                                             {
-                                                                item.from == this.state.to
+                                                                item.from == this.state.tempContactId
                                                                     ?
                                                                     <li style={{ paddingRight: 0 }}>
                                                                         <img class="ui avatar image" style={{ float: 'right', marginLeft: '5px' }} src={userpic1}
@@ -416,7 +417,7 @@ export const Chat = createReactClass({
                                                                         <div class="clear"></div>
                                                                     </li>
                                                                     :
-                                                                    item.to == this.state.to
+                                                                    item.to == this.state.tempContactId
                                                                         ?
                                                                         <li>
                                                                             <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }}
@@ -456,7 +457,11 @@ export const Chat = createReactClass({
                                 // it doenst work cause we are already observing user
                                 // <Message.Single id={tempContactId}  />
                                 :
-                                <Message.Group id={this.state.tempGroupId} />
+                                this.state.targetedChat == "group"
+                                    ?
+                                    <Message.Group id={this.state.tempGroupId} groupName={<GroupInfo id={this.state.tempGroupId} />} />
+                                    :
+                                    <span></span>
 
 
 
