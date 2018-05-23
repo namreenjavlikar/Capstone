@@ -202,14 +202,6 @@ const Instructor = createReactClass({
                 this.setState({ selectedsections })
             }
         }
-        // let sectionIdIndex = this.state.selectedsections.findIndex((selectedsection) => selectedsection === sectionid)
-        // if (sectionIdIndex == -1) {
-        //     this.setState({ selectedsections: [...this.state.selectedsections, sectionid] })
-        // } else {
-        //     let selectedsections = this.state.selectedsections
-        //     selectedsections.splice(sectionIdIndex, 1)
-        //     this.setState({selectedsections})
-        // }
     },
 
     async handleSelectCourse(courseid) {

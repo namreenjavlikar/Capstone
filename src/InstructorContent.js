@@ -695,33 +695,26 @@ const Submission = createReactClass({
             show: false
         };
     },
+
     async componentWillReceiveProps() {
-        // console.log("BEFFFFFFFFFFFFFFFFFFF", this.props.sections)
-        // if (this.data.submissions.value()) {
-        this.props.sections.map(async sec => {
+        await this.setState({ show: false })
+        this.props.sections.map(sec => {
             let query = r.table("sections").get(sec)
-            await ReactRethinkdb.DefaultSession.runQuery(query).then(
+            ReactRethinkdb.DefaultSession.runQuery(query).then(
                 res => {
                     res.students.map(
-                        async studentCid => {
-                            let studentQuery = r.table("users").filter({ collegeId: studentCid })
-                            await ReactRethinkdb.DefaultSession.runQuery(studentQuery).then(
-                                resStu => {
-                                    resStu.toArray((err, stuArray) => {
-                                        console.log("RESSSSSSSSS", stuArray)
-                                        if (stuArray.findIndex(stu => stu.collegeId === this.data.submissions.value().studentid)) {
-                                            this.setState({ show: true })
-                                        } else {
-                                            this.setState({ show: false })
-                                        }
-                                    })
+                        studentCid => {
+                            let studentQuery = r.table("users").get(studentCid)
+                            ReactRethinkdb.DefaultSession.runQuery(studentQuery).then(
+                                async resStu => {
+                                    if (resStu.collegeId === (this.data.submissions.value().studentid) + "") {
+                                        await this.setState({ show: true })
+                                    }
                                 })
                         })
-
                 }
             )
         })
-        // }
     },
 
     handleSelectedSubmission() {
@@ -730,6 +723,7 @@ const Submission = createReactClass({
             allrows[i].classList.remove("selectedrow1")
         document.getElementById(this.data.submissions.value().id).classList.add("selectedrow1")
     },
+    
     render() {
         console.log("SHOW", this.state.show)
         return (
