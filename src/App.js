@@ -4,7 +4,6 @@ import ReactRethinkdb from 'react-rethinkdb'
 import createReactClass from 'create-react-class'
 import Login from './Login'
 import Register from './Register'
-import * as Questions from './Questions'
 import * as Documents from './Documents'
 import * as Documents2 from './Documents2'
 import * as Exams from './Exams'
@@ -40,8 +39,6 @@ const App = createReactClass({
         <Route path="/forgot" component={ForgotPassword} />
         <Route path="/register" component={Register} />
         <Route path="/reset/:id/:key" component={ResetPassword} />
-        <Route path="/questions" component={Questions.Create} />
-        <Route path="/allquestions" component={Questions.All} />
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
         <Route path="/documents2/:id" component={Documents2.Details} />
