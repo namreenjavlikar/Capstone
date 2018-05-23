@@ -4,7 +4,6 @@ import ReactRethinkdb from 'react-rethinkdb'
 import createReactClass from 'create-react-class'
 import Login from './Login'
 import Register from './Register'
-import * as Questions from './Questions'
 import * as Documents from './Documents'
 import * as Documents2 from './Documents2'
 import * as Exams from './Exams'
@@ -19,6 +18,7 @@ import * as Contacts  from './Contacts'
 import * as Messages  from './Messages'
 import EditDocument from './EditDocument'
 import Question from './Question'
+import Chat from './Chat'
 
 let r = ReactRethinkdb.r
 
@@ -39,8 +39,6 @@ const App = createReactClass({
         <Route path="/forgot" component={ForgotPassword} />
         <Route path="/register" component={Register} />
         <Route path="/reset/:id/:key" component={ResetPassword} />
-        <Route path="/questions" component={Questions.Create} />
-        <Route path="/allquestions" component={Questions.All} />
         <Route path="/allcourses" component={Courses.All} />
         <Route path="/createcourse" component={Courses.Create} />
         <Route path="/documents2/:id" component={Documents2.Details} />
@@ -57,6 +55,7 @@ const App = createReactClass({
         <Route path="/Contacts" component={Contacts.Single} />
         <Route path="/Messages/:id" component={Messages.Single} />
         <Route path="/GroupMessages/:id" component={Messages.Group} />
+        <Route path="/Chat/" component={Chat} />
 
       </div>
     </Router>
