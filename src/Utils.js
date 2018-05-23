@@ -9,12 +9,6 @@ const r = ReactRethinkdb.r;
 export const UserPopup = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
-    getInitialState() {
-        return {
-
-        };
-    },
-
     observe(props, state) {
         return {
             user: new ReactRethinkdb.QueryRequest({
@@ -23,7 +17,6 @@ export const UserPopup = createReactClass({
                 initial: true,
             })
         };
-
     },
 
     render() {

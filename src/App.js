@@ -19,7 +19,7 @@ import * as Contacts  from './Contacts'
 import * as Messages  from './Messages'
 import EditDocument from './EditDocument'
 import Question from './Question'
-
+import StudentHome from './StudentHome'
 let r = ReactRethinkdb.r
 
 ReactRethinkdb.DefaultSession.connect({
@@ -47,7 +47,7 @@ const App = createReactClass({
         <Route exact path="/documents/create" component={Documents.Create} />
         <Route exact path="/documents/:id" component={EditDocument} />
         <Route path="/enroll" component={Students.Enroll} />
-        <Route path="/studenthome" component={Students.Home} />
+        <Route path="/studenthome" component={StudentHome} />
         <Route path="/exams/:id" component={Exams.Details} />
         <Route path="/instructors" component={InstructorsHome} />
         {/* <Route path="/Contacts" component={Contacts.All} />
