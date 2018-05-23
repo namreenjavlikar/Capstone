@@ -189,17 +189,32 @@ const Instructor = createReactClass({
         this.setState({ open: false })
     },
 
-    handleSelectSection(sectionid) {
+    async handleSelectSection(sectionid, courseid) {
         console.log("HERE ID", sectionid)
         let item = document.getElementById(sectionid)
         if (item) {
             let checked = item.checked
             if (checked) {
-                this.setState({ selectedsections: [...this.state.selectedsections, sectionid] })
+                await this.setState({ selectedsections: [...this.state.selectedsections, sectionid], })
+                if (this.state.selectedcourses.findIndex(id => id === courseid) === -1) {
+                    await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
+                }
             } else {
+                let count = 0
+                let allsections = document.getElementsByClassName("Nav_check")
+                for (let i = 0; i < allsections.length; i++) {
+                    if (allsections[i].checked === false)
+                        count++
+                }
+                if (count === allsections.length) {
+                    let selectedcourses = this.state.selectedcourses
+                    selectedcourses.splice(this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse === courseid), 1)
+                    await this.setState({ selectedcourses })
+                }
+
                 let selectedsections = this.state.selectedsections
                 selectedsections.splice(this.state.selectedsections.findIndex((selectedsection) => selectedsection === sectionid), 1)
-                this.setState({ selectedsections })
+                await this.setState({ selectedsections })
             }
         }
     },
@@ -207,50 +222,51 @@ const Instructor = createReactClass({
     async handleSelectCourse(courseid) {
         if (courseid === "All") {
             let checked = document.getElementById("nav_check_all").checked
-            this.setState({ selectedcourses: [] })
+            await this.setState({ selectedcourses: [], selectedcourses: [] })
             if (checked) {
-                this.data.user.value()
                 let selectedcourses = []
                 this.data.user.value().courses.map(course => selectedcourses.push(course))
-                await this.setState({ selectedcourses })
-                await this.setState({ selectedcourses })
+                
                 let allsections = document.getElementsByClassName("Nav_check")
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = true
-                    await this.handleSelectSection(allsections[i].id)
+                    this.handleSelectSection(allsections[i].id, courseid)
                 }
+                await this.setState({ selectedcourses })
             } else {
-
-
+                await this.setState({ selectedcourses: [], selectedsections: [] })
                 let allsections = document.getElementsByClassName("Nav_check")
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = false
-                    await this.handleSelectSection(allsections[i].id)
+                    this.handleSelectSection(allsections[i].id, courseid)
                 }
             }
         } else {
-            let courseIdIndex = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse == courseid)
-            if (courseIdIndex == -1) {
-                this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
-                //select all sections under course
-                let allsections = document.getElementsByClassName(courseid)
-                for (let i = 0; i < allsections.length; i++) {
-                    allsections[i].checked = true
-                    // console.log("HERE ID", allsections[i].id)
-                    await this.handleSelectSection(allsections[i].id)
+            let item = document.getElementById(courseid)
+            if (item) {
+                let checked = item.checked
+                let courseIdIndex = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse == courseid)
+                if (checked) {
+                    if (courseIdIndex === -1)
+                        await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
+                    let allsections = document.getElementsByClassName(courseid)
+                    for (let i = 0; i < allsections.length; i++) {
+                        allsections[i].checked = true
+                        this.handleSelectSection(allsections[i].id, courseid)
+                    }
                 }
-            }
-            else {
-                let selectedcourses = this.state.selectedcourses
+                else {
+                    let selectedcourses = this.state.selectedcourses
 
-                selectedcourses.splice(courseIdIndex, 1)
-                let allsections = document.getElementsByClassName(courseid)
-                for (let i = 0; i < allsections.length; i++) {
-                    allsections[i].checked = false
-                    this.handleSelectSection(allsections[i].id)
+                    selectedcourses.splice(courseIdIndex, 1)
+                    let allsections = document.getElementsByClassName(courseid)
+                    for (let i = 0; i < allsections.length; i++) {
+                        allsections[i].checked = false
+                        this.handleSelectSection(allsections[i].id, courseid)
+                    }
+                    await this.setState({ selectedcourses })
+                    await this.setState({ selectedcourses })
                 }
-                await this.setState({ selectedcourses })
-                await this.setState({ selectedcourses })
             }
         }
     },
@@ -270,7 +286,7 @@ const Instructor = createReactClass({
 
                 } */}
 
-                    <NavInstructor2 handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} handleSelectSection={(id) => this.handleSelectSection(id)} />
+                    <NavInstructor2 handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} handleSelectSection={(id, id2) => this.handleSelectSection(id, id2)} />
                 </div>
                 <div className={this.state.changeClass}>
                     <span class={this.state.leftButton} uk-icon={this.state.iconLeft} onClick={() => this.handleExpandLeft()}>

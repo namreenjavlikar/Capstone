@@ -45,7 +45,6 @@ const NavInstructor = createReactClass({
     },
 
     render() {
-        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", sessionStorage.getItem("user_id"))
         const { items, activeIndex } = this.state
         return (
 
@@ -94,7 +93,7 @@ const NavInstructor = createReactClass({
                         &&
                         this.data.user.value().courses.map(
                             (course) =>
-                                <p>{<Course id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} handleSelectSection={(id) => this.props.handleSelectSection(id)} />}</p>
+                                <p>{<Course id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} handleSelectSection={(id, id2) => this.props.handleSelectSection(id, id2)} />}</p>
                         )
                     }
                    
@@ -171,14 +170,13 @@ const Course = createReactClass({
         this.setState({ list: checked })
     },
     
-
     render() {
         const { items, activeIndex } = this.state
         return (
             this.data.course.value()
             &&
             <Accordion inverted className="nav-box1">
-                <span className="nav-course-checkbox"><input onClick={() => this.props.handleSelectedCourse(this.props.id)} class="Nav_check uk-checkbox" type="checkbox" /></span>
+                <span className="nav-course-checkbox"><input id={this.props.id} onClick={() => this.props.handleSelectedCourse(this.props.id)} class="Nav_check uk-checkbox" type="checkbox" /></span>
                 <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick} className="nav-term-course">
                     <span className="nav-font"> {this.data.course.value().name} </span>
                     <span className="nav-dropdown-icon" > <Icon name='dropdown' /></span>
@@ -191,7 +189,7 @@ const Course = createReactClass({
                                 <span className="nav-section-checkbox">
                                     <input id={section} 
                                         className={this.data.course.value().id + " Nav_check " + "uk-checkbox"} 
-                                        onClick={() => this.props.handleSelectSection(section)}
+                                        onClick={() => this.props.handleSelectSection(section, this.props.id)}
                                         type="checkbox" />
                                 </span>
                                 <span className="nav-section-img">

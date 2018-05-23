@@ -49,7 +49,9 @@ const Instructor = createReactClass({
             iconLeft: false ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5",
             cal: 0,
             contentid: null,
-            listofdocs: []
+            listofdocs: [],
+            courseName: "",
+            submissionId: null
         }
     },
 
@@ -78,7 +80,7 @@ const Instructor = createReactClass({
     },
 
     handleSize() {
-        // console.log('resize',window.innerWidth)
+        // ////console.log('resize',window.innerWidth)
         window.innerWidth <= 800 ?
             this.setState(
                 {
@@ -96,7 +98,7 @@ const Instructor = createReactClass({
 
     handleExpandRight() {
         let right = !this.state.expandRight
-        console.log('right:', right, this.state.expandLeft, this.state.expandRight)
+        ////console.log('right:', right, this.state.expandLeft, this.state.expandRight)
         this.setState(
             {
                 changeClass:
@@ -141,8 +143,8 @@ const Instructor = createReactClass({
     handleExpandLeft() {
         let left = !this.state.expandLeft
 
-        console.log('left:', left, this.state.expandLeft, this.state.expandRight)
-        console.log('left:', left)
+        ////console.log('left:', left, this.state.expandLeft, this.state.expandRight)
+        ////console.log('left:', left)
         this.setState(
             {
                 changeClass:
@@ -190,7 +192,7 @@ const Instructor = createReactClass({
     // contentid : null,
     async handleSaveContentId(id) {
         await this.setState({ contentid: null })
-        await this.setState({ contentid: id, listofdocs: [] })
+        await this.setState({ contentid: id, listofdocs: [], submissionId: null })
     },
 
     async handleNextWork() {
@@ -201,7 +203,7 @@ const Instructor = createReactClass({
                 index = this.state.listofdocs.length - 1
             }
             await this.setState({ contentid: null })
-            await this.setState({ contentid: this.state.listofdocs[index] })
+            await this.setState({ contentid: this.state.listofdocs[index], submissionId: null })
 
             let allrows = document.querySelectorAll(".selectedrow")
             if (allrows) {
@@ -221,7 +223,7 @@ const Instructor = createReactClass({
                 index = 0
             }
             await this.setState({ contentid: null })
-            await this.setState({ contentid: this.state.listofdocs[index] })
+            await this.setState({ contentid: this.state.listofdocs[index], submissionId: null })
 
             let allrows = document.querySelectorAll(".selectedrow")
             if (allrows) {
@@ -232,10 +234,18 @@ const Instructor = createReactClass({
         }
     },
 
-    handleAddDocument(docid) {
+    async handleAddDocument(docid) {
         if (!this.state.listofdocs.find(id => docid === id)) {
-            this.setState({ listofdocs: [...this.state.listofdocs, docid] })
+            await this.setState({ listofdocs: [...this.state.listofdocs, docid] })
         }
+    },
+
+    async handleSaveCName(courseName) {
+        await this.setState({ courseName })
+    },
+
+    async handleSaveSubmissionId(submissionId) {
+        await this.setState({ submissionId })
     },
 
     render() {
@@ -273,7 +283,7 @@ const Instructor = createReactClass({
                                                     &&
                                                     this.props.selectedcourses.map(
                                                         (course) =>
-                                                            <Course id={course} handleAddDocument={this.handleAddDocument} handleSaveContentId={(id) => this.handleSaveContentId(id)} />
+                                                            <Course id={course} handleAddDocument={this.handleAddDocument} handleSaveCName={this.handleSaveCName} handleSaveContentId={this.handleSaveContentId} />
                                                     )
                                                 }
                                             </tbody>
@@ -311,7 +321,7 @@ const Instructor = createReactClass({
                                             {
                                                 this.state.contentid
                                                 &&
-                                                <ContentShowSub id={this.state.contentid} sections={this.props.selectedsections} />
+                                                <ContentShowSub selectedsubmissionid={this.state.submissionId} id={this.state.contentid} sections={this.props.selectedsections} handleSaveSubmissionId={this.handleSaveSubmissionId} />
                                             }
                                         </tbody>
                                     </table>
@@ -320,119 +330,12 @@ const Instructor = createReactClass({
                         </ul>
                         <div className='simplemargin5'>
                             <Transition visible={visible} animation='scale' duration={500}>
-
                                 <div class='togglestyle' >
-                                    <p>Here</p>
-                                    <Form class="ui form" >
-                                        <div class="ui dividing header ">
-                                            <div><Form.Group inline >
-                                                <label class='formlabelstyle simplemargin4'>Work Detail</label>
-                                                <label class='formlabelstyle2'> CP1818</label>
-
-                                                <Form.Input width={2} placeholder='Quiz one' readOnly />
-
-                                                {/* start date */}  <Form.Input size='mini' placeholder='13/5/2018' readOnly />
-                                                {/* due date */} <Form.Input size='mini' placeholder='19/5/2018' readOnly />
-                                                {/* end date */}  <Form.Input size='mini' placeholder='20/5/2018' readOnly />
-                                                <div class="navcss2">
-                                                    <a href="#" uk-icon="chevron-left"></a>
-                                                    <a href="#" uk-icon="chevron-right"></a>
-
-                                                </div>
-                                            </Form.Group>
-
-                                            </div>
-                                        </div>
-
-                                        <div class="ui dividing header">
-
-                                            <div className='simplemargin2' >
-                                                <FormGroup>
-                                                    <ControlLabel>Q01: Write a Java program that...</ControlLabel>
-                                                </FormGroup>
-                                            </div >
-
-                                            <div className='simplemargin' >
-                                                <Form.Group inline>
-
-                                                    <ControlLabel >Grade:</ControlLabel>
-
-                                                    <Form.Field control={Radio} label='0' value='0' checked={value === '0'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='1' value='1' checked={value === '1'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='2' value='2' checked={value === '2'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='3' value='3' checked={value === '3'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='4' value='4' checked={value === '4'} onChange={this.handleChange} />
-                                                </Form.Group>
-                                            </div>
-                                            <div class="inline fields">
-                                                <label>Feedback:</label>
-                                                <textarea placeholder="Q01 Feedback" rows="1" style={{ width: '50vh', height: '3vh' }} />
-                                            </div>
-                                        </div>
-                                        <div class="ui dividing header">
-                                            <div className='simplemargin2' >
-                                                <FormGroup>
-                                                    <ControlLabel>Q02: What is the...</ControlLabel>
-
-                                                </FormGroup>
-                                            </div >
-                                            <div className='simplemargin' >
-
-                                                <div class="inline fields ">
-                                                    <div class="field">
-                                                        <label>Answer:</label>
-                                                        <input type="text" placeholder="it depends on the value of loop counters in the calling" readOnly style={{ width: '50vh', marginLeft: '0.5vh' }} />
-                                                    </div>
-                                                </div></div>
-                                            <div className='simplemargin' >
-                                                <Form.Group inline>
-
-                                                    <ControlLabel >Grade:</ControlLabel>
-
-                                                    <Form.Field control={Radio} label='0' value='0' checked={value === '0'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='1' value='1' checked={value === '1'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='2' value='2' checked={value === '2'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='3' value='3' checked={value === '3'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='4' value='4' checked={value === '4'} onChange={this.handleChange} />
-                                                </Form.Group>
-                                            </div>
-                                            <div class="inline fields">
-                                                <label>Feedback:</label>
-                                                <textarea placeholder="Q02 Feedback" rows="1" style={{ width: '50vh', height: '3vh' }} />
-                                            </div>
-                                        </div>
-                                        <div class="ui dividing header">
-                                            <div className='simplemargin2' >
-                                                <FormGroup>
-                                                    <ControlLabel>Q03: Write a Python program that...</ControlLabel>
-                                                </FormGroup>
-                                            </div >
-
-                                            <div className='simplemargin' >
-                                                <Form.Group inline>
-
-                                                    <ControlLabel >Grade:</ControlLabel>
-
-                                                    <Form.Field control={Radio} label='0' value='0' checked={value === '0'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='1' value='1' checked={value === '1'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='2' value='2' checked={value === '2'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='3' value='3' checked={value === '3'} onChange={this.handleChange} />
-                                                    <Form.Field control={Radio} label='4' value='4' checked={value === '4'} onChange={this.handleChange} />
-                                                </Form.Group>
-                                            </div>
-                                            <div class="inline fields">
-                                                <label>Feedback:</label>
-                                                <textarea placeholder="Q03 Feedback" rows="1" style={{ width: '50vh', height: '3vh' }} />
-                                            </div>
-                                        </div>
-                                        <div class="ui dividing header">
-                                            <div class="inline fields">
-                                                <label>Feedback:</label>
-                                                <textarea placeholder="Document Feedback" rows="1" style={{ width: '100vh', height: '3vh' }} />
-                                            </div>
-                                        </div>
-                                    </Form>
-
+                                    {
+                                        this.state.submissionId
+                                        &&
+                                        <StudentSubmission contentid={this.state.contentid} coursename={this.state.courseName} id={this.state.submissionId} />
+                                    }
                                 </div>
                             </Transition>
                         </div>
@@ -474,18 +377,14 @@ const Course = createReactClass({
         this.setState({ list: checked })
     },
 
-    handleSelectedSection() {
-
-    },
-
     render() {
-        console.log("SEEE ", this.props.selectedcourses)
+        ////console.log("SEEE ", this.props.selectedcourses)
         return (
             this.data.course.value()
             &&
             this.data.course.value().contents.map(
                 (content) =>
-                    <Content id={content} coursename={this.data.course.value().name} handleAddDocument={this.props.handleAddDocument} handleSaveContentId={(id) => this.props.handleSaveContentId(id)} />
+                    <Content handleSaveCName={this.props.handleSaveCName} id={content} courseid={this.props.id} coursename={this.data.course.value().name} handleAddDocument={this.props.handleAddDocument} handleSaveContentId={this.props.handleSaveContentId} />
             )
         )
     },
@@ -496,7 +395,7 @@ const Content = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        console.log("SDF", this.props.id)
+        ////console.log("SDF", this.props.id)
 
         return {
             content: new ReactRethinkdb.QueryRequest({
@@ -514,8 +413,9 @@ const Content = createReactClass({
         };
     },
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        this.props.handleAddDocument(prevProps.id)
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        ////console.log("CNNNNNNNNNNNNNNNNNN", this.props.coursename)
+        await this.props.handleAddDocument(prevProps.id)
     },
 
     handleSelectedDocument() {
@@ -524,7 +424,7 @@ const Content = createReactClass({
         for (let i = 0; i < allrows.length; i++)
             allrows[i].classList.remove("selectedrow")
         document.getElementById(this.data.content.value().id).classList.add("selectedrow")
-
+        this.props.handleSaveCName(this.props.coursename)
     },
 
     render() {
@@ -545,37 +445,13 @@ const Content = createReactClass({
     },
 });
 
-const ContentShowSub2 = createReactClass({
-
-    mixins: [ReactRethinkdb.DefaultMixin],
-    observe(props, state) {
-        return {}
-    },
-
-    componentWillMount() {
-        console.log("WILL MOUNT", this.props.id)
-    },
-
-    getInitialState() {
-        return {
-            id: this.props.id
-        };
-    },
-
-    render() {
-        console.log("BETWEEN", this.state.id)
-        return (
-            <ContentShowSub2 id={this.state.id} />
-        )
-    },
-})
 
 const ContentShowSub = createReactClass({
 
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        console.log("SFFFDF BF", this.props.id)
+        ////console.log("SFFFDF BF", this.props.id)
 
         return {
             content: new ReactRethinkdb.QueryRequest({
@@ -587,13 +463,13 @@ const ContentShowSub = createReactClass({
     },
 
     render() {
-        console.log("Contentsssss", this.props.id)
+        //console.log("Contentsssss", this.props.id)
         return (
             this.data.content.value()
             &&
             this.data.content.value().submissions.map(
                 (submission) =>
-                    <Submission id={submission} sections={this.props.sections} />
+                    <Submission selectedsubmissionid={this.props.selectedsubmissionid} id={submission} sections={this.props.sections} handleSaveSubmissionId={this.props.handleSaveSubmissionId} />
             )
 
         )
@@ -623,57 +499,165 @@ const Document = createReactClass({
     },
 });
 
-const Section = createReactClass({
+const StudentSubmission = createReactClass({
 
     mixins: [ReactRethinkdb.DefaultMixin],
     observe(props, state) {
         return {
-            section: new ReactRethinkdb.QueryRequest({
-                query: r.table('sections').get(this.props.id),
+            submissions: new ReactRethinkdb.QueryRequest({
+                query: r.table('submissions').get(this.props.id),
+                changes: true,
+                initial: null,
+            }),
+            content: new ReactRethinkdb.QueryRequest({
+                query: r.table('contents').get(this.props.contentid),
                 changes: true,
                 initial: null,
             }),
         };
     },
 
-    handleSelectedSection() {
-        let sectionid = this.data.section.value().id
-        console.log("Secy sec", sectionid)
-        let sectionstudents = this.data.section.value().students
-        let selectedsection = document.getElementById(sectionid).checked
-
-        if (selectedsection) {
-            let allsubmissions = []
-            this.state.submissions.map((s) => allsubmissions.push(s))
-
-            let addedsubmissions = this.state.filteredsubmissions
-            sectionstudents.map(
-                (x) => allsubmissions.filter(y => x.studentid == y.studentid).map((z) => addedsubmissions.push(z))
+    getInitialState() {
+        return {
+            document: "",
+            feedbacks: [],
+            grades: [],
+            finalFeed: ""
+        };
+    },
+    async handleUpdateSub() {
+        if (this.data.content.value()) {
+            let query = r.table('documents').get(this.data.content.value().docid)
+            ReactRethinkdb.DefaultSession.runQuery(query).then(
+                async res => {
+                    await this.setState({ document: res.name })
+                }
             )
-            this.setState({
-                filteredsubmissions: addedsubmissions
-            })
-        }
-        else {
-            let filtered = []
-            this.state.filteredsubmissions.map((s) => filtered.push(s))
-            sectionstudents.map(
-                (x) => filtered.splice(filtered.findIndex(y => x.studentid == y.studentid), 1)
-            )
-            this.setState({
-                filteredsubmissions: filtered
-            })
         }
     },
+
+    handleEditField(newValue, fieldName) {
+        let query = r.table('submissions').get(this.props.id).update({
+            [fieldName]: newValue
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query)
+    },
+
+    componentWillMount() {
+        this.handleUpdateSub()
+    },
+
+    componentWillReceiveProps() {
+        this.handleUpdateSub()
+    },
+
+    handleFeedback(e, i) {
+        let text = e.target.value
+        let updated = this.state.feedbacks
+        updated[i] = text
+        this.setState({ feedbacks: updated })
+    },
+
+    handleGrades(e, i) {
+
+        let text = e.target.value
+        let updated = this.state.grades
+        updated[i] = text
+        this.setState({ grades: updated })
+    },
+
+    handleFinalFeed(e) {
+        let text = e.target.value
+        this.handleEditField(text, "feedback")
+        // this.setState({finalFeed: text})
+    },
+
     render() {
         return (
-            this.data.section.value()
+            this.data.submissions.value()
             &&
-            <span>
+            <Form class="ui form" >
+                <div class="ui dividing header ">
+                    <div><Form.Group inline >
+                        <label class='formlabelstyle simplemargin4'>Work Detail</label>
+                        <label class='formlabelstyle2'> {this.props.coursename}</label>
+                        <Form.Input width={2} value={this.state.document} readOnly />
+
+                        {/* start date */}  <Form.Input size='mini' placeholder='13/5/2018' readOnly />
+                        {/* due date */}    <Form.Input size='mini' placeholder='19/5/2018' readOnly />
+                        {/* end date */}    <Form.Input size='mini' placeholder='20/5/2018' readOnly />
+                        <div class="navcss2">
+                            <a href="#" uk-icon="chevron-left"></a>
+                            <a href="#" uk-icon="chevron-right"></a>
+                        </div>
+                    </Form.Group>
+                    </div>
+                </div>
                 {
-                    this.data.section.value().sectionNo
+                    this.data.submissions.value().answers.map(
+                        (answer, i) =>
+                            <div key={i} class="ui dividing header">
+
+                                <div className='simplemargin2' >
+                                    <FormGroup>
+                                        <ControlLabel><Question id={answer.questionid} /></ControlLabel>
+                                    </FormGroup>
+                                </div >
+                                <div className='simplemargin' >
+
+                                    <div class="inline fields ">
+                                        <div class="field">
+                                            <label>Answer:</label>
+                                            <input type="text" value={answer.answer} readOnly style={{ width: '50vh', marginLeft: '0.5vh' }} />
+                                        </div>
+                                    </div></div>
+                                <div className='simplemargin' >
+                                    <Form.Group inline>
+                                        <div class="inline fields ">
+                                            <ControlLabel >Grade:</ControlLabel>
+                                            <input type="number" min={0} max={20} value={this.state.grades[i]} onChange={(e) => this.handleGrades(e, i)} style={{ width: '10vh', marginLeft: '0.5vh' }} />
+                                            <input type="text" value={"/20"} readOnly style={{ width: '8vh', marginLeft: '0.5vh' }} />
+                                        </div>
+                                    </Form.Group>
+                                </div>
+                                <div class="inline fields">
+                                    <label>Feedback:</label>
+                                    <textarea value={this.state.feedbacks[i]} onChange={(e) => this.handleFeedback(e, i)} placeholder="Q02 Feedback" rows="1" style={{ width: '50vh', height: '3vh' }} />
+                                </div>
+                            </div>
+                    )
                 }
-            </span>
+
+                <div class="ui dividing header">
+                    <div class="inline fields">
+                        <label>Feedback:</label>
+                        <textarea value={this.data.submissions.value().feedback} onChange={this.handleFinalFeed} placeholder="Document Feedback" rows="1" style={{ width: '100vh', height: '3vh' }} />
+                    </div>
+                </div>
+            </Form>
+        )
+    },
+});
+
+const Question = createReactClass({
+
+    mixins: [ReactRethinkdb.DefaultMixin],
+    observe(props, state) {
+        return {
+            document: new ReactRethinkdb.QueryRequest({
+                query: r.table('questions').get(this.props.id),
+                changes: true,
+                initial: null,
+            }),
+        };
+    },
+
+    render() {
+        return (
+            this.data.document.value()
+            &&
+            this.data.document.value().question
+
         )
     },
 });
@@ -718,21 +702,25 @@ const Submission = createReactClass({
     },
 
     handleSelectedSubmission() {
-        let allrows = document.querySelectorAll(".selectedrow1")
-        for (let i = 0; i < allrows.length; i++)
-            allrows[i].classList.remove("selectedrow1")
-        document.getElementById(this.data.submissions.value().id).classList.add("selectedrow1")
+        // let allrows = document.querySelectorAll(".selectedrow1")
+        // for (let i = 0; i < allrows.length; i++)
+        //     allrows[i].classList.remove("selectedrow1")
+        // document.getElementById(this.props.id).classList.add("selectedrow1")
+        this.props.handleSaveSubmissionId(this.props.id)
     },
-    
+
     render() {
-        console.log("SHOW", this.state.show)
+        // let style = null
+        // this.props.selectedsubmissionid === this.props.id 
+        // ?
+        // style = {} 
         return (
             this.state.show
             &&
             this.data.submissions.value()
             &&
-            <tr id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
-                <td>{this.data.submissions.value().studentid} </td>
+            <tr style={this.props.selectedsubmissionid === this.props.id ? {backgroundColor: 'yellow'} : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+                <td>{this.data.submissions.value().studentid}</td>
                 <td>B</td>
                 <td>B</td>
                 <td>B</td>
