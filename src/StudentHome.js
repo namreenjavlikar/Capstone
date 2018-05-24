@@ -260,17 +260,23 @@ const Student = createReactClass({
                     <span class={this.state.rightButton}
                         uk-icon={this.state.iconRight}
                         onClick={() => this.handleExpandRight()}>
-
                     </span>
 
                 </div>
-                {
+                <div className={!this.state.expandRight && "hide"}>
+                    {
+                        this.data.user.value()
+                        &&
+                        <Chat userid = {this.data.user.value().id}  />
+                    }
+                </div>
+                {/* {
                     this.state.expandRight
                         ?
                         <Chat />
                         :
                         <span></span>
-                }
+                } */}
             </div>
 
 
@@ -359,7 +365,7 @@ const Content = createReactClass({
                 <td >
                     <Document id={this.data.content.value().docid} />
                 </td>
-               
+
             </tr>
         )
     },

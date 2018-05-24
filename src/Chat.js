@@ -54,7 +54,7 @@ export const Chat = createReactClass({
 
         return {
             user: new ReactRethinkdb.QueryRequest({
-                query: r.table('users').get(sessionStorage.getItem("user_id")),
+                query: r.table('users').get(this.props.userid),
                 changes: true,
                 initial: [],
             }),
@@ -66,30 +66,30 @@ export const Chat = createReactClass({
 
     /////////////////////////// design team methods
 
-    handleAdd() { this.setState({ items: users.slice(0, this.state.items.length + 1) }) },
+   async  handleAdd() { await this.setState({ items: users.slice(0, this.state.items.length + 1) }) },
 
-    handleRemove() { this.setState({ items: this.state.items.slice(0, -1) }) },
+   async  handleRemove() {await this.setState({ items: this.state.items.slice(0, -1) }) },
 
-    handleClick(e, titleProps) {
+    async handleClick(e, titleProps) {
         const { index } = titleProps
         const { activeIndex } = this.state
         const newIndex = activeIndex === index ? -1 : index
 
-        this.setState({ activeIndex: newIndex })
+        await this.setState({ activeIndex: newIndex })
     },
 
-    handleSize() {
-        this.setState(
+    async handleSize() {
+       await  this.setState(
             {
                 screen: window.innerWidth,
                 changeClass: this.state.screen >= 500 ? "container-instructor" : "container-instructor-full"
             }
         )
     },
-    handleExpandRight() {
+    async handleExpandRight() {
         let right = !this.state.expandRight
         console.log('right:', right, this.state.expandLeft, this.state.expandRight)
-        this.setState(
+        await this.setState(
             {
                 changeClass:
                 this.state.expandLeft && right ?
@@ -107,12 +107,12 @@ export const Chat = createReactClass({
         )
     },
 
-    handleExpandLeft() {
+    async  handleExpandLeft() {
         let left = !this.state.expandLeft
 
         console.log('left:', left, this.state.expandLeft, this.state.expandRight)
         console.log('left:', left)
-        this.setState(
+        await this.setState(
             {
                 changeClass:
                 left && this.state.expandRight ?
@@ -130,11 +130,11 @@ export const Chat = createReactClass({
         )
     },
 
-    handleClick(e, titleProps) {
+    async handleClick(e, titleProps) {
         const { index } = titleProps
         const { activeIndex } = this.state
         const newIndex = activeIndex === index ? -1 : index
-        this.setState({ activeIndex: newIndex })
+        await this.setState({ activeIndex: newIndex })
     },
 
     /////////////////////////// contacts.js methods
@@ -260,17 +260,17 @@ export const Chat = createReactClass({
 
     },
 
-    handleSendContacts() {
+    async handleSendContacts() {
 
         let tempMessage = {
-            from: sessionStorage.getItem("user_id"),
+            from: this.props.userid,
             to: this.state.tempContactId,
             date: new Date(),
             content: this.state.txtMessage
         }
 
         // get the user id from the session
-        let messageToSelfQuery = r.table('users').get(sessionStorage.getItem("user_id")).update({
+        let messageToSelfQuery = r.table('users').get(this.props.userid).update({
             messages: r.row('messages').append(tempMessage)
         });
         ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
@@ -281,7 +281,7 @@ export const Chat = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
 
 
-        this.setState({ txtMessage: '' })
+        await this.setState({ txtMessage: '' })
     },
 
 
@@ -339,22 +339,22 @@ export const Chat = createReactClass({
                             <div class="ui middle aligned selection list chat-group-contacts">
 
                                 {
-                                    this.data.user.value().groups
-                                        ?
-                                        this.data.user.value().groups.map((item) => {
-                                            return <div key={item.groupid} class="item" id={item.groupid} onClick={() => this.selectGroup(item.groupid)}>
+                                    // this.data.user.value().groups
+                                    //     ?
+                                    //     this.data.user.value().groups.map((item) => {
+                                    //         return <div key={item.groupid} class="item" id={item.groupid} onClick={() => this.selectGroup(item.groupid)}>
 
-                                                <img class="ui avatar image" src={userpic}
-                                                />
-                                                <div class="content">
-                                                    <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div>
-                                                </div>
+                                    //             <img class="ui avatar image" src={userpic}
+                                    //             />
+                                    //             <div class="content">
+                                    //                 <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div>
+                                    //             </div>
 
 
-                                            </div>;
-                                        })
-                                        :
-                                        <p>Loading...</p>
+                                    //         </div>;
+                                    //     })
+                                    //     :
+                                    //     <p>Loading...</p>
                                 }
 
                             </div>
@@ -466,9 +466,6 @@ export const Chat = createReactClass({
 
 
                         }
-
-
-
 
                         {/* </Transition.Group> */}
 
