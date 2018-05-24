@@ -20,7 +20,6 @@ let r = ReactRethinkdb.r;
 
 
 
-const users = ['ade']
 
 export const Chat = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
@@ -29,7 +28,6 @@ export const Chat = createReactClass({
         return {
             screen: window.innerWidth,
             activeIndex: 0,
-            items: users.slice(0, 3),
             changeClass: window.innerWidth >= 500 ? "container-instructor-full" : "container-instructor-both",
             expandRight: false,
             iconRight: false ? "icon: chevron-right; ratio: 2.5" : "icon: chevron-left; ratio: 2.5",
@@ -65,10 +63,6 @@ export const Chat = createReactClass({
 
 
     /////////////////////////// design team methods
-
-   async  handleAdd() { await this.setState({ items: users.slice(0, this.state.items.length + 1) }) },
-
-   async  handleRemove() {await this.setState({ items: this.state.items.slice(0, -1) }) },
 
     async handleClick(e, titleProps) {
         const { index } = titleProps
@@ -378,84 +372,84 @@ export const Chat = createReactClass({
                         {
                             this.state.targetedChat == "contacts"
                                 ?
-                                // <div className="chat-msg">
-                                //     <div className="chat-head">
-                                //         <img class="ui avatar image" src={userpic}
-                                //         />
-                                //         <span style={{ color: "#76323f" }} className="contacts">
-                                //             <strong> <Userinfo id={this.state.tempContactId} /> </strong>
-                                //             <span class="chat-online-status"></span>
-                                //         </span>
-                                //         <span style={{ marginLeft: '140px', paddingRight: '10px', borderRight: '1px solid #76323f' }}>
-                                //             <Rating maxRating={1} icon='star' size='huge' uk-tooltip="title: Star This Contact; pos: bottom-right" />
-                                //         </span>
-                                //         <span style={{ marginLeft: '10px', paddingRight: '10px', borderRight: '1px solid #76323f', cursor: 'pointer' }}>
-                                //             <Icon inverted color='red' size='large' name='attach' uk-tooltip="title: Attach Any File ; pos: bottom-right" />
-                                //         </span>
-                                //         <span uk-icon="close" onClick={this.handleRemove} uk-tooltip="title: Close Message ; pos: bottom-right" style={{ color: "black", marginLeft: '10px', marginRight: '10px', cursor: 'pointer' }}></span>
-                                //     </div>
+                                <div className="chat-msg">
+                                    <div className="chat-head">
+                                        <img class="ui avatar image" src={userpic}
+                                        />
+                                        <span style={{ color: "#76323f" }} className="contacts">
+                                            <strong> <Userinfo id={this.state.tempContactId} /> </strong>
+                                            <span class="chat-online-status"></span>
+                                        </span>
+                                        <span style={{ marginLeft: '140px', paddingRight: '10px', borderRight: '1px solid #76323f' }}>
+                                            <Rating maxRating={1} icon='star' size='huge' uk-tooltip="title: Star This Contact; pos: bottom-right" />
+                                        </span>
+                                        <span style={{ marginLeft: '10px', paddingRight: '10px', borderRight: '1px solid #76323f', cursor: 'pointer' }}>
+                                            <Icon inverted color='red' size='large' name='attach' uk-tooltip="title: Attach Any File ; pos: bottom-right" />
+                                        </span>
+                                        <span uk-icon="close" onClick={this.handleRemove} uk-tooltip="title: Close Message ; pos: bottom-right" style={{ color: "black", marginLeft: '10px', marginRight: '10px', cursor: 'pointer' }}></span>
+                                    </div>
 
-                                //     <div style={{ borderTop: '1px solid #76323f', marginTop: '15px' }}>
-                                //     </div>
+                                    <div style={{ borderTop: '1px solid #76323f', marginTop: '15px' }}>
+                                    </div>
 
-                                //     <div id="messages" class="messages">
-                                //         <ul>
-                                //             {
-                                //                 this.data.user.value().messages
-                                //                     ?
-                                //                     this.data.user.value().messages.map((item) => {
-                                //                         return <div >
-                                //                             {
-                                //                                 item.from == this.state.tempContactId
-                                //                                     ?
-                                //                                     <li style={{ paddingRight: 0 }}>
-                                //                                         <img class="ui avatar image" style={{ float: 'right', marginLeft: '5px' }} src={userpic1}
-                                //                                         />
-                                //                                         <span class="right">{item.content}
-                                //                                             <p className="msg-time"> {this.dateConverter(item.date)} </p>
-                                //                                         </span>
-                                //                                         <div class="clear"></div>
-                                //                                     </li>
-                                //                                     :
-                                //                                     item.to == this.state.tempContactId
-                                //                                         ?
-                                //                                         <li>
-                                //                                             <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }}
-                                //                                             />
-                                //                                             <span className="chat-from"> {item.content}
-                                //                                                 <p className="msg-time"> {this.dateConverter(item.date)} </p>
-                                //                                             </span>
-                                //                                         </li>
-                                //                                         :
-                                //                                         <span></span>
-                                //                             }
-                                //                         </div>;
-                                //                     })
-                                //                     :
-                                //                     <p>Loading</p>
-                                //             }
+                                    <div id="messages" class="messages">
+                                        <ul>
+                                            {
+                                                this.data.user.value().messages
+                                                    ?
+                                                    this.data.user.value().messages.map((item) => {
+                                                        return <div >
+                                                            {
+                                                                item.from == this.state.tempContactId
+                                                                    ?
+                                                                    <li style={{ paddingRight: 0 }}>
+                                                                        <img class="ui avatar image" style={{ float: 'right', marginLeft: '5px' }} src={userpic1}
+                                                                        />
+                                                                        <span class="right">{item.content}
+                                                                            <p className="msg-time"> {this.dateConverter(item.date)} </p>
+                                                                        </span>
+                                                                        <div class="clear"></div>
+                                                                    </li>
+                                                                    :
+                                                                    item.to == this.state.tempContactId
+                                                                        ?
+                                                                        <li>
+                                                                            <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }}
+                                                                            />
+                                                                            <span className="chat-from"> {item.content}
+                                                                                <p className="msg-time"> {this.dateConverter(item.date)} </p>
+                                                                            </span>
+                                                                        </li>
+                                                                        :
+                                                                        <span></span>
+                                                            }
+                                                        </div>;
+                                                    })
+                                                    :
+                                                    <p>Loading</p>
+                                            }
 
-                                //         </ul>
-                                //         <div class="clear"></div>
-                                //     </div>
+                                        </ul>
+                                        <div class="clear"></div>
+                                    </div>
 
-                                //     <div className="input-box">
+                                    <div className="input-box">
 
-                                //         <div style={{ float: 'left', marginLeft: '10px', marginTop: '10px' }}>
-                                //             <Icon color='grey' size='large' name='smile' />
-                                //         </div>
-                                //         <div style={{ float: 'left' }}>
-                                //             <textarea value={this.state.txtMessage} onChange={(event) => this.setState({ txtMessage: event.target.value })} placeholder="Enter message"></textarea>
-                                //         </div>
-                                //         <div style={{ float: 'left', marginRight: '10px', marginTop: '10px' }}>
-                                //             <button style={{ border: "none", background: "none" }} onClick={() => this.handleSendContacts()}><Icon color='grey' size='large' name='send' /></button>
-                                //         </div>
-                                //     </div>
+                                        <div style={{ float: 'left', marginLeft: '10px', marginTop: '10px' }}>
+                                            <Icon color='grey' size='large' name='smile' />
+                                        </div>
+                                        <div style={{ float: 'left' }}>
+                                            <textarea value={this.state.txtMessage} onChange={(event) => this.setState({ txtMessage: event.target.value })} placeholder="Enter message"></textarea>
+                                        </div>
+                                        <div style={{ float: 'left', marginRight: '10px', marginTop: '10px' }}>
+                                            <button style={{ border: "none", background: "none" }} onClick={() => this.handleSendContacts()}><Icon color='grey' size='large' name='send' /></button>
+                                        </div>
+                                    </div>
 
-                                // </div>
+                                </div>
 
                                 // it doenst work cause we are already observing user
-                                <Message.Single id={this.state.tempContactId} contactName={<Userinfo id={this.state.tempContactId} />} />
+                                // <Message.Single id={this.state.tempContactId} contactName={<Userinfo id={this.state.tempContactId} />} />
                                 :
                                 this.state.targetedChat == "group"
                                     ?
