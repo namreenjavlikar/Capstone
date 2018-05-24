@@ -15,10 +15,6 @@ import * as Message from './Messages'
 
 
 let r = ReactRethinkdb.r;
-// let tempGroupId = ""
-// let tempContactId = ""
-
-
 
 
 export const Chat = createReactClass({
