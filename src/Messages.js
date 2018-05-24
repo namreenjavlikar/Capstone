@@ -27,7 +27,7 @@ export const Single = createReactClass({
 
     observe(props, state) {
         return {
-            user: new ReactRethinkdb.QueryRequest({
+            contact: new ReactRethinkdb.QueryRequest({
                 query: r.table('users').get(sessionStorage.getItem("user_id")),
                 changes: true,
                 initial: [],
@@ -78,6 +78,7 @@ export const Single = createReactClass({
                     />
                     <span style={{ color: "#76323f" }} className="contacts">
                         {/* <strong> <Userinfo id={this.props.id} /> </strong> */}
+                        <strong>  {this.props.contactName} </strong> 
                         <span class="chat-online-status"></span>
                     </span>
                     <span style={{ marginLeft: '140px', paddingRight: '10px', borderRight: '1px solid #76323f' }}>
@@ -95,9 +96,9 @@ export const Single = createReactClass({
                 <div id="messages" class="messages">
                     <ul>
                         {
-                            this.data.user.value().messages
+                            this.data.contact.value().messages
                                 ?
-                                this.data.user.value().messages.map((item) => {
+                                this.data.contact.value().messages.map((item) => {
                                     return <div >
                                         {
                                             item.from == this.props.id
