@@ -3,6 +3,11 @@ import userpic from './Images/cat.jpg'
 import userpic1 from './Images/flower.jpg'
 import logo from './Images/logo.png'
 import ReactRethinkdb from 'react-rethinkdb'
+import FroalaEditor from 'react-froala-wysiwyg';
+import $ from 'jquery'
+import * as FroalaConfiguration from './FroalaConfiguration'
+import * as Utils from './Utils'
+import profile from './profile.png';
 import * as BS from 'react-bootstrap'
 import { Header, Input, Radio, Select, TextArea, Accordion, Icon, Segment, Form, Button, Image, List, Transition, Dropdown, Menu, TransitionablePortal } from 'semantic-ui-react'
 import { Table, Checkbox, FormControl, InputGroup, Col, ControlLabel, FormGroup } from 'react-bootstrap'
@@ -51,7 +56,9 @@ const Instructor = createReactClass({
             contentid: null,
             listofdocs: [],
             courseName: "",
-            submissionId: null
+            submissionId: null,
+            listofsubmissions: [],
+            course: null
         }
     },
 
@@ -192,7 +199,7 @@ const Instructor = createReactClass({
     // contentid : null,
     async handleSaveContentId(id) {
         await this.setState({ contentid: null })
-        await this.setState({ contentid: id, listofdocs: [], submissionId: null })
+        await this.setState({ contentid: id, listofdocs: [], submissionId: null, listofsubmissions: [] })
     },
 
     async handleNextWork() {
@@ -234,14 +241,46 @@ const Instructor = createReactClass({
         }
     },
 
+    async handleNextSubmission() {
+        if (this.state.listofsubmissions.length > 0) {
+            let index = this.state.listofsubmissions.findIndex(subid => subid === this.state.submissionId)
+            index -= 1
+            if (index < 0) {
+                index = this.state.listofsubmissions.length - 1
+            }
+            await this.setState({ submissionId: null })
+            await this.setState({ submissionId: this.state.listofsubmissions[index] })
+        }
+    },
+
+    async handlePreviousSubmission() {
+        if (this.state.listofsubmissions.length > 0) {
+
+            let index = this.state.listofsubmissions.findIndex(subid => subid === this.state.submissionId)
+            index += 1
+            if (index > this.state.listofsubmissions.length - 1) {
+                index = 0
+            }
+            await this.setState({ submissionId: null })
+            await this.setState({ submissionId: this.state.listofsubmissions[index] })
+        }
+    },
+
     async handleAddDocument(docid) {
         if (!this.state.listofdocs.find(id => docid === id)) {
             await this.setState({ listofdocs: [...this.state.listofdocs, docid] })
         }
     },
 
-    async handleSaveCName(courseName) {
-        await this.setState({ courseName })
+    async handleAddSubmission(subid) {
+        if (!this.state.listofsubmissions.find(id => subid === id)) {
+            await this.setState({ listofsubmissions: [...this.state.listofsubmissions, subid] })
+        }
+    },
+
+    async handleSaveCName(courseName, course) {
+        console.log("Course", course)
+        await this.setState({ courseName, course })
     },
 
     async handleSaveSubmissionId(submissionId) {
@@ -282,8 +321,11 @@ const Instructor = createReactClass({
                                                     this.props.selectedcourses
                                                     &&
                                                     this.props.selectedcourses.map(
-                                                        (course) =>
-                                                            <Course id={course} handleAddDocument={this.handleAddDocument} handleSaveCName={this.handleSaveCName} handleSaveContentId={this.handleSaveContentId} />
+                                                        (course, i) =>
+                                                            <Course key={i} id={course}
+                                                                handleAddDocument={this.handleAddDocument}
+                                                                handleSaveCName={this.handleSaveCName}
+                                                                handleSaveContentId={this.handleSaveContentId} />
                                                     )
                                                 }
                                             </tbody>
@@ -321,7 +363,12 @@ const Instructor = createReactClass({
                                             {
                                                 this.state.contentid
                                                 &&
-                                                <ContentShowSub selectedsubmissionid={this.state.submissionId} id={this.state.contentid} sections={this.props.selectedsections} handleSaveSubmissionId={this.handleSaveSubmissionId} />
+                                                <ContentShowSub handleAddSubmission={this.handleAddSubmission}
+                                                    selectedsubmissionid={this.state.submissionId}
+                                                    id={this.state.contentid}
+                                                    course={this.state.course}
+                                                    sections={this.props.selectedsections}
+                                                    handleSaveSubmissionId={this.handleSaveSubmissionId} />
                                             }
                                         </tbody>
                                     </table>
@@ -334,7 +381,10 @@ const Instructor = createReactClass({
                                     {
                                         this.state.submissionId
                                         &&
-                                        <StudentSubmission contentid={this.state.contentid} coursename={this.state.courseName} id={this.state.submissionId} />
+                                        <StudentSubmission handleNextSubmission={this.handleNextSubmission}
+                                            handlePreviousSubmission={this.handlePreviousSubmission}
+                                            contentid={this.state.contentid} coursename={this.state.courseName}
+                                            id={this.state.submissionId} />
                                     }
                                 </div>
                             </Transition>
@@ -383,8 +433,14 @@ const Course = createReactClass({
             this.data.course.value()
             &&
             this.data.course.value().contents.map(
-                (content) =>
-                    <Content handleSaveCName={this.props.handleSaveCName} id={content} courseid={this.props.id} coursename={this.data.course.value().name} handleAddDocument={this.props.handleAddDocument} handleSaveContentId={this.props.handleSaveContentId} />
+                (content, i) =>
+                    <Content key={i} handleSaveCName={this.props.handleSaveCName}
+                        id={content} courseid={this.props.id}
+                        course={this.data.course.value()}
+                        coursename={this.data.course.value().name}
+                        handleAddDocument={this.props.handleAddDocument}
+                        handleSaveContentId={this.props.handleSaveContentId}
+                    />
             )
         )
     },
@@ -395,8 +451,6 @@ const Content = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        ////console.log("SDF", this.props.id)
-
         return {
             content: new ReactRethinkdb.QueryRequest({
                 query: r.table('contents').get(this.props.id),
@@ -414,7 +468,6 @@ const Content = createReactClass({
     },
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
-        ////console.log("CNNNNNNNNNNNNNNNNNN", this.props.coursename)
         await this.props.handleAddDocument(prevProps.id)
     },
 
@@ -424,7 +477,7 @@ const Content = createReactClass({
         for (let i = 0; i < allrows.length; i++)
             allrows[i].classList.remove("selectedrow")
         document.getElementById(this.data.content.value().id).classList.add("selectedrow")
-        this.props.handleSaveCName(this.props.coursename)
+        this.props.handleSaveCName(this.props.coursename, this.props.course)
     },
 
     render() {
@@ -451,7 +504,6 @@ const ContentShowSub = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        ////console.log("SFFFDF BF", this.props.id)
 
         return {
             content: new ReactRethinkdb.QueryRequest({
@@ -463,15 +515,23 @@ const ContentShowSub = createReactClass({
     },
 
     render() {
-        //console.log("Contentsssss", this.props.id)
+        let show = false 
+        
         return (
             this.data.content.value()
             &&
-            this.data.content.value().submissions.map(
-                (submission) =>
-                    <Submission selectedsubmissionid={this.props.selectedsubmissionid} id={submission} sections={this.props.sections} handleSaveSubmissionId={this.props.handleSaveSubmissionId} />
+            this.props.sections.map((sec, i) => this.props.course.sections.map(c_sec => sec === c_sec)
+                &&
+                i === 0
+                &&
+                this.data.content.value().submissions.map(
+                    (submission, i) =>
+                        <Submission key={i}  handleAddSubmission={this.props.handleAddSubmission} 
+                                selectedsubmissionid={this.props.selectedsubmissionid} id={submission} 
+                                sections={this.props.sections} course={this.props.course}
+                                handleSaveSubmissionId={this.props.handleSaveSubmissionId} />
+                )
             )
-
         )
     },
 });
@@ -522,7 +582,8 @@ const StudentSubmission = createReactClass({
             document: "",
             feedbacks: [],
             grades: [],
-            finalFeed: ""
+            finalFeed: "",
+            show: true
         };
     },
     async handleUpdateSub() {
@@ -551,27 +612,6 @@ const StudentSubmission = createReactClass({
         this.handleUpdateSub()
     },
 
-    handleFeedback(e, i) {
-        let text = e.target.value
-        let updated = this.state.feedbacks
-        updated[i] = text
-        this.setState({ feedbacks: updated })
-    },
-
-    handleGrades(e, i) {
-
-        let text = e.target.value
-        let updated = this.state.grades
-        updated[i] = text
-        this.setState({ grades: updated })
-    },
-
-    handleFinalFeed(e) {
-        let text = e.target.value
-        this.handleEditField(text, "feedback")
-        // this.setState({finalFeed: text})
-    },
-
     render() {
         return (
             this.data.submissions.value()
@@ -587,8 +627,8 @@ const StudentSubmission = createReactClass({
                         {/* due date */}    <Form.Input size='mini' placeholder='19/5/2018' readOnly />
                         {/* end date */}    <Form.Input size='mini' placeholder='20/5/2018' readOnly />
                         <div class="navcss2">
-                            <a href="#" uk-icon="chevron-left"></a>
-                            <a href="#" uk-icon="chevron-right"></a>
+                            <a href="#" onClick={this.props.handleNextSubmission} uk-icon="chevron-left" ></a>
+                            <a href="#" onClick={this.props.handlePreviousSubmission} uk-icon="chevron-right"></a>
                         </div>
                     </Form.Group>
                     </div>
@@ -596,42 +636,14 @@ const StudentSubmission = createReactClass({
                 {
                     this.data.submissions.value().answers.map(
                         (answer, i) =>
-                            <div key={i} class="ui dividing header">
-
-                                <div className='simplemargin2' >
-                                    <FormGroup>
-                                        <ControlLabel><Question id={answer.questionid} /></ControlLabel>
-                                    </FormGroup>
-                                </div >
-                                <div className='simplemargin' >
-
-                                    <div class="inline fields ">
-                                        <div class="field">
-                                            <label>Answer:</label>
-                                            <input type="text" value={answer.answer} readOnly style={{ width: '50vh', marginLeft: '0.5vh' }} />
-                                        </div>
-                                    </div></div>
-                                <div className='simplemargin' >
-                                    <Form.Group inline>
-                                        <div class="inline fields ">
-                                            <ControlLabel >Grade:</ControlLabel>
-                                            <input type="number" min={0} max={20} value={this.state.grades[i]} onChange={(e) => this.handleGrades(e, i)} style={{ width: '10vh', marginLeft: '0.5vh' }} />
-                                            <input type="text" value={"/20"} readOnly style={{ width: '8vh', marginLeft: '0.5vh' }} />
-                                        </div>
-                                    </Form.Group>
-                                </div>
-                                <div class="inline fields">
-                                    <label>Feedback:</label>
-                                    <textarea value={this.state.feedbacks[i]} onChange={(e) => this.handleFeedback(e, i)} placeholder="Q02 Feedback" rows="1" style={{ width: '50vh', height: '3vh' }} />
-                                </div>
-                            </div>
+                            <Answer key={i} id={answer} />
                     )
                 }
 
                 <div class="ui dividing header">
                     <div class="inline fields">
                         <label>Feedback:</label>
-                        <textarea value={this.data.submissions.value().feedback} onChange={this.handleFinalFeed} placeholder="Document Feedback" rows="1" style={{ width: '100vh', height: '3vh' }} />
+                        <textarea value={this.data.submissions.value().feedback} onChange={(e) => this.handleEditField(e.target.value, "feedback")} placeholder="Document Feedback" rows="1" style={{ width: '100vh', height: '3vh' }} />
                     </div>
                 </div>
             </Form>
@@ -639,12 +651,83 @@ const StudentSubmission = createReactClass({
     },
 });
 
+const Answer = createReactClass({
+
+    mixins: [ReactRethinkdb.DefaultMixin],
+
+    observe(props, state) {
+        return {
+            answer: new ReactRethinkdb.QueryRequest({
+                query: r.table('answers').get(this.props.id),
+                changes: true,
+                initial: null,
+            }),
+        };
+    },
+
+    getInitialState() {
+        return {
+            correct: ''
+        };
+    },
+
+    handleEditField(newValue, fieldName) {
+        let query = r.table('answers').get(this.props.id).update({
+            [fieldName]: newValue
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query)
+    },
+
+    render() {
+        return (
+            this.data.answer.value()
+            &&
+            <div class="ui dividing header">
+
+                <div className='simplemargin2' >
+                    <FormGroup>
+                        <ControlLabel><Question id={this.data.answer.value().questionid} /></ControlLabel>
+                    </FormGroup>
+                </div >
+                <div className='simplemargin' >
+
+                    <div class="inline fields ">
+                        <div class="field">
+                            <label>Student Answer:</label>
+                            <FroalaEditor
+                                id="answer"
+                                tag='textarea'
+                                config={FroalaConfiguration.StudentQuestion}
+                                model={('html.set', this.data.answer.value().answer)}
+                            />
+                            <label>Correct Answer:</label>
+                            <CorrectAnswer id={this.data.answer.value().questionid} />
+                        </div>
+                    </div></div>
+                <div className='simplemargin' >
+                    <Form.Group inline>
+                        <div class="inline fields ">
+                            <ControlLabel >Grade:</ControlLabel>
+                            <input type="number" min={0} max={20} value={this.data.answer.value().grade} onChange={(e) => this.handleEditField(e.target.value, "grade")} style={{ width: '10vh', marginLeft: '0.5vh' }} />
+                            <input type="text" value={"/20"} readOnly style={{ width: '8vh', marginLeft: '0.5vh' }} />
+                        </div>
+                    </Form.Group>
+                </div>
+                <div class="inline fields">
+                    <label>Feedback:</label>
+                    <textarea value={this.data.answer.value().feedback} onChange={(e) => this.handleEditField(e.target.value, "feedback")} placeholder="Feedback" rows="1" style={{ width: '50vh', height: '3vh' }} />
+                </div>
+            </div>
+        )
+    }
+})
+
 const Question = createReactClass({
 
     mixins: [ReactRethinkdb.DefaultMixin],
     observe(props, state) {
         return {
-            document: new ReactRethinkdb.QueryRequest({
+            question: new ReactRethinkdb.QueryRequest({
                 query: r.table('questions').get(this.props.id),
                 changes: true,
                 initial: null,
@@ -654,9 +737,42 @@ const Question = createReactClass({
 
     render() {
         return (
-            this.data.document.value()
+            this.data.question.value()
             &&
-            this.data.document.value().question
+            <FroalaEditor
+                id="question"
+                tag='textarea'
+                config={FroalaConfiguration.StudentQuestion}
+                model={('html.set', this.data.question.value().question)}
+            />
+
+        )
+    },
+});
+
+const CorrectAnswer = createReactClass({
+
+    mixins: [ReactRethinkdb.DefaultMixin],
+    observe(props, state) {
+        return {
+            question: new ReactRethinkdb.QueryRequest({
+                query: r.table('questions').get(this.props.id),
+                changes: true,
+                initial: null,
+            }),
+        };
+    },
+
+    render() {
+        return (
+            this.data.question.value()
+            &&
+            <FroalaEditor
+                id="question"
+                tag='textarea'
+                config={FroalaConfiguration.StudentQuestion}
+                model={('html.set', this.data.question.value().answer)}
+            />
 
         )
     },
@@ -674,52 +790,57 @@ const Submission = createReactClass({
             }),
         };
     },
+
     getInitialState() {
         return {
-            show: false
+            show: true,
         };
     },
 
     async componentWillReceiveProps() {
-        await this.setState({ show: false })
-        this.props.sections.map(sec => {
-            let query = r.table("sections").get(sec)
-            ReactRethinkdb.DefaultSession.runQuery(query).then(
-                res => {
-                    res.students.map(
-                        studentCid => {
-                            let studentQuery = r.table("users").get(studentCid)
-                            ReactRethinkdb.DefaultSession.runQuery(studentQuery).then(
-                                async resStu => {
-                                    if (resStu.collegeId === (this.data.submissions.value().studentid) + "") {
-                                        await this.setState({ show: true })
-                                    }
-                                })
-                        })
-                }
-            )
-        })
+        // if (this.data.submissions.value()) {
+        //     await this.setState({ show: false })
+        //     this.props.sections.map(async sec => {
+        //         let query = r.table("sections").get(sec)
+        //         ReactRethinkdb.DefaultSession.runQuery(query).then(
+        //             async res => {
+        //                 if (res) {
+        //                     let show = false
+        //                     await res.students.map(
+        //                         async studentCid => {
+        //                             let studentQuery = r.table("users").get(studentCid)
+        //                             await ReactRethinkdb.DefaultSession.runQuery(studentQuery).then(
+        //                                 async resStu => {
+        //                                     if (resStu.collegeId === (this.data.submissions.value().studentid) + "") {
+        //                                         this.props.handleAddSubmission(this.props.id)
+        //                                         await this.setState({ show: true })
+        //                                     }
+        //                                     // console.log("SHOW IN", show + " S " + resStu.collegeId)
+        //                                 })
+        //                         })
+        //                     // console.log("SHOW AF", show)
+        //                     // await this.setState({ show })
+        //                 }
+        //             }
+        //         )
+        //     })
+        // }
+
     },
 
+
+
     handleSelectedSubmission() {
-        // let allrows = document.querySelectorAll(".selectedrow1")
-        // for (let i = 0; i < allrows.length; i++)
-        //     allrows[i].classList.remove("selectedrow1")
-        // document.getElementById(this.props.id).classList.add("selectedrow1")
         this.props.handleSaveSubmissionId(this.props.id)
     },
 
     render() {
-        // let style = null
-        // this.props.selectedsubmissionid === this.props.id 
-        // ?
-        // style = {} 
         return (
             this.state.show
             &&
             this.data.submissions.value()
             &&
-            <tr style={this.props.selectedsubmissionid === this.props.id ? {backgroundColor: 'yellow'} : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+            <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
                 <td>{this.data.submissions.value().studentid}</td>
                 <td>B</td>
                 <td>B</td>
