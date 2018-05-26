@@ -119,8 +119,6 @@ export const Enroll = createReactClass({
                     ReactRethinkdb.DefaultSession.runQuery(querySection);
                 }
             );
-
-
         })
     },
 
