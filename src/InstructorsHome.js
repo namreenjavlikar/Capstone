@@ -190,24 +190,6 @@ const Instructor = createReactClass({
         this.setState({ open: false })
     },
 
-    // async handleStudentsBySection() {
-    //     //also keep track of the course this student belongs to
-    //     await this.setState({ students: [] })
-    //     this.state.selectedcourses.map(course => {
-    //         this.state.selectedsections.map(async sec => {
-    //             let query = r.table("sections").get(sec)
-    //             ReactRethinkdb.DefaultSession.runQuery(query).then(
-    //                 async res => {
-    //                     if (res) {
-    //                         await res.students.map(async stu => {
-    //                             await this.setState({ students: [...this.state.students, { student: stu, course: course }] })
-    //                         })
-    //                     }
-    //                 })
-    //         })
-    //     })
-    // },
-
     async handleAddStudents(secid, courseid) {
         let query = r.table("sections").get(secid)
         ReactRethinkdb.DefaultSession.runQuery(query).then(
@@ -229,7 +211,6 @@ const Instructor = createReactClass({
             async res => {
                 if (res) {
                     await res.students.map(async stu => {
-                        let student = { student: stu, course: courseid }
                         let students = this.state.students
                         let index = this.state.students.findIndex((studentSplice) => studentSplice.student === stu && studentSplice.course === courseid)
                         if (index != -1) {
@@ -284,18 +265,34 @@ const Instructor = createReactClass({
                 let selectedcourses = []
                 this.data.user.value().courses.map(course => selectedcourses.push(course))
 
-                let allsections = document.getElementsByClassName("Nav_check")
-                for (let i = 0; i < allsections.length; i++) {
-                    allsections[i].checked = true
-                    await this.handleSelectSection(allsections[i].id, courseid)
+                let allCourses = document.getElementsByClassName("Courses")
+                for(let i = 0; i < allCourses.length; i++){
+                    let sectionsPerCourse = document.getElementsByClassName(allCourses[i].id)
+                    for(let j = 0; j < sectionsPerCourse.length; j ++){
+                        sectionsPerCourse[j].checked = true
+                        this.handleSelectSection(sectionsPerCourse[j].id, allCourses[i].id)
+                    }
                 }
+                // let allsections = document.getElementsByClassName("Nav_check")
+                // for (let i = 0; i < allsections.length; i++) {
+                //     allsections[i].checked = true
+                //     this.handleSelectSection(allsections[i].id, courseid)
+                // }
                 await this.setState({ selectedcourses })
             } else {
                 await this.setState({ selectedcourses: [], selectedsections: [] })
-                let allsections = document.getElementsByClassName("Nav_check")
-                for (let i = 0; i < allsections.length; i++) {
-                    allsections[i].checked = false
-                    await this.handleSelectSection(allsections[i].id, courseid)
+                // let allsections = document.getElementsByClassName("Nav_check")
+                // for (let i = 0; i < allsections.length; i++) {
+                //     allsections[i].checked = false
+                //     this.handleSelectSection(allsections[i].id, courseid)
+                // }
+                let allCourses = document.getElementsByClassName("Courses")
+                for(let i = 0; i < allCourses.length; i++){
+                    let sectionsPerCourse = document.getElementsByClassName(allCourses[i].id)
+                    for(let j = 0; j < sectionsPerCourse.length; j ++){
+                        sectionsPerCourse[j].checked = false
+                        this.handleSelectSection(sectionsPerCourse[j].id, allCourses[i].id)
+                    }
                 }
             }
         } else {
