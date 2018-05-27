@@ -292,7 +292,7 @@ const Instructor = createReactClass({
     },
 
     render() {
-        // console.log("CCC", this.props.selectedcourses)
+        console.log("CCC", this.props.students)
         const { items, value, activeIndex, visible, open } = this.state
         return (
             <div className="container">

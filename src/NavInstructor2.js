@@ -176,7 +176,7 @@ const Course = createReactClass({
             this.data.course.value()
             &&
             <Accordion inverted className="nav-box1">
-                <span className="nav-course-checkbox"><input id={this.props.id} onClick={() => this.props.handleSelectedCourse(this.props.id)} class="Nav_check uk-checkbox" type="checkbox" /></span>
+                <span className="nav-course-checkbox"><input id={this.props.id} onClick={() => this.props.handleSelectedCourse(this.props.id)} class="Courses Nav_check uk-checkbox" type="checkbox" /></span>
                 <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick} className="nav-term-course">
                     <span className="nav-font"> {this.data.course.value().name} </span>
                     <span className="nav-dropdown-icon" > <Icon name='dropdown' /></span>
