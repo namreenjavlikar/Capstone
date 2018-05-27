@@ -15,12 +15,7 @@ import * as Message from './Messages'
 
 
 let r = ReactRethinkdb.r;
-// let tempGroupId = ""
-// let tempContactId = ""
 
-
-
-const users = ['ade']
 
 export const Chat = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
@@ -29,7 +24,6 @@ export const Chat = createReactClass({
         return {
             screen: window.innerWidth,
             activeIndex: 0,
-            items: users.slice(0, 3),
             changeClass: window.innerWidth >= 500 ? "container-instructor-full" : "container-instructor-both",
             expandRight: false,
             iconRight: false ? "icon: chevron-right; ratio: 2.5" : "icon: chevron-left; ratio: 2.5",
@@ -65,10 +59,6 @@ export const Chat = createReactClass({
 
 
     /////////////////////////// design team methods
-
-   async  handleAdd() { await this.setState({ items: users.slice(0, this.state.items.length + 1) }) },
-
-   async  handleRemove() {await this.setState({ items: this.state.items.slice(0, -1) }) },
 
     async handleClick(e, titleProps) {
         const { index } = titleProps
@@ -339,22 +329,22 @@ export const Chat = createReactClass({
                             <div class="ui middle aligned selection list chat-group-contacts">
 
                                 {
-                                    // this.data.user.value().groups
-                                    //     ?
-                                    //     this.data.user.value().groups.map((item) => {
-                                    //         return <div key={item.groupid} class="item" id={item.groupid} onClick={() => this.selectGroup(item.groupid)}>
+                                    this.data.user.value().groups
+                                        ?
+                                        this.data.user.value().groups.map((item) => {
+                                            return <div key={item.groupid} class="item" id={item.groupid} onClick={() => this.selectGroup(item.groupid)}>
 
-                                    //             <img class="ui avatar image" src={userpic}
-                                    //             />
-                                    //             <div class="content">
-                                    //                 <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div>
-                                    //             </div>
+                                                <img class="ui avatar image" src={userpic}
+                                                />
+                                                <div class="content">
+                                                    <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div>
+                                                </div>
 
 
-                                    //         </div>;
-                                    //     })
-                                    //     :
-                                    //     <p>Loading...</p>
+                                            </div>;
+                                        })
+                                        :
+                                        <p>Loading...</p>
                                 }
 
                             </div>
@@ -455,7 +445,7 @@ export const Chat = createReactClass({
                                 </div>
 
                                 // it doenst work cause we are already observing user
-                                // <Message.Single id={tempContactId}  />
+                                // <Message.Single id={this.state.tempContactId} contactName={<Userinfo id={this.state.tempContactId} />} />
                                 :
                                 this.state.targetedChat == "group"
                                     ?

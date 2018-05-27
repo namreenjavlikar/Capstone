@@ -107,13 +107,18 @@ export const Enroll = createReactClass({
             let queryStudent = r.table('users').get(studentId).update({
                 courses: r.row('courses').append(courseId)
             })
-            let querySection = r.table('sections').get(sectionId).update({
-                students: r.row('students').append(studentId)
-            })
-            ReactRethinkdb.DefaultSession.runQuery(queryStudent);
-            ReactRethinkdb.DefaultSession.runQuery(querySection);
+            let queryCollegeId = r.table('users').get(studentId)
 
+            ReactRethinkdb.DefaultSession.runQuery(queryStudent)
 
+            ReactRethinkdb.DefaultSession.runQuery(queryCollegeId).then(
+                res => {
+                    let querySection = r.table('sections').filter({collegeId : res.collegeId}).update({
+                        students: r.row('students').append(studentId)
+                    })
+                    ReactRethinkdb.DefaultSession.runQuery(querySection);
+                }
+            );
         })
     },
 

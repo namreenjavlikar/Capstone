@@ -50,7 +50,8 @@ const Instructor = createReactClass({
             iconLeft: false ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5",
             cal: 0,
             selectedcourses: [],
-            selectedsections: []
+            selectedsections: [],
+            students: []
         }
     },
 
@@ -189,8 +190,21 @@ const Instructor = createReactClass({
         this.setState({ open: false })
     },
 
+    async handleStudentsBySection() {
+        //also keep track of the course this student belongs to
+        await this.setState({ students: [] })
+        this.state.selectedsections.map(async sec => {
+            let query = r.table("sections").get(sec)
+            ReactRethinkdb.DefaultSession.runQuery(query).then(
+                async res => {
+                    await res.students.map(async stu => {
+                        await this.setState({ students: [...this.state.students, stu] })
+                    })
+                })
+        })
+    },
+
     async handleSelectSection(sectionid, courseid) {
-        console.log("HERE ID", sectionid)
         let item = document.getElementById(sectionid)
         if (item) {
             let checked = item.checked
@@ -199,9 +213,10 @@ const Instructor = createReactClass({
                 if (this.state.selectedcourses.findIndex(id => id === courseid) === -1) {
                     await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
                 }
+                // await this.handleStudentsBySection()
             } else {
                 let count = 0
-                let allsections = document.getElementsByClassName("Nav_check")
+                let allsections = document.getElementsByClassName(courseid)
                 for (let i = 0; i < allsections.length; i++) {
                     if (allsections[i].checked === false)
                         count++
@@ -209,13 +224,16 @@ const Instructor = createReactClass({
                 if (count === allsections.length) {
                     let selectedcourses = this.state.selectedcourses
                     selectedcourses.splice(this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse === courseid), 1)
-                    await this.setState({ selectedcourses })
+                    await this.setState({ selectedcourses, students: [] })
                 }
 
                 let selectedsections = this.state.selectedsections
                 selectedsections.splice(this.state.selectedsections.findIndex((selectedsection) => selectedsection === sectionid), 1)
                 await this.setState({ selectedsections })
+                // await this.handleRemoveStudentsBySection()
             }
+            await this.handleStudentsBySection()
+            console.log("HERE ID", this.state.students)
         }
     },
 
@@ -226,7 +244,7 @@ const Instructor = createReactClass({
             if (checked) {
                 let selectedcourses = []
                 this.data.user.value().courses.map(course => selectedcourses.push(course))
-                
+
                 let allsections = document.getElementsByClassName("Nav_check")
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = true
@@ -292,7 +310,7 @@ const Instructor = createReactClass({
                     <span class={this.state.leftButton} uk-icon={this.state.iconLeft} onClick={() => this.handleExpandLeft()}>
                     </span>
 
-                    <InstructorContent selectedcourses={this.state.selectedcourses} selectedsections={this.state.selectedsections} />
+                    <InstructorContent students={this.state.students} selectedcourses={this.state.selectedcourses} selectedsections={this.state.selectedsections} />
 
                     <span class={this.state.rightButton}
                         uk-icon={this.state.iconRight}
