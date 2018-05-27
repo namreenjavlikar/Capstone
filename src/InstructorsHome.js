@@ -252,17 +252,22 @@ const Instructor = createReactClass({
                 }
                 await this.handleAddStudents(sectionid, courseid)
             } else {
-                // let count = 0
-                // let allsections = document.getElementsByClassName(courseid)
-                // for (let i = 0; i < allsections.length; i++) {
-                //     if (allsections[i].checked === false)
-                //         count++
-                // }
-                // if (count === allsections.length) {
-                //     let selectedcourses = this.state.selectedcourses
-                //     selectedcourses.splice(this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse === courseid), 1)
-                //     await this.setState({ selectedcourses })
-                // }
+                let count = 0
+                let allsections = document.getElementsByClassName(courseid)
+                // console.log("ALL", allsections)
+                for (let i = 0; i < allsections.length; i++) {
+                    if (allsections[i].checked === false)
+                        count++
+                }
+                if (count === allsections.length) {
+                    let selectedcourses = this.state.selectedcourses
+                    let index = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse === courseid)
+                    if (index != -1) {
+                        console.log("IN", index)
+                        selectedcourses.splice(index, 1)
+                        await this.setState({ selectedcourses })
+                    }
+                }
                 let selectedsections = this.state.selectedsections
                 selectedsections.splice(this.state.selectedsections.findIndex((selectedsection) => selectedsection === sectionid), 1)
                 await this.setState({ selectedsections })
