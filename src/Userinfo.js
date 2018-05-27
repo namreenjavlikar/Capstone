@@ -35,9 +35,27 @@ const Userinfo = createReactClass({
                 {
                     this.data.user.value()
                         ?
-                        this.data.user.value()
+                        this.data.user.value().name && this.data.user.value().status
                             ?
-                            <span >{this.data.user.value().name}</span>
+                            <span >
+
+                                {this.data.user.value().name + "   "} 
+
+                               
+
+                                    {
+                                        this.data.user.value().status == "online"
+                                        ?
+                                        <span class="chat-online-status"></span>
+                                        :
+                                        <span class="chat-offline-status"></span>
+                                    }
+
+
+                                
+
+
+                            </span>
                             :
                             <div></div>
                         :
