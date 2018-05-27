@@ -92,7 +92,6 @@ const Student = createReactClass({
 
     handleExpandRight() {
         let right = !this.state.expandRight
-        console.log('right:', right, this.state.expandLeft, this.state.expandRight)
         this.setState(
             {
                 changeClass:
@@ -178,7 +177,6 @@ const Student = createReactClass({
     },
 
     handleSelectSection(sectionid) {
-        console.log("HERE ID", sectionid)
         let item = document.getElementById(sectionid)
         if (item) {
             let checked = item.checked
@@ -224,7 +222,6 @@ const Student = createReactClass({
                 let allsections = document.getElementsByClassName(courseid)
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = true
-                    // console.log("HERE ID", allsections[i].id)
                     await this.handleSelectSection(allsections[i].id)
                 }
             }
@@ -314,7 +311,6 @@ const Course = createReactClass({
     },
 
     render() {
-        console.log("SEEE ", this.props.selectedcourses)
         return (
             this.data.course.value()
             &&
@@ -331,7 +327,6 @@ const Content = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        console.log("SDF", this.props.id)
 
         return {
             content: new ReactRethinkdb.QueryRequest({
@@ -354,7 +349,6 @@ const Content = createReactClass({
     },
 
     render() {
-        console.log(this.data.content.value())
         return (
             this.data.content.value()
             &&

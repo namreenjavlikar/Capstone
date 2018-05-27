@@ -32,6 +32,7 @@ const Instructor = createReactClass({
                 changes: true,
                 initial: null,
             }),
+
         };
     },
 
@@ -52,7 +53,8 @@ const Instructor = createReactClass({
             listofdocs: [],
             documentid: null,
             coursename: null,
-            submissionid: null
+            submissionid: null,
+            allsubmissions: []
         }
     },
 
@@ -190,9 +192,57 @@ const Instructor = createReactClass({
     async handleSaveSubmissionId(id) {
         await this.setState({ submissionid: null })
         await this.setState({ submissionid: id })
+        await this.getAllSubmissionsforStudent()
     },
 
-
+    async handleNextSubmission() {
+        let selectedSubmissionIndex = this.state.allsubmissions.findIndex(e => e == this.state.submissionid)
+        let nextSubmission = ""
+        if (selectedSubmissionIndex == (this.state.allsubmissions.length - 1))
+            nextSubmission = this.state.allsubmissions[0]
+        else
+            nextSubmission = this.state.allsubmissions[selectedSubmissionIndex + 1]
+        await this.setState({
+            submissionid: nextSubmission
+        })
+    },
+    async handlePreviousSubmission() {
+        let selectedSubmissionIndex = this.state.allsubmissions.findIndex(e => e == this.state.submissionid)
+        let previousSubmission = ""
+        if (selectedSubmissionIndex == 0)
+            previousSubmission = this.state.allsubmissions[this.state.allsubmissions.length - 1]
+        else
+            previousSubmission = this.state.allsubmissions[selectedSubmissionIndex - 1]
+        await this.setState({
+            submissionid: previousSubmission
+        })
+    },
+    getAllSubmissionsforStudent() {
+        let query = r.table('contents').get(this.state.contentid)('submissions')
+        ReactRethinkdb.DefaultSession.runQuery(query).then(
+            submissions => {
+                submissions.map(
+                    sub => {
+                        console.log("SUB ", sub)
+                        let query1 = r.table('submissions').get(sub)
+                        ReactRethinkdb.DefaultSession.runQuery(query1).then(
+                            async result => {
+                                //
+                                console.log(result.studentid === this.data.user.value().collegeId)
+                                if (result.studentid === this.data.user.value().collegeId) {
+                                    let subid = result.id
+                                    if (this.state.allsubmissions.findIndex(e => e == subid) == -1)
+                                        await this.setState({
+                                            allsubmissions: [...this.state.allsubmissions, subid]
+                                        })
+                                }
+                            }
+                        )
+                    }
+                )
+            }
+        )
+    },
     async handleNextWork() {
         if (this.state.listofdocs.length > 0) {
             let index = this.state.listofdocs.findIndex(docid => docid === this.state.contentid)
@@ -238,13 +288,13 @@ const Instructor = createReactClass({
         }
     },
 
-    handleNewSubmission() {
+    async  handleNewSubmission() {
 
         let query = r.table("submissions").insert({ studentid: this.data.user.value().collegeId, answers: [] })
         let submissionid = null
-        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
+        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(async  res => {
             let insertedSubmissionId = res.generated_keys[0]
-            this.setState({
+            await this.setState({
                 submissionid: res.generated_keys[0]
             })
             let query2 = r.table('contents').get(this.state.contentid).update({
@@ -255,19 +305,19 @@ const Instructor = createReactClass({
             //get document questionids
             let allquestions = r.table('documents').get(this.state.documentid)('questions')
             ReactRethinkdb.DefaultSession.runQuery(allquestions).then(
-                res => {
-                    res.map(question => {
-                        let addanswerquery = r.table("answers").insert({ questionid: question, answer: "", feedback: "", grade: "" })
-                        ReactRethinkdb.DefaultSession.runQuery(addanswerquery, { return_changes: true }).then(result => {
+                async res => {
+                    for (let i = 0; i < res.length; i++) {
+
+                        let addanswerquery = r.table("answers").insert({ questionid: res[i], answer: "", feedback: "", grade: "" })
+                        await ReactRethinkdb.DefaultSession.runQuery(addanswerquery, { return_changes: true }).then(result => {
+
                             let insertedAnswerId = result.generated_keys[0]
                             let studentanswer = r.table('submissions').get(insertedSubmissionId).update({
                                 answers: r.row('answers').append(insertedAnswerId)
                             })
                             ReactRethinkdb.DefaultSession.runQuery(studentanswer);
                         })
-
                     }
-                    )
                 }
 
             )
@@ -275,6 +325,7 @@ const Instructor = createReactClass({
 
     },
     render() {
+        console.log("#####", this.state.allsubmissions)
 
         const { items, value, activeIndex, visible, open } = this.state
         return (
@@ -283,10 +334,7 @@ const Instructor = createReactClass({
                     <div class="uk-section-default USD">
                         <ul uk-accordion="multiple: true " className='simplemargin5'>
                             <li class="uk-open ">
-                                <div class="navcss">
-                                    <a href="#" uk-icon="chevron-left"></a>
-                                    <a href="#" uk-icon="chevron-right"></a>
-                                </div>
+
                                 <a class="uk-accordion-title checkbx " href="#" ><strong>Course Works </strong>  </a>
 
                                 <div class="uk-accordion-content" >
@@ -349,10 +397,13 @@ const Instructor = createReactClass({
                                                 this.state.contentid && this.data.user.value()
                                                 &&
                                                 <ContentShowSub
+                                                    selectedsubmissionid={this.state.submissionid}
                                                     id={this.state.contentid}
                                                     sections={this.props.selectedsections}
                                                     studentid={this.data.user.value().collegeId}
                                                     handleSaveSubmissionId={(id) => this.handleSaveSubmissionId(id)}
+                                                //    handleSaveAllSubmissions={(submission) => this.handleSaveAllSubmissions(submission)}
+
                                                 />
                                             }
                                         </tbody>
@@ -363,6 +414,10 @@ const Instructor = createReactClass({
                                         <BS.Button onClick={() => this.handleNewSubmission()}> New Submission</BS.Button >
                                     }
 
+                                </div>
+                                <div class="navcss">
+                                    <a href="#" onClick={() => this.handlePreviousSubmission()} uk-icon="chevron-left" ></a>
+                                    <a href="#" onClick={() => this.handleNextSubmission()} uk-icon="chevron-right"></a>
                                 </div>
                             </li>
                         </ul>
@@ -411,6 +466,7 @@ const Course = createReactClass({
     },
 
     handleSelectedCourse() {
+
         let checked = document.getElementById(this.data.course.value().id).checked
         this.setState({ list: checked })
     },
@@ -418,7 +474,7 @@ const Course = createReactClass({
 
 
     render() {
-        console.log("SEEE ", this.props.selectedcourses)
+
         return (
             this.data.course.value()
             &&
@@ -441,7 +497,7 @@ const Content = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        console.log("SDF", this.props.id)
+
 
         return {
             content: new ReactRethinkdb.QueryRequest({
@@ -522,7 +578,6 @@ const ContentShowSub = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        console.log("SFFFDF BF", this.props.id)
 
         return {
             content: new ReactRethinkdb.QueryRequest({
@@ -534,7 +589,7 @@ const ContentShowSub = createReactClass({
     },
 
     render() {
-        console.log("Contentsssss", this.data.content.value())
+
         return (
             this.data.content.value()
                 &&
@@ -542,7 +597,12 @@ const ContentShowSub = createReactClass({
                 ?
                 this.data.content.value().submissions.map(
                     (submission) =>
-                        <Submission id={submission} studentid={this.props.studentid} handleSaveSubmissionId={(id) => this.props.handleSaveSubmissionId(id)} />
+                        <Submission
+                            selectedsubmissionid={this.props.selectedsubmissionid}
+                            id={submission} studentid={this.props.studentid}
+                            handleSaveSubmissionId={(id) => this.props.handleSaveSubmissionId(id)}
+                        //handleSaveAllSubmissions={(submission) => this.props.handleSaveAllSubmissions(submission)}
+                        />
                 )
                 :
                 <h3>No submissions</h3>
@@ -550,10 +610,6 @@ const ContentShowSub = createReactClass({
         )
     },
 });
-
-
-
-
 
 const Submission = createReactClass({
 
@@ -567,24 +623,16 @@ const Submission = createReactClass({
             }),
         };
     },
-
     handleSelectedSubmission() {
         this.props.handleSaveSubmissionId(this.data.submissions.value().id)
-        let allrows = document.querySelectorAll(".selectedrow1")
-        for (let i = 0; i < allrows.length; i++)
-            allrows[i].classList.remove("selectedrow1")
-        document.getElementById(this.data.submissions.value().id).classList.add("selectedrow1")
     },
-
     render() {
-        console.log("SHOW", this.props.studentid)
         return (
-
             this.data.submissions.value()
             &&
             this.data.submissions.value().studentid == this.props.studentid
             &&
-            <tr id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+            <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: "lightgrey" } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
                 <td>{this.data.submissions.value().studentid} </td>
                 <td>B</td>
                 <td>B</td>
