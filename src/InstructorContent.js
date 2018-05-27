@@ -58,7 +58,8 @@ const Instructor = createReactClass({
             courseName: "",
             submissionId: null,
             listofsubmissions: [],
-            course: null
+            course: null,
+            students: []
         }
     },
 
@@ -279,15 +280,19 @@ const Instructor = createReactClass({
     },
 
     async handleSaveCName(courseName, course) {
-        console.log("Course", course)
+        // console.log("Course", course)
         await this.setState({ courseName, course })
     },
 
     async handleSaveSubmissionId(submissionId) {
-        await this.setState({ submissionId })
+        if (submissionId != this.state.submissionId) {
+            await this.setState({ submissionId: null })
+            await this.setState({ submissionId, listofsubmissions: [] })
+        }
     },
 
     render() {
+        // console.log("CCC", this.props.selectedcourses)
         const { items, value, activeIndex, visible, open } = this.state
         return (
             <div className="container">
@@ -366,8 +371,9 @@ const Instructor = createReactClass({
                                                 <ContentShowSub handleAddSubmission={this.handleAddSubmission}
                                                     selectedsubmissionid={this.state.submissionId}
                                                     id={this.state.contentid}
-                                                    course={this.state.course}
+                                                    students={this.props.students}
                                                     sections={this.props.selectedsections}
+                                                    course={this.state.course}
                                                     handleSaveSubmissionId={this.handleSaveSubmissionId} />
                                             }
                                         </tbody>
@@ -515,22 +521,16 @@ const ContentShowSub = createReactClass({
     },
 
     render() {
-        let show = false 
-        
         return (
             this.data.content.value()
             &&
-            this.props.sections.map((sec, i) => this.props.course.sections.map(c_sec => sec === c_sec)
-                &&
-                i === 0
-                &&
-                this.data.content.value().submissions.map(
-                    (submission, i) =>
-                        <Submission key={i}  handleAddSubmission={this.props.handleAddSubmission} 
-                                selectedsubmissionid={this.props.selectedsubmissionid} id={submission} 
-                                sections={this.props.sections} course={this.props.course}
-                                handleSaveSubmissionId={this.props.handleSaveSubmissionId} />
-                )
+            this.data.content.value().submissions.map(
+                (submission, i) =>
+                    <Submission key={i} handleAddSubmission={this.props.handleAddSubmission}
+                        selectedsubmissionid={this.props.selectedsubmissionid} id={submission}
+                        sections={this.props.sections} students={this.props.students}
+                        handleSaveSubmissionId={this.props.handleSaveSubmissionId}
+                        content={this.props.id} course={this.props.course} />
             )
         )
     },
@@ -586,6 +586,7 @@ const StudentSubmission = createReactClass({
             show: true
         };
     },
+
     async handleUpdateSub() {
         if (this.data.content.value()) {
             let query = r.table('documents').get(this.data.content.value().docid)
@@ -793,63 +794,56 @@ const Submission = createReactClass({
 
     getInitialState() {
         return {
-            show: true,
+            students: []
         };
     },
 
-    async componentWillReceiveProps() {
-        // if (this.data.submissions.value()) {
-        //     await this.setState({ show: false })
-        //     this.props.sections.map(async sec => {
-        //         let query = r.table("sections").get(sec)
-        //         ReactRethinkdb.DefaultSession.runQuery(query).then(
-        //             async res => {
-        //                 if (res) {
-        //                     let show = false
-        //                     await res.students.map(
-        //                         async studentCid => {
-        //                             let studentQuery = r.table("users").get(studentCid)
-        //                             await ReactRethinkdb.DefaultSession.runQuery(studentQuery).then(
-        //                                 async resStu => {
-        //                                     if (resStu.collegeId === (this.data.submissions.value().studentid) + "") {
-        //                                         this.props.handleAddSubmission(this.props.id)
-        //                                         await this.setState({ show: true })
-        //                                     }
-        //                                     // console.log("SHOW IN", show + " S " + resStu.collegeId)
-        //                                 })
-        //                         })
-        //                     // console.log("SHOW AF", show)
-        //                     // await this.setState({ show })
-        //                 }
-        //             }
-        //         )
-        //     })
-        // }
-
-    },
-
-
+    // componentWillReceiveProps() {
+    //     if (this.data.submissions.value()) {
+    //         if (this.props.students.find(st => st.student === this.data.submissions.value().studentid)) {
+    //             this.props.handleAddSubmission(this.props.id)
+    //         }
+    //     }
+    // },
 
     handleSelectedSubmission() {
         this.props.handleSaveSubmissionId(this.props.id)
     },
 
+    checkCourse() {
+        let thisStudent = this.props.students.filter(st => st.student === this.data.submissions.value().studentid)
+        let show = false
+        thisStudent.map(id => {
+            if (id.course === this.props.course.id)
+                show = true
+                this.props.handleAddSubmission(this.props.id)
+        })
+        return show
+    },
+
     render() {
         return (
-            this.state.show
-            &&
             this.data.submissions.value()
-            &&
-            <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
-                <td>{this.data.submissions.value().studentid}</td>
-                <td>B</td>
-                <td>B</td>
-                <td>B</td>
-                <td>B</td>
-                <td>B</td>
-                <td>B</td>
-                <td>B</td>
-            </tr>
+                &&
+                this.props.students.find(st => st.student === this.data.submissions.value().studentid)
+                ?
+                this.checkCourse()
+                    // this.props.students.find(st => st.course === this.props.course.id)
+                    ?
+                    <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+                        <td>{this.data.submissions.value().studentid}</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                    </tr>
+                    :
+                    <span></span>
+                :
+                <span></span>
         )
     },
 });
