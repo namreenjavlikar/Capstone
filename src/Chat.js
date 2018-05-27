@@ -38,17 +38,17 @@ export const Chat = createReactClass({
         };
     },
 
-    // async componentWillMount() {
-    //     if (!sessionStorage.getItem("token")) {
-    //         this.props.history.push("/")
-    //     }
-    // },
+    async componentWillMount() {
+        if (!sessionStorage.getItem("token")) {
+            this.props.history.push("/")
+        }
+    },
 
     observe(props, state) {
 
         return {
             user: new ReactRethinkdb.QueryRequest({
-                query: r.table('users').get(this.props.userid),
+                query: r.table('users').get(sessionStorage.getItem("user_id")),
                 changes: true,
                 initial: [],
             }),
@@ -253,14 +253,14 @@ export const Chat = createReactClass({
     async handleSendContacts() {
 
         let tempMessage = {
-            from: this.props.userid,
+            from: sessionStorage.getItem("user_id"),
             to: this.state.tempContactId,
             date: new Date(),
             content: this.state.txtMessage
         }
 
         // get the user id from the session
-        let messageToSelfQuery = r.table('users').get(this.props.userid).update({
+        let messageToSelfQuery = r.table('users').get(sessionStorage.getItem("user_id")).update({
             messages: r.row('messages').append(tempMessage)
         });
         ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
