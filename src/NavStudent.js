@@ -40,8 +40,8 @@ const NavStudent = createReactClass({
     },
 
     async handleUserStatus(id){
-        let querySetOnline = r.table('users').get(id).update({status: "offline"})
-        ReactRethinkdb.DefaultSession.runQuery(querySetOnline);
+        let querySetOffline= r.table('users').get(id).update({status: "offline"})
+        ReactRethinkdb.DefaultSession.runQuery(querySetOffline);
     },
 
 
