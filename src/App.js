@@ -20,7 +20,6 @@ import EditDocument from './EditDocument'
 import Question from './Question'
 import StudentHome from './StudentHome'
 import Chat from './Chat'
-
 let r = ReactRethinkdb.r
 
 ReactRethinkdb.DefaultSession.connect({

@@ -672,10 +672,10 @@ font-family: 'Roboto', sans-serif;
     font-family: 'Roboto', sans-serif;
 }
 .selectedrow{
-  background-color: aquamarine;
+  background-color: lightgrey;
 }
 .selectedrow1{
-  background-color: yellow;
+  background-color: lightgrey;
 }
 .hide{
   display: none;
