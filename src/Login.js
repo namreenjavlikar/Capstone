@@ -30,6 +30,11 @@ const Login = createReactClass({
         };
     },
 
+    async handleUserStatus(id){
+        let querySetOnline = r.table('users').get(id).update({status: "online"})
+        ReactRethinkdb.DefaultSession.runQuery(querySetOnline);
+    },
+
     async handleLogin() {
         let field = this.state.credentials;
         const specialCharacter = "."
@@ -68,6 +73,7 @@ const Login = createReactClass({
                                     console.log(sessionStorage.getItem("token"))
                                     console.log(sessionStorage.getItem("user_id"))
                                     console.log(sessionStorage.getItem("role"))
+                                    //handleUserStatus(result.user.id)
                                     this.setState({ messageToUser: "" })
                                 }
                                 else {
