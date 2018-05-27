@@ -58,7 +58,8 @@ const Instructor = createReactClass({
             courseName: "",
             submissionId: null,
             listofsubmissions: [],
-            course: null
+            course: null,
+            students: []
         }
     },
 
@@ -371,6 +372,7 @@ const Instructor = createReactClass({
                                                     id={this.state.contentid}
                                                     students={this.props.students}
                                                     sections={this.props.selectedsections}
+                                                    course={this.state.course}
                                                     handleSaveSubmissionId={this.handleSaveSubmissionId} />
                                             }
                                         </tbody>
@@ -526,7 +528,8 @@ const ContentShowSub = createReactClass({
                     <Submission key={i} handleAddSubmission={this.props.handleAddSubmission}
                         selectedsubmissionid={this.props.selectedsubmissionid} id={submission}
                         sections={this.props.sections} students={this.props.students}
-                        handleSaveSubmissionId={this.props.handleSaveSubmissionId} />
+                        handleSaveSubmissionId={this.props.handleSaveSubmissionId}
+                        content={this.props.id} course={this.props.course} />
             )
         )
     },
@@ -794,34 +797,50 @@ const Submission = createReactClass({
         };
     },
 
-    componentWillReceiveProps() {
-        if (this.data.submissions.value()) {
-            if (this.props.students.find(st => st === this.data.submissions.value().studentid)) {
-                this.props.handleAddSubmission(this.props.id)
-            }
-        }
-    },
+    // componentWillReceiveProps() {
+    //     if (this.data.submissions.value()) {
+    //         if (this.props.students.find(st => st.student === this.data.submissions.value().studentid)) {
+    //             this.props.handleAddSubmission(this.props.id)
+    //         }
+    //     }
+    // },
 
     handleSelectedSubmission() {
         this.props.handleSaveSubmissionId(this.props.id)
+    },
+
+    checkCourse() {
+        let thisStudent = this.props.students.filter(st => st.student === this.data.submissions.value().studentid)
+        let show = false
+        thisStudent.map(id => {
+            if (id.course === this.props.course.id)
+                show = true
+                this.props.handleAddSubmission(this.props.id)
+        })
+        return show
     },
 
     render() {
         return (
             this.data.submissions.value()
                 &&
-                this.props.students.find(st => st === this.data.submissions.value().studentid)
+                this.props.students.find(st => st.student === this.data.submissions.value().studentid)
                 ?
-                <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
-                    <td>{this.data.submissions.value().studentid}</td>
-                    <td>B</td>
-                    <td>B</td>
-                    <td>B</td>
-                    <td>B</td>
-                    <td>B</td>
-                    <td>B</td>
-                    <td>B</td>
-                </tr>
+                this.checkCourse()
+                    // this.props.students.find(st => st.course === this.props.course.id)
+                    ?
+                    <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+                        <td>{this.data.submissions.value().studentid}</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                        <td>B</td>
+                    </tr>
+                    :
+                    <span></span>
                 :
                 <span></span>
         )

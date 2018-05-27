@@ -190,18 +190,55 @@ const Instructor = createReactClass({
         this.setState({ open: false })
     },
 
-    async handleStudentsBySection() {
-        //also keep track of the course this student belongs to
-        await this.setState({ students: [] })
-        this.state.selectedsections.map(async sec => {
-            let query = r.table("sections").get(sec)
-            ReactRethinkdb.DefaultSession.runQuery(query).then(
-                async res => {
+    // async handleStudentsBySection() {
+    //     //also keep track of the course this student belongs to
+    //     await this.setState({ students: [] })
+    //     this.state.selectedcourses.map(course => {
+    //         this.state.selectedsections.map(async sec => {
+    //             let query = r.table("sections").get(sec)
+    //             ReactRethinkdb.DefaultSession.runQuery(query).then(
+    //                 async res => {
+    //                     if (res) {
+    //                         await res.students.map(async stu => {
+    //                             await this.setState({ students: [...this.state.students, { student: stu, course: course }] })
+    //                         })
+    //                     }
+    //                 })
+    //         })
+    //     })
+    // },
+
+    async handleAddStudents(secid, courseid) {
+        let query = r.table("sections").get(secid)
+        ReactRethinkdb.DefaultSession.runQuery(query).then(
+            async res => {
+                if (res) {
                     await res.students.map(async stu => {
-                        await this.setState({ students: [...this.state.students, stu] })
+                        let newEntry = { student: stu, course: courseid }
+                        if (!this.state.students.find(search => search === newEntry)) {
+                            await this.setState({ students: [...this.state.students, newEntry] })
+                        }
                     })
-                })
-        })
+                }
+            })
+    },
+
+    async handleRemoveStudents(secid, courseid) {
+        let query = r.table("sections").get(secid)
+        ReactRethinkdb.DefaultSession.runQuery(query).then(
+            async res => {
+                if (res) {
+                    await res.students.map(async stu => {
+                        let student = { student: stu, course: courseid }
+                        let students = this.state.students
+                        let index = this.state.students.findIndex((studentSplice) => studentSplice.student === stu && studentSplice.course === courseid)
+                        if (index != -1) {
+                            students.splice(index, 1)
+                            await this.setState({ students })
+                        }
+                    })
+                }
+            })
     },
 
     async handleSelectSection(sectionid, courseid) {
@@ -213,27 +250,24 @@ const Instructor = createReactClass({
                 if (this.state.selectedcourses.findIndex(id => id === courseid) === -1) {
                     await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
                 }
-                // await this.handleStudentsBySection()
+                await this.handleAddStudents(sectionid, courseid)
             } else {
-                let count = 0
-                let allsections = document.getElementsByClassName(courseid)
-                for (let i = 0; i < allsections.length; i++) {
-                    if (allsections[i].checked === false)
-                        count++
-                }
-                if (count === allsections.length) {
-                    let selectedcourses = this.state.selectedcourses
-                    selectedcourses.splice(this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse === courseid), 1)
-                    await this.setState({ selectedcourses, students: [] })
-                }
-
+                // let count = 0
+                // let allsections = document.getElementsByClassName(courseid)
+                // for (let i = 0; i < allsections.length; i++) {
+                //     if (allsections[i].checked === false)
+                //         count++
+                // }
+                // if (count === allsections.length) {
+                //     let selectedcourses = this.state.selectedcourses
+                //     selectedcourses.splice(this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse === courseid), 1)
+                //     await this.setState({ selectedcourses })
+                // }
                 let selectedsections = this.state.selectedsections
                 selectedsections.splice(this.state.selectedsections.findIndex((selectedsection) => selectedsection === sectionid), 1)
                 await this.setState({ selectedsections })
-                // await this.handleRemoveStudentsBySection()
+                await this.handleRemoveStudents(sectionid, courseid)
             }
-            await this.handleStudentsBySection()
-            console.log("HERE ID", this.state.students)
         }
     },
 
@@ -248,7 +282,7 @@ const Instructor = createReactClass({
                 let allsections = document.getElementsByClassName("Nav_check")
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = true
-                    this.handleSelectSection(allsections[i].id, courseid)
+                    await this.handleSelectSection(allsections[i].id, courseid)
                 }
                 await this.setState({ selectedcourses })
             } else {
@@ -256,7 +290,7 @@ const Instructor = createReactClass({
                 let allsections = document.getElementsByClassName("Nav_check")
                 for (let i = 0; i < allsections.length; i++) {
                     allsections[i].checked = false
-                    this.handleSelectSection(allsections[i].id, courseid)
+                    await this.handleSelectSection(allsections[i].id, courseid)
                 }
             }
         } else {
@@ -265,25 +299,27 @@ const Instructor = createReactClass({
                 let checked = item.checked
                 let courseIdIndex = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse == courseid)
                 if (checked) {
-                    if (courseIdIndex === -1)
+                    if (courseIdIndex === -1) {
                         await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
-                    let allsections = document.getElementsByClassName(courseid)
-                    for (let i = 0; i < allsections.length; i++) {
-                        allsections[i].checked = true
-                        this.handleSelectSection(allsections[i].id, courseid)
+                        let allsections = document.getElementsByClassName(courseid)
+                        for (let i = 0; i < allsections.length; i++) {
+                            allsections[i].checked = true
+                            await this.handleSelectSection(allsections[i].id, courseid)
+                        }
                     }
                 }
                 else {
-                    let selectedcourses = this.state.selectedcourses
-
-                    selectedcourses.splice(courseIdIndex, 1)
-                    let allsections = document.getElementsByClassName(courseid)
-                    for (let i = 0; i < allsections.length; i++) {
-                        allsections[i].checked = false
-                        this.handleSelectSection(allsections[i].id, courseid)
+                    if (courseIdIndex != -1) {
+                        let selectedcourses = this.state.selectedcourses
+                        selectedcourses.splice(courseIdIndex, 1)
+                        let allsections = document.getElementsByClassName(courseid)
+                        for (let i = 0; i < allsections.length; i++) {
+                            allsections[i].checked = false
+                            await this.handleSelectSection(allsections[i].id, courseid)
+                        }
+                        await this.setState({ selectedcourses })
+                        await this.setState({ selectedcourses })
                     }
-                    await this.setState({ selectedcourses })
-                    await this.setState({ selectedcourses })
                 }
             }
         }
