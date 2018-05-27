@@ -39,7 +39,14 @@ const NavStudent = createReactClass({
         this.setState({ activeIndex: newIndex })
     },
 
+    async handleUserStatus(id){
+        let querySetOnline = r.table('users').get(id).update({status: "offline"})
+        ReactRethinkdb.DefaultSession.runQuery(querySetOnline);
+    },
+
+
     handleLogout() {
+        //handleUserStatus(sessionStorage.getItem("user_id"))
         sessionStorage.clear()
         this.props.history.push("/")
     },
