@@ -197,7 +197,7 @@ const Instructor = createReactClass({
                 if (res) {
                     await res.students.map(async stu => {
                         let newEntry = { student: stu, course: courseid }
-                        if (!this.state.students.find(search => search === newEntry)) {
+                        if (!this.state.students.find(search => search.student === stu && search.course === courseid)) {
                             await this.setState({ students: [...this.state.students, newEntry] })
                         }
                     })
@@ -244,7 +244,6 @@ const Instructor = createReactClass({
                     let selectedcourses = this.state.selectedcourses
                     let index = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse === courseid)
                     if (index != -1) {
-                        console.log("IN", index)
                         selectedcourses.splice(index, 1)
                         await this.setState({ selectedcourses })
                     }
@@ -266,32 +265,24 @@ const Instructor = createReactClass({
                 this.data.user.value().courses.map(course => selectedcourses.push(course))
 
                 let allCourses = document.getElementsByClassName("Courses")
-                for(let i = 0; i < allCourses.length; i++){
+                for (let i = 0; i < allCourses.length; i++) {
+                    allCourses[i].checked = true
                     let sectionsPerCourse = document.getElementsByClassName(allCourses[i].id)
-                    for(let j = 0; j < sectionsPerCourse.length; j ++){
+                    for (let j = 0; j < sectionsPerCourse.length; j++) {
                         sectionsPerCourse[j].checked = true
-                        this.handleSelectSection(sectionsPerCourse[j].id, allCourses[i].id)
+                        await this.handleSelectSection(sectionsPerCourse[j].id, allCourses[i].id)
                     }
                 }
-                // let allsections = document.getElementsByClassName("Nav_check")
-                // for (let i = 0; i < allsections.length; i++) {
-                //     allsections[i].checked = true
-                //     this.handleSelectSection(allsections[i].id, courseid)
-                // }
                 await this.setState({ selectedcourses })
             } else {
                 await this.setState({ selectedcourses: [], selectedsections: [] })
-                // let allsections = document.getElementsByClassName("Nav_check")
-                // for (let i = 0; i < allsections.length; i++) {
-                //     allsections[i].checked = false
-                //     this.handleSelectSection(allsections[i].id, courseid)
-                // }
                 let allCourses = document.getElementsByClassName("Courses")
-                for(let i = 0; i < allCourses.length; i++){
+                for (let i = 0; i < allCourses.length; i++) {
+                    allCourses[i].checked = false
                     let sectionsPerCourse = document.getElementsByClassName(allCourses[i].id)
-                    for(let j = 0; j < sectionsPerCourse.length; j ++){
+                    for (let j = 0; j < sectionsPerCourse.length; j++) {
                         sectionsPerCourse[j].checked = false
-                        this.handleSelectSection(sectionsPerCourse[j].id, allCourses[i].id)
+                        await this.handleSelectSection(sectionsPerCourse[j].id, allCourses[i].id)
                     }
                 }
             }
@@ -301,17 +292,17 @@ const Instructor = createReactClass({
                 let checked = item.checked
                 let courseIdIndex = this.state.selectedcourses.findIndex((selectedcourse) => selectedcourse == courseid)
                 if (checked) {
-                    if (courseIdIndex === -1) {
+                    if (courseIdIndex === -1)
                         await this.setState({ selectedcourses: [...this.state.selectedcourses, courseid] })
-                        let allsections = document.getElementsByClassName(courseid)
-                        for (let i = 0; i < allsections.length; i++) {
-                            allsections[i].checked = true
-                            await this.handleSelectSection(allsections[i].id, courseid)
-                        }
+                    let allsections = document.getElementsByClassName(courseid)
+                    for (let i = 0; i < allsections.length; i++) {
+                        allsections[i].checked = true
+                        await this.handleSelectSection(allsections[i].id, courseid)
                     }
+
                 }
                 else {
-                    if (courseIdIndex != -1) {
+                    if (courseIdIndex !== -1) {
                         let selectedcourses = this.state.selectedcourses
                         selectedcourses.splice(courseIdIndex, 1)
                         let allsections = document.getElementsByClassName(courseid)

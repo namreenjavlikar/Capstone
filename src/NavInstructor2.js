@@ -7,6 +7,7 @@ import { Accordion, Icon, Segment, Form, Button, Image, List, Transition, Dropdo
 import _ from 'lodash'
 import createReactClass from 'create-react-class';
 import { Rating } from 'semantic-ui-react'
+import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 
 let r = ReactRethinkdb.r
 
@@ -41,7 +42,7 @@ const NavInstructor = createReactClass({
 
     handleLogout() {
         sessionStorage.clear()
-        this.props.history.push("/")
+        this.props.history.push("/login")
     },
 
     render() {

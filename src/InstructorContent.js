@@ -3,7 +3,7 @@ import userpic from './Images/cat.jpg'
 import userpic1 from './Images/flower.jpg'
 import logo from './Images/logo.png'
 import ReactRethinkdb from 'react-rethinkdb'
-import FroalaEditor from 'react-froala-wysiwyg';
+import FroalaEditor from 'react-froala-wysiwyg'
 import $ from 'jquery'
 import * as FroalaConfiguration from './FroalaConfiguration'
 import * as Utils from './Utils'
@@ -16,7 +16,7 @@ import _ from 'lodash'
 import { Rating } from 'semantic-ui-react'
 import NavInstructor2 from './NavInstructor2'
 import Chat from './Chat'
-import './App.css';
+import './App.css'
 
 let r = ReactRethinkdb.r
 
@@ -59,7 +59,8 @@ const Instructor = createReactClass({
             submissionId: null,
             listofsubmissions: [],
             course: null,
-            students: []
+            students: [],
+            allStudents: false
         }
     },
 
@@ -279,6 +280,15 @@ const Instructor = createReactClass({
         }
     },
 
+    async handleRemoveSubmission(subid) {
+        let index = this.state.listofsubmissions.findIndex(id => subid === id)
+        if (index !== -1) {
+            let listofsubmissions = this.state.listofsubmissions
+            listofsubmissions.splice(index, 1)
+            await this.setState({ listofsubmissions })
+        }
+    },
+
     async handleSaveCName(courseName, course) {
         // console.log("Course", course)
         await this.setState({ courseName, course })
@@ -292,7 +302,7 @@ const Instructor = createReactClass({
     },
 
     render() {
-        console.log("CCC", this.props.students)
+        // console.log("COUR")
         const { items, value, activeIndex, visible, open } = this.state
         return (
             <div className="container">
@@ -349,7 +359,7 @@ const Instructor = createReactClass({
                                 <div class="uk-accordion-content">
 
                                     <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-                                        <label class=" checkbx2" > <Checkbox inline>Show All Students</Checkbox></label>
+                                        <label class=" checkbx2" > <Checkbox checked={this.state.allStudents} onClick={() => this.setState({ allStudents: !this.state.allStudents })} inline>Show All Students</Checkbox></label>
                                     </div>
 
                                     <table className="scroll" >
@@ -374,7 +384,9 @@ const Instructor = createReactClass({
                                                     students={this.props.students}
                                                     sections={this.props.selectedsections}
                                                     course={this.state.course}
-                                                    handleSaveSubmissionId={this.handleSaveSubmissionId} />
+                                                    allStudents={this.state.allStudents}
+                                                    handleSaveSubmissionId={this.handleSaveSubmissionId}
+                                                    handleRemoveSubmission={this.handleRemoveSubmission} />
                                             }
                                         </tbody>
                                     </table>
@@ -530,7 +542,8 @@ const ContentShowSub = createReactClass({
                         selectedsubmissionid={this.props.selectedsubmissionid} id={submission}
                         sections={this.props.sections} students={this.props.students}
                         handleSaveSubmissionId={this.props.handleSaveSubmissionId}
-                        content={this.props.id} course={this.props.course} />
+                        content={this.props.id} course={this.props.course}
+                        allStudents={this.props.allStudents} handleRemoveSubmission={this.props.handleRemoveSubmission} />
             )
         )
     },
@@ -798,52 +811,58 @@ const Submission = createReactClass({
         };
     },
 
-    // componentWillReceiveProps() {
-    //     if (this.data.submissions.value()) {
-    //         if (this.props.students.find(st => st.student === this.data.submissions.value().studentid)) {
-    //             this.props.handleAddSubmission(this.props.id)
-    //         }
-    //     }
-    // },
-
     handleSelectedSubmission() {
         this.props.handleSaveSubmissionId(this.props.id)
     },
 
     checkCourse() {
+        console.log("CheckCourse")
         let thisStudent = this.props.students.filter(st => st.student === this.data.submissions.value().studentid)
         let show = false
         thisStudent.map(id => {
-            if (id.course === this.props.course.id)
+            if (id.course === this.props.course.id) {
                 show = true
                 this.props.handleAddSubmission(this.props.id)
+            }
         })
+        if (show === false)
+            this.props.handleRemoveSubmission(this.props.id)
         return show
     },
 
+    checkAll() {
+        console.log("CheckAll")
+        if (this.props.allStudents === true)
+            return true
+        else {
+            return this.checkCourse()
+        }
+    },
+
     render() {
+        console.log("Submissions")
         return (
             this.data.submissions.value()
                 &&
-                this.props.students.find(st => st.student === this.data.submissions.value().studentid)
+                // this.props.students.find(st => st.student === this.data.submissions.value().studentid)
+                // ?
+                this.checkAll()
+                // this.props.students.find(st => st.course === this.props.course.id)
                 ?
-                this.checkCourse()
-                    // this.props.students.find(st => st.course === this.props.course.id)
-                    ?
-                    <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
-                        <td>{this.data.submissions.value().studentid}</td>
-                        <td>B</td>
-                        <td>B</td>
-                        <td>B</td>
-                        <td>B</td>
-                        <td>B</td>
-                        <td>B</td>
-                        <td>B</td>
-                    </tr>
-                    :
-                    <span></span>
+                <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+                    <td>{this.data.submissions.value().studentid}</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
                 :
                 <span></span>
+            // :
+            // <span></span>
         )
     },
 });
