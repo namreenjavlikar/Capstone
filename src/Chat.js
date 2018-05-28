@@ -52,6 +52,11 @@ export const Chat = createReactClass({
                 changes: true,
                 initial: [],
             }),
+            messages: new ReactRethinkdb.QueryRequest({
+                query: r.table('messages').get(sessionStorage.getItem("user_id")),
+                changes: true,
+                initial: [],
+            }),
 
 
         };
@@ -141,17 +146,17 @@ export const Chat = createReactClass({
             return
         }
 
-        let findUserquery = r.table('users').get(this.state.txtUserId)
+        let findUserquery = r.table('messages').get(this.state.txtUserId)
 
         ReactRethinkdb.DefaultSession.runQuery(findUserquery).then(
             (res) => {
                 if (res) {
-                    let queryCheckMyContacts = r.table('users').get(this.state.userid)("contacts").filter({ "userid": this.state.txtUserId })
+                    let queryCheckMyContacts = r.table('messages').get(this.state.userid)("contacts").filter({ "userid": this.state.txtUserId })
                     ReactRethinkdb.DefaultSession.runQuery(queryCheckMyContacts).then(
                         (res) => {
                             if (res.length == 0) {
                                 console.log(res)
-                                let queryAdd2Contacts = r.table('users').get(this.state.userid).update({
+                                let queryAdd2Contacts = r.table('messages').get(this.state.userid).update({
                                     contacts: r.row('contacts').append({ userid: this.state.txtUserId, status: "accepted" })
                                 });
                                 ReactRethinkdb.DefaultSession.runQuery(queryAdd2Contacts);
@@ -161,12 +166,12 @@ export const Chat = createReactClass({
 
                         })
 
-                    let queryCheckOtherContacts = r.table('users').get(this.state.txtUserId)("contacts").filter({ "userid": this.state.userid })
+                    let queryCheckOtherContacts = r.table('messages').get(this.state.txtUserId)("contacts").filter({ "userid": this.state.userid })
                     ReactRethinkdb.DefaultSession.runQuery(queryCheckOtherContacts).then(
                         (res) => {
                             if (res.length == 0) {
                                 console.log(res)
-                                let query2 = r.table('users').get(this.state.txtUserId).update({
+                                let query2 = r.table('messages').get(this.state.txtUserId).update({
                                     contacts: r.row('contacts').append({ userid: this.state.userid, status: "pending" })
                                 });
                                 ReactRethinkdb.DefaultSession.runQuery(query2);
@@ -260,12 +265,12 @@ export const Chat = createReactClass({
         }
 
         // get the user id from the session
-        let messageToSelfQuery = r.table('users').get(sessionStorage.getItem("user_id")).update({
+        let messageToSelfQuery = r.table('messages').get(sessionStorage.getItem("user_id")).update({
             messages: r.row('messages').append(tempMessage)
         });
         ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
 
-        let messageToOtherQuery = r.table('users').get(this.state.tempContactId).update({
+        let messageToOtherQuery = r.table('messages').get(this.state.tempContactId).update({
             messages: r.row('messages').append(tempMessage)
         });
         ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
@@ -293,6 +298,7 @@ export const Chat = createReactClass({
                         </span></h3>
 
                     <div class="ui middle aligned selection list chat-contacts">
+                        
 
                         {
                             this.data.user.value().contacts
@@ -305,9 +311,7 @@ export const Chat = createReactClass({
                                         <div class="content">
                                             <div class="header" className="contacts"><Userinfo id={item.userid} /></div>
                                         </div>
-                                        <div class="right floated content">
-                                            <span class="chat-online-status"></span>
-                                        </div>
+                                        
 
                                     </div>;
                                 })
@@ -374,7 +378,7 @@ export const Chat = createReactClass({
                                         />
                                         <span style={{ color: "#76323f" }} className="contacts">
                                             <strong> <Userinfo id={this.state.tempContactId} /> </strong>
-                                            <span class="chat-online-status"></span>
+                                            
                                         </span>
                                         <span style={{ marginLeft: '140px', paddingRight: '10px', borderRight: '1px solid #76323f' }}>
                                             <Rating maxRating={1} icon='star' size='huge' uk-tooltip="title: Star This Contact; pos: bottom-right" />
@@ -391,9 +395,9 @@ export const Chat = createReactClass({
                                     <div id="messages" class="messages">
                                         <ul>
                                             {
-                                                this.data.user.value().messages
+                                                this.data.messages.value()
                                                     ?
-                                                    this.data.user.value().messages.map((item) => {
+                                                    this.data.messages.value().messages.map((item) => {
                                                         return <div >
                                                             {
                                                                 item.from == this.state.tempContactId
