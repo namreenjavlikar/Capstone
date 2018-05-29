@@ -348,8 +348,7 @@ const Instructor = createReactClass({
                                                     <th>Start</th>
                                                     <th>Due</th>
                                                     <th>End</th>
-                                                    <th>Submitted</th>
-                                                    <th>New</th>
+                                                    <th>Grade</th>
                                                 </tr>
                                             </thead>
                                             <tbody class='tbodystyle'>
@@ -385,11 +384,10 @@ const Instructor = createReactClass({
                                         <thead>
                                             <tr>
                                                 <th>Name</th>
+                                                <th>Student ID </th>
                                                 <th>Time</th>
-                                                <th>Files</th>
-                                                <th>Work Grade</th>
-                                                <th>Course Grade</th>
-                                                <th >GPA </th>
+                                                <th>Grade</th>
+                                                <th>Course Average</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -567,7 +565,6 @@ const Document = createReactClass({
                 <td>{this.data.document.value().dueDate}</td>
                 <td>{this.data.document.value().endDate}</td>
                 <td>A</td>
-                <td>A</td>
             </span>
 
         )
@@ -638,8 +635,7 @@ const Submission = createReactClass({
                 <td>B</td>
                 <td>B</td>
                 <td>B</td>
-                <td>B</td>
-                <td>B</td>
+               
             </tr>
         )
     },

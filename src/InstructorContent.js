@@ -327,7 +327,6 @@ const Instructor = createReactClass({
                                                     <th>Due</th>
                                                     <th>End</th>
                                                     <th>Submitted</th>
-                                                    <th>New</th>
                                                 </tr>
                                             </thead>
                                             <tbody class='tbodystyle'>
@@ -831,15 +830,29 @@ const Submission = createReactClass({
             submissions: new ReactRethinkdb.QueryRequest({
                 query: r.table('submissions').get(this.props.id),
                 changes: true,
-                initial: null,
+                initial: null
             }),
         };
     },
 
     getInitialState() {
         return {
-            students: []
+            students: [],
+            user: null
         };
+    },
+
+    async componentWillReceiveProps() {
+        console.log("STATE", this.state.user)
+        if (this.data.submissions.value()) {
+            let query = r.table("users").filter({ collegeId: this.data.submissions.value().studentid })
+            ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
+                res.toArray((err, results) => {
+                    console.log("Here", results[0])
+                    this.setState({user: results[0]})
+                })
+            })
+        }
     },
 
     handleSelectedSubmission() {
@@ -870,14 +883,16 @@ const Submission = createReactClass({
 
     render() {
         return (
-            this.data.submissions.value()
+            // this.state.user
+            //     &&
+                this.data.submissions.value()
                 &&
                 this.checkAll()
                 ?
                 <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+                    {/* <td>{this.state.user.name}</td> */}
+                    <td>B</td>
                     <td>{this.data.submissions.value().studentid}</td>
-                    <td>B</td>
-                    <td>B</td>
                     <td>B</td>
                     <td>B</td>
                     <td>{this.data.submissions.value().grade}</td>
