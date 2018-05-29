@@ -622,7 +622,7 @@ const StudentSubmission = createReactClass({
             this.handleUpdateSub()
             let array = []
             this.data.submissions.value().answers.map(ans => array.push(0))
-            await this.setState({grades: array})
+            await this.setState({ grades: array })
         }
     },
 
@@ -632,6 +632,8 @@ const StudentSubmission = createReactClass({
 
     async handleTotalGrade(i, value) {
         let grades = this.state.grades
+        if (!value)
+            value = 0
         grades[i] = value
         let total = 0
         grades.map(grade => total += parseInt(grade))
@@ -665,7 +667,7 @@ const StudentSubmission = createReactClass({
                 {
                     this.data.submissions.value().answers.map(
                         (answer, i) =>
-                            <Answer i = {i} handleTotalGrade={this.handleTotalGrade} key={i} id={answer} />
+                            <Answer i={i} handleTotalGrade={this.handleTotalGrade} key={i} id={answer} />
                     )
                 }
 
@@ -708,8 +710,11 @@ const Answer = createReactClass({
     },
 
     componentWillReceiveProps() {
-        if(this.data.answer.value()){
-            this.props.handleTotalGrade(this.props.i,  this.data.answer.value().grade)
+        if (this.data.answer.value()) {
+            // let grade = this.data.answer.value().grade
+            // if (!grade)
+            //     grade = 0
+            this.props.handleTotalGrade(this.props.i, this.data.answer.value().grade)
         }
     },
 
@@ -745,7 +750,7 @@ const Answer = createReactClass({
                             <ControlLabel >Grade:</ControlLabel>
                             <input type="number" min={0} max={20} value={this.data.answer.value().grade} onChange={(e) => {
                                 this.handleEditField(e.target.value, "grade")
-                                this.props.handleTotalGrade(this.props.i,  e.target.value)
+                                this.props.handleTotalGrade(this.props.i, e.target.value)
                             }
                             }
                                 style={{ width: '10vh', marginLeft: '0.5vh' }} />
