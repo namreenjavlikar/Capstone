@@ -42,8 +42,9 @@ const NavInstructor = createReactClass({
     },
 
     handleLogout() {
-        sessionStorage.clear()
+        // console.log("PROP", this.props)
         this.props.history.push("/login")
+        sessionStorage.clear()
     },
 
     render() {

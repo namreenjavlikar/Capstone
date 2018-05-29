@@ -314,8 +314,7 @@ const Instructor = createReactClass({
                                     <a href="#" uk-icon="chevron-left"></a>
                                     <a href="#" uk-icon="chevron-right"></a>
                                 </div>
-                                <a class="uk-accordion-title checkbx " href="#" ><strong>Course Works </strong>  </a>
-
+                                <a class="uk-accordion-title checkbx " href="#" ><span><strong>Course Works</strong></span></a>
                                 <div class="uk-accordion-content" >
                                     <div>
                                         <table className="scroll " >
@@ -354,7 +353,7 @@ const Instructor = createReactClass({
                                     <a href="#" onClick={() => this.handlePreviousWork()} uk-icon="chevron-left" ></a>
                                     <a href="#" onClick={() => this.handleNextWork()} uk-icon="chevron-right"></a>
                                 </div>
-                                <a class="uk-accordion-title checkbx simplemargin4" href="#" ><strong>Work Submitted  </strong>  </a>
+                                <a class="uk-accordion-title checkbx simplemargin4" href="#" ><strong>Work Submitted</strong>  </a>
 
                                 <div class="uk-accordion-content">
 
@@ -596,19 +595,19 @@ const StudentSubmission = createReactClass({
             feedbacks: [],
             grades: [],
             finalFeed: "",
-            show: true
+            show: true,
+            grade: 0,
+            grades: []
         };
     },
 
     async handleUpdateSub() {
-        if (this.data.content.value()) {
-            let query = r.table('documents').get(this.data.content.value().docid)
-            ReactRethinkdb.DefaultSession.runQuery(query).then(
-                async res => {
-                    await this.setState({ document: res.name })
-                }
-            )
-        }
+        let query = r.table('documents').get(this.data.content.value().docid)
+        ReactRethinkdb.DefaultSession.runQuery(query).then(
+            async res => {
+                await this.setState({ document: res.name })
+            }
+        )
     },
 
     handleEditField(newValue, fieldName) {
@@ -618,12 +617,28 @@ const StudentSubmission = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
-    componentWillMount() {
-        this.handleUpdateSub()
+    async componentWillMount() {
+        if (this.data.content.value()) {
+            this.handleUpdateSub()
+            let array = []
+            this.data.submissions.value().answers.map(ans => array.push(0))
+            await this.setState({grades: array})
+        }
     },
 
     componentWillReceiveProps() {
         this.handleUpdateSub()
+    },
+
+    async handleTotalGrade(i, value) {
+        let grades = this.state.grades
+        grades[i] = value
+        let total = 0
+        grades.map(grade => total += parseInt(grade))
+        let query = r.table('submissions').get(this.props.id).update({
+            grade: total
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
     render() {
@@ -650,7 +665,7 @@ const StudentSubmission = createReactClass({
                 {
                     this.data.submissions.value().answers.map(
                         (answer, i) =>
-                            <Answer key={i} id={answer} />
+                            <Answer i = {i} handleTotalGrade={this.handleTotalGrade} key={i} id={answer} />
                     )
                 }
 
@@ -692,6 +707,12 @@ const Answer = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
+    componentWillReceiveProps() {
+        if(this.data.answer.value()){
+            this.props.handleTotalGrade(this.props.i,  this.data.answer.value().grade)
+        }
+    },
+
     render() {
         return (
             this.data.answer.value()
@@ -722,7 +743,12 @@ const Answer = createReactClass({
                     <Form.Group inline>
                         <div class="inline fields ">
                             <ControlLabel >Grade:</ControlLabel>
-                            <input type="number" min={0} max={20} value={this.data.answer.value().grade} onChange={(e) => this.handleEditField(e.target.value, "grade")} style={{ width: '10vh', marginLeft: '0.5vh' }} />
+                            <input type="number" min={0} max={20} value={this.data.answer.value().grade} onChange={(e) => {
+                                this.handleEditField(e.target.value, "grade")
+                                this.props.handleTotalGrade(this.props.i,  e.target.value)
+                            }
+                            }
+                                style={{ width: '10vh', marginLeft: '0.5vh' }} />
                             <input type="text" value={"/20"} readOnly style={{ width: '8vh', marginLeft: '0.5vh' }} />
                         </div>
                     </Form.Group>
@@ -816,7 +842,6 @@ const Submission = createReactClass({
     },
 
     checkCourse() {
-        console.log("CheckCourse")
         let thisStudent = this.props.students.filter(st => st.student === this.data.submissions.value().studentid)
         let show = false
         thisStudent.map(id => {
@@ -831,7 +856,6 @@ const Submission = createReactClass({
     },
 
     checkAll() {
-        console.log("CheckAll")
         if (this.props.allStudents === true)
             return true
         else {
@@ -840,14 +864,10 @@ const Submission = createReactClass({
     },
 
     render() {
-        console.log("Submissions")
         return (
             this.data.submissions.value()
                 &&
-                // this.props.students.find(st => st.student === this.data.submissions.value().studentid)
-                // ?
                 this.checkAll()
-                // this.props.students.find(st => st.course === this.props.course.id)
                 ?
                 <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
                     <td>{this.data.submissions.value().studentid}</td>
@@ -855,7 +875,7 @@ const Submission = createReactClass({
                     <td>B</td>
                     <td>B</td>
                     <td>B</td>
-                    <td>B</td>
+                    <td>{this.data.submissions.value().grade}</td>
                     <td>B</td>
                     <td>B</td>
                 </tr>

@@ -337,10 +337,9 @@ const Instructor = createReactClass({
                     this.state.expandLeft
                     &&
                     <NavInstructor2  handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} />
-
                 } */}
 
-                    <NavInstructor2 handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} handleSelectSection={(id, id2) => this.handleSelectSection(id, id2)} />
+                    <NavInstructor2 history={this.props.history} handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} handleSelectSection={(id, id2) => this.handleSelectSection(id, id2)} />
                 </div>
                 <div className={this.state.changeClass}>
                     <span class={this.state.leftButton} uk-icon={this.state.iconLeft} onClick={() => this.handleExpandLeft()}>
