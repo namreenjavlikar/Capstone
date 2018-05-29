@@ -778,3 +778,11 @@ font-family: 'Roboto', sans-serif;
 .fr-quick-insert { display: none; }
 
 .fr-toolbar-buttons { display: none; }
+
+.PageHeader{
+  text-align: center
+}
+
+/* .left{
+  text-align: left
+} */

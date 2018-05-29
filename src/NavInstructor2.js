@@ -23,7 +23,7 @@ const NavInstructor = createReactClass({
         }
     },
 
-  
+
     observe(props, state) {
         return {
             user: new ReactRethinkdb.QueryRequest({
@@ -88,17 +88,18 @@ const NavInstructor = createReactClass({
 
                 <div>
                     <h4 className="nav-head"><input id="nav_check_all" class="uk-checkbox" onClick={() => this.props.handleSelectedCourse("All")} type="checkbox" /> My Term Courses</h4>
+                    <Accordion inverted className="nav-box2">
                     {
                         this.data.user.value()
                         &&
                         this.data.user.value().courses
                         &&
                         this.data.user.value().courses.map(
-                            (course) =>
-                                <p>{<Course id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} handleSelectSection={(id, id2) => this.props.handleSelectSection(id, id2)} />}</p>
+                            (course, i) =>
+                                <p>{<Course i={i} id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} handleSelectSection={(id, id2) => this.props.handleSelectSection(id, id2)} />}</p>
                         )
                     }
-                   
+                    </Accordion>
 
                 </div>
                 <hr />
@@ -128,6 +129,70 @@ const NavInstructor = createReactClass({
                                         CP4567
                                         </span>
                                 </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+                                <div className="prev-course">
+                                    <span className="prev-checkbox"><input class="uk-checkbox" type="checkbox" />
+                                    </span>
+                                    <span className="nav-font" style={{ color: 'white' }}>
+                                        CP4567
+                                        </span>
+                                </div>
+
                             </div>
                         </Accordion.Content>
                     </Accordion>
@@ -171,26 +236,25 @@ const Course = createReactClass({
         let checked = document.getElementById(this.data.course.value().id).checked
         this.setState({ list: checked })
     },
-    
+
     render() {
         const { items, activeIndex } = this.state
         return (
             this.data.course.value()
             &&
-            <Accordion inverted className="nav-box1">
+            <div style={{marginBottom: -17}}>
                 <span className="nav-course-checkbox"><input id={this.props.id} onClick={() => this.props.handleSelectedCourse(this.props.id)} class="Courses Nav_check uk-checkbox" type="checkbox" /></span>
-                <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick} className="nav-term-course">
+                <Accordion.Title active={activeIndex === this.props.i} index={this.props.i} onClick={this.handleClick} className="nav-term-course">
                     <span className="nav-font"> {this.data.course.value().name} </span>
                     <span className="nav-dropdown-icon" > <Icon name='dropdown' /></span>
                 </Accordion.Title>
-                <Accordion.Content active={activeIndex === 0}>
+                <Accordion.Content active={activeIndex === this.props.i}>
                     {
                         this.data.course.value().sections.map((section, i) =>
-                            
                             <div>
                                 <span className="nav-section-checkbox">
-                                    <input id={section} 
-                                        className={this.data.course.value().id + " Nav_check " + "uk-checkbox"} 
+                                    <input id={section}
+                                        className={this.data.course.value().id + " Nav_check " + " uk-checkbox"}
                                         onClick={() => this.props.handleSelectSection(section, this.props.id)}
                                         type="checkbox" />
                                 </span>
@@ -198,14 +262,14 @@ const Course = createReactClass({
                                     <img class="ui avatar image" src={userpic} />
                                 </span>
                                 <span className="nav-sections" style={{ color: 'white' }}>
-                                    <Section id={section}  />
+                                    <Section id={section} />
                                 </span>
                                 <br />
                             </div>
                         )
                     }
                 </Accordion.Content>
-            </Accordion>
+            </div>
         )
     },
 });

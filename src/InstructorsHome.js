@@ -105,7 +105,7 @@ const Instructor = createReactClass({
 
     handleExpandRight() {
         let right = !this.state.expandRight
-        console.log('right:', right, this.state.expandLeft, this.state.expandRight)
+        // console.log('right:', right, this.state.expandLeft, this.state.expandRight)
         this.setState(
             {
                 changeClass:
@@ -150,8 +150,8 @@ const Instructor = createReactClass({
     handleExpandLeft() {
         let left = !this.state.expandLeft
 
-        console.log('left:', left, this.state.expandLeft, this.state.expandRight)
-        console.log('left:', left)
+        // console.log('left:', left, this.state.expandLeft, this.state.expandRight)
+        // console.log('left:', left)
         this.setState(
             {
                 changeClass:
@@ -404,7 +404,7 @@ const Course = createReactClass({
     },
 
     render() {
-        console.log("SEEE ", this.props.selectedcourses)
+        // console.log("SEEE ", this.props.selectedcourses)
         return (
             this.data.course.value()
             &&
@@ -421,7 +421,7 @@ const Content = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
 
     observe(props, state) {
-        console.log("SDF", this.props.id)
+        // console.log("SDF", this.props.id)
 
         return {
             content: new ReactRethinkdb.QueryRequest({
@@ -445,7 +445,7 @@ const Content = createReactClass({
     },
 
     render() {
-        console.log(this.data.content.value())
+        // console.log(this.data.content.value())
         return (
             this.data.content.value()
             &&
@@ -511,7 +511,7 @@ const Section = createReactClass({
 
     handleSelectedSection() {
         let sectionid = this.data.section.value().id
-        console.log("Secy sec", sectionid)
+        // console.log("Secy sec", sectionid)
         let sectionstudents = this.data.section.value().students
         let selectedsection = document.getElementById(sectionid).checked
 
