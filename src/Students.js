@@ -122,8 +122,6 @@ export const Enroll = createReactClass({
         })
     },
 
-
-
     render() {
         return (
             this.state.coursesList === []

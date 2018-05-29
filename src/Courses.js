@@ -101,9 +101,9 @@ export const Create = createReactClass({
     },
 
     async componentWillMount() {
-        // if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
-        //     this.props.history.push("/")
-        // } else {
+        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Admin") {
+            this.props.history.push("/")
+        } else {
         let query = r.table('users').filter({ role: "Instructor" })
 
         let users = {}
@@ -116,7 +116,7 @@ export const Create = createReactClass({
             })
         this.setState({ allInstructors: users })
         console.log("ALL ", users)
-        // }
+        }
     },
 
     observe(props, state) {
@@ -133,7 +133,7 @@ export const Create = createReactClass({
                 this.state.selectedInstructors.map((inst, i) => {
                     let queryInst = r.table("users").get(inst.id).update({ courses: r.row("courses").append(insertedCourseId) })
                     ReactRethinkdb.DefaultSession.runQuery(queryInst)
-                    let secQuery = r.table("sections").insert({ sectionNo: i + 1, students: [] })
+                    let secQuery = r.table("sections").insert({ sectionNo: i + 1 + " - " + inst.name, students: [] })
                     ReactRethinkdb.DefaultSession.runQuery(secQuery, { return_changes: true }).then(res => {
                         let insertedSectionId = res.generated_keys[0]
                         let addSection = r.table("courses").get(insertedCourseId).update({ sections: r.row("sections").append( insertedSectionId) })

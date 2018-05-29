@@ -1,11 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ReactRethinkdb from 'react-rethinkdb';
-import createReactClass from 'create-react-class';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ReactRethinkdb from 'react-rethinkdb'
+import createReactClass from 'create-react-class'
 import jwt from 'express-jwt'
-import '../node_modules/uikit/dist/css/uikit.css';
-import './App.css';
-import photo from './photo.png';
+import '../node_modules/uikit/dist/css/uikit.css'
+import './App.css'
+import photo from './photo.png'
 import logo from './logo.png'
 import { sign } from 'jsonwebtoken'
 import bcrypt from "bcryptjs"

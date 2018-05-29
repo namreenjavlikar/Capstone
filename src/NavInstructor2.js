@@ -8,6 +8,7 @@ import _ from 'lodash'
 import createReactClass from 'create-react-class';
 import { Rating } from 'semantic-ui-react'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
+import ReactDOM from 'react-dom';
 
 let r = ReactRethinkdb.r
 

@@ -13,6 +13,7 @@ import NavInstructor2 from './NavInstructor2'
 import Chat from './Chat'
 import InstructorContent from './InstructorContent'
 import './App.css';
+import ReactDOM from 'react-dom';
 
 let r = ReactRethinkdb.r
 
@@ -28,6 +29,12 @@ const Instructor = createReactClass({
                 initial: null,
             }),
         };
+    },
+
+    componentWillMount() {
+        if (!sessionStorage.getItem("token") || sessionStorage.getItem("role") !== "Instructor") {
+            this.props.history.push("/")
+        }
     },
 
     async componentDidMount() {
