@@ -287,13 +287,14 @@ export const Chat = createReactClass({
         return (
 
             <div className="chat">
-                <div class="chat-page">
+
+                {
+                    this.data.user.value().chatStatus == "enabled" && this.data.user.value()
+                    ?
+                    <div class="chat-page">
                     <h3 className="contacts">Chat
                                 <span class="ui category search  chat-search-box">
-                            <div class="ui icon input">
-                                <input class="prompt" type="text" placeholder="Search..." />
-                                <i class="search icon"></i>
-                            </div>
+                            
                             <div class="results"></div>
                         </span></h3>
 
@@ -309,7 +310,7 @@ export const Chat = createReactClass({
                                         <img class="ui avatar image" src={userpic}
                                         />
                                         <div class="content">
-                                            <div class="header" className="contacts"><Userinfo id={item.userid} /></div>
+                                            <div class="header" className="contacts"><Userinfo id={item.userid} option={"1"} /></div>
                                         </div>
                                         
 
@@ -378,15 +379,7 @@ export const Chat = createReactClass({
                                         />
                                         <span style={{ color: "#76323f" }} className="contacts">
                                             <strong> <Userinfo id={this.state.tempContactId} /> </strong>
-                                            
                                         </span>
-                                        <span style={{ marginLeft: '140px', paddingRight: '10px', borderRight: '1px solid #76323f' }}>
-                                            <Rating maxRating={1} icon='star' size='huge' uk-tooltip="title: Star This Contact; pos: bottom-right" />
-                                        </span>
-                                        <span style={{ marginLeft: '10px', paddingRight: '10px', borderRight: '1px solid #76323f', cursor: 'pointer' }}>
-                                            <Icon inverted color='red' size='large' name='attach' uk-tooltip="title: Attach Any File ; pos: bottom-right" />
-                                        </span>
-                                        <span uk-icon="close" onClick={this.handleRemove} uk-tooltip="title: Close Message ; pos: bottom-right" style={{ color: "black", marginLeft: '10px', marginRight: '10px', cursor: 'pointer' }}></span>
                                     </div>
 
                                     <div style={{ borderTop: '1px solid #76323f', marginTop: '15px' }}>
@@ -467,6 +460,19 @@ export const Chat = createReactClass({
 
                 </div>
 
+                    :
+                    <center>
+                        <h3 className="contacts">
+                        Chat has been disabled
+                        </h3>
+
+                    </center>
+
+                }
+
+
+
+                
             </div>
 
         );

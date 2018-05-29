@@ -44,7 +44,7 @@ const Userinfo = createReactClass({
                                
 
                                     {
-                                        this.data.user.value().status == "online"
+                                        this.data.user.value().status == "online" && this.props.option == "1"
                                         ?
                                         <span class="chat-online-status"></span>
                                         :

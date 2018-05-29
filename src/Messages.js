@@ -228,16 +228,9 @@ export const Group = createReactClass({
                         // <strong> Loading.. </strong>
                     }
                     <strong> {this.props.groupName} </strong>
-                    
             
                     </span>
-                    <span style={{ marginLeft: '140px', paddingRight: '10px', borderRight: '1px solid #76323f' }}>
-                        <Rating maxRating={1} icon='star' size='huge' uk-tooltip="title: Star This Contact; pos: bottom-right" />
-                    </span>
-                    <span style={{ marginLeft: '10px', paddingRight: '10px', borderRight: '1px solid #76323f', cursor: 'pointer' }}>
-                        <Icon inverted color='red' size='large' name='attach' uk-tooltip="title: Attach Any File ; pos: bottom-right" />
-                    </span>
-                    <span uk-icon="close" onClick={this.handleRemove} uk-tooltip="title: Close Message ; pos: bottom-right" style={{ color: "black", marginLeft: '10px', marginRight: '10px', cursor: 'pointer' }}></span>
+                    
                 </div>
 
                 <div style={{ borderTop: '1px solid #76323f', marginTop: '15px' }}>
