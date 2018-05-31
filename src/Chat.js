@@ -10,6 +10,7 @@ import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import Userinfo from './Userinfo'
 import GroupInfo from './GroupInfo'
+import CourseInfo from './CourseInfo'
 import * as Contacts from './Contacts'
 import * as Message from './Messages'
 
@@ -34,7 +35,8 @@ export const Chat = createReactClass({
             targetedChat: "empty",
             tempGroupId: "",
             tempContactId: "",
-            testUserNameToggle: false
+            testUserNameToggle: false,
+            isRecorded: false
         };
     },
 
@@ -57,6 +59,27 @@ export const Chat = createReactClass({
                 changes: true,
                 initial: [],
             }),
+            // messageslog: new ReactRethinkdb.QueryRequest({
+            //     query: r.table('messageslog').get(sessionStorage.getItem("user_id")),
+            //     changes: true,
+            //     initial: [],
+            // }),
+            sections: new ReactRethinkdb.QueryRequest({
+                query: r.table('sections'),
+                changes: true,
+                initial: null,
+            }),
+            courses: new ReactRethinkdb.QueryRequest({
+                query: r.table('courses'),
+                changes: true,
+                initial: null,
+            }),
+            hardsection: new ReactRethinkdb.QueryRequest({
+                query: r.table('sections').get("e186e3ba-f8b4-464e-9d82-a906be5633e4"),
+                changes: true,
+                initial: [],
+            }),
+
 
 
         };
@@ -74,7 +97,7 @@ export const Chat = createReactClass({
     },
 
     async handleSize() {
-       await  this.setState(
+        await this.setState(
             {
                 screen: window.innerWidth,
                 changeClass: this.state.screen >= 500 ? "container-instructor" : "container-instructor-full"
@@ -138,6 +161,7 @@ export const Chat = createReactClass({
         if (this.state.txtUserId == "") {
             return
         }
+
 
 
         if (this.state.txtUserId == this.state.userid) {
@@ -244,10 +268,21 @@ export const Chat = createReactClass({
     },
 
     async selectContact(id) {
-        await this.setState({ tempContactId: id })
-        await this.setState({ targetedChat: "contacts" })
+        // await this.setState({ tempContactId: id })
+        // await this.setState({ targetedChat: "contacts" })
+        console.log("student id= " + id)
 
-
+        let getId = r.table('users').filter({ "collegeid": id })
+        await ReactRethinkdb.DefaultSession.runQuery(getId).then(
+            (res) => {
+                res.toArray((err, results) => {
+                    console.log("", results[0].id);
+                    if (results[0].id) {
+                        this.setState({ tempContactId: results[0].id })
+                        this.setState({ targetedChat: "contacts" })
+                    }
+                })
+            })
     },
     async selectGroup(id) {
         await this.setState({ tempGroupId: id })
@@ -255,28 +290,81 @@ export const Chat = createReactClass({
 
     },
 
-    async handleSendContacts() {
+    async  handleSendContacts() {
 
-        let tempMessage = {
-            from: sessionStorage.getItem("user_id"),
-            to: this.state.tempContactId,
-            date: new Date(),
-            content: this.state.txtMessage
+
+
+        if (this.state.isRecorded == true) {
+
+            let tempMessage = {
+                from: sessionStorage.getItem("user_id"),
+                to: this.state.tempContactId,
+                date: new Date(),
+                content: this.state.txtMessage
+            }
+
+            let messageToSelfQuery = r.table('messages').get(sessionStorage.getItem("user_id")).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
+
+            let messageToOtherQuery = r.table('messages').get(this.state.tempContactId).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
+
+
+            await this.setState({ txtMessage: '' })
+
+        } else {
+
+            let tempMessage = {
+                from: sessionStorage.getItem("user_id"),
+                to: this.state.tempContactId,
+                date: new Date(),
+                content: this.state.txtMessage
+            }
+
+            this.data.messages.value().messages.push(tempMessage)
+
+            await this.setState({ txtMessage: '' })
+
         }
 
-        // get the user id from the session
-        let messageToSelfQuery = r.table('messages').get(sessionStorage.getItem("user_id")).update({
-            messages: r.row('messages').append(tempMessage)
-        });
-        ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
 
-        let messageToOtherQuery = r.table('messages').get(this.state.tempContactId).update({
-            messages: r.row('messages').append(tempMessage)
-        });
-        ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
+    },
 
 
-        await this.setState({ txtMessage: '' })
+    async handleCheckbox(e) {
+
+
+        if (e == true) {
+
+            let tempMessage = {
+                from: sessionStorage.getItem("user_id"),
+                to: this.state.tempContactId,
+                date: new Date(),
+                botmessage: true,
+                content: "The message is being recorded"
+            }
+
+            this.data.messages.value().messages.push(tempMessage)
+            await this.setState({ isRecorded: true })
+
+
+        } else {
+            let tempMessage = {
+                from: sessionStorage.getItem("user_id"),
+                to: this.state.tempContactId,
+                date: new Date(),
+                botmessage: true,
+                content: "The message stopped recording"
+            }
+
+            this.data.messages.value().messages.push(tempMessage)
+            await this.setState({ isRecorded: false })
+        }
+
     },
 
 
@@ -290,79 +378,236 @@ export const Chat = createReactClass({
 
                 {
                     this.data.user.value().chatStatus == "enabled" && this.data.user.value()
-                    ?
-                    <div class="chat-page">
-                    <h3 className="contacts">Chat
+                        ?
+                        <div class="chat-page">
+                            <h3 className="contacts">Chat
                                 <span class="ui category search  chat-search-box">
-                            
-                            <div class="results"></div>
-                        </span></h3>
 
-                    <div class="ui middle aligned selection list chat-contacts">
-                        
+                                    <div class="results"></div>
+                                </span></h3>
 
-                        {
-                            this.data.user.value().contacts
-                                ?
-                                this.data.user.value().contacts.map((item) => {
-                                    return <div key={item.userid} class="item" id={item.userid} onClick={() => this.selectContact(item.userid)}>
+                            <div class="ui middle aligned selection list chat-contacts">
 
-                                        <img class="ui avatar image" src={userpic}
-                                        />
-                                        <div class="content">
-                                            <div class="header" className="contacts"><Userinfo id={item.userid} option={"1"} /></div>
-                                        </div>
-                                        
-
-                                    </div>;
-                                })
-                                :
-                                <p>Empty</p>
-                        }
-
-
-                    </div>
-
-                    <hr />
-
-                    <Accordion inverted>
-                        <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick} className="chat-gp">
-                            <span style={{ fontSize: '18px' }}>Group Chat</span>
-                            <span className="nav-dropdown-icon" > <Icon name='dropdown' /></span>
-                        </Accordion.Title>
-                        <Accordion.Content active={activeIndex === 0}>
-                            <div class="ui middle aligned selection list chat-group-contacts">
 
                                 {
-                                    this.data.user.value().groups
-                                        ?
-                                        this.data.user.value().groups.map((item) => {
-                                            return <div key={item.groupid} class="item" id={item.groupid} onClick={() => this.selectGroup(item.groupid)}>
+                                    // old contacts
+                                    // this.data.user.value().contacts
+                                    //     ?
+                                    //     this.data.user.value().contacts.map((item) => {
+                                    //         return <div key={item.userid} class="item" id={item.userid} onClick={() => this.selectContact(item.userid)}>
 
-                                                <img class="ui avatar image" src={userpic}
-                                                />
-                                                <div class="content">
-                                                    <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div>
-                                                </div>
+                                    //             <img class="ui avatar image" src={userpic}
+                                    //             />
+                                    //             <div class="content">
+                                    //                 <div class="header" className="contacts"><Userinfo id={item.userid} option={"1"} /></div>
+                                    //             </div>
 
 
-                                            </div>;
-                                        })
-                                        :
-                                        <p>Loading...</p>
+                                    //         </div>;
+                                    //     })
+                                    //     :
+                                    //     <p>Empty</p>
                                 }
 
+                                {
+                                    // new from sections
+                                    // this.data.sections.value()
+                                    //     ?
+                                    //     // this.data.sections.value().map((section) => {
+                                    //     //     console.log(section)
+                                    //     // })
+                                    //         this.data.sections.value().map((item) => {
+                                    //         return <div key={item.id} class="item" id={item.id} >
+
+                                    //             <img class="ui avatar image" src={userpic}
+                                    //             />
+                                    //             <div class="content">
+                                    //                 <div class="header" className="contacts">section {item.id}</div>
+                                    //             </div>
+
+                                    //         </div>;
+                                    //     })
+                                    //     :
+                                    //     <div class="item" >
+
+                                    //     </div>
+
+                                }
+                                {
+                                    // this.data.user.value().courses
+                                    //     ?
+                                    //     this.data.user.value().courses.map((course) => {
+                                    //         return <span>
+
+
+                                    //             <span >
+                                    //                 {/* dont forget to get the course name */}
+                                    //                 {/* <span > {course}</span> */}
+                                    //                 <h5 class="header" className="contacts">  <CourseInfo id={course} /> </h5>
+                                    //                 {
+                                    //                     this.data.hardsection.value().students
+                                    //                         ?
+                                    //                         // console.log(this.data.hardsection.value().students)
+                                    //                         this.data.hardsection.value().students.map((student) => {
+                                    //                             return <div key={student} class="item" id={student} onClick={() => this.selectContact(student)}>
+
+                                    //                                 {
+                                    //                                     student != this.data.user.value().collegeid
+                                    //                                         ?
+                                    //                                         <span>
+                                    //                                             <img class="ui avatar image" src={userpic}
+                                    //                                             />
+                                    //                                             <div class="content">
+                                    //                                                 <div class="header" className="contacts">{student}</div>
+                                    //                                             </div>
+                                    //                                         </span>
+                                    //                                         :
+                                    //                                         <span></span>
+                                    //                                 }
+
+
+                                    //                             </div>;
+                                    //                         })
+                                    //                         :
+                                    //                         <div></div>
+
+                                    //                 }
+                                    //             </span>
+
+
+                                    //         </span>;
+                                    //     })
+                                    //     :
+                                    //     <p>Empty</p>
+                                }
+
+                                {
+                                    this.data.user.value().courses
+                                        ?
+                                        this.data.user.value().courses.map((mycourse) => {
+                                            return <span>
+                                                <span >
+                                                    {/* dont forget to get the course name */}
+                                                    {/* <span > {course}</span> */}
+                                                    <h5 class="header" className="contacts">  <CourseInfo id={mycourse} /> </h5>
+
+
+                                                    {
+                                                        this.data.courses.value()
+                                                            ?
+                                                            this.data.courses.value().map((item) => {
+                                                                return <span>
+                                                                    {
+                                                                        item.id == mycourse
+                                                                            ?
+                                                                            item.sections.map((courseSections) => {
+                                                                                return <span>
+
+                                                                                    {
+                                                                                        this.data.sections.value()
+                                                                                            ?
+                                                                                            this.data.sections.value().map((section) => {
+                                                                                                return <span>
+
+                                                                                                    {
+                                                                                                        section.id == courseSections
+                                                                                                            ?
+                                                                                                            section.students.map((student) => {
+                                                                                                                return <div key={student} class="item" id={student} onClick={() => this.selectContact(student)}>
+
+                                                                                                                    {
+                                                                                                                        student != this.data.user.value().collegeid
+                                                                                                                            ?
+                                                                                                                            <span>
+                                                                                                                                <img class="ui avatar image" src={userpic}
+                                                                                                                                />
+                                                                                                                                <div class="content">
+                                                                                                                                    <div class="header" className="contacts">{student}</div>
+                                                                                                                                </div>
+                                                                                                                            </span>
+                                                                                                                            :
+                                                                                                                            <span></span>
+                                                                                                                    }
+                                                                                                                </div>;
+                                                                                                            })
+                                                                                                            :
+                                                                                                            <span></span>
+                                                                                                    }
+                                                                                                </span>
+                                                                                            })
+                                                                                            :
+                                                                                            <span></span>
+                                                                                    }
+
+                                                                                </span>
+                                                                            })
+                                                                            :
+                                                                            <span></span>
+                                                                    }
+                                                                </span>
+                                                            })
+                                                            :
+                                                            <span></span>
+                                                    }
+
+                                                    <br />
+
+
+
+                                                </span>
+
+
+                                            </span>;
+                                        })
+                                        :
+                                        <p>Empty</p>
+                                }
+
+
+
+
                             </div>
-                        </Accordion.Content>
-                    </Accordion>
 
-                    <hr />
+                            <hr />
+
+                            <Accordion inverted>
+                                <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick} className="chat-gp">
+                                    <span style={{ fontSize: '18px' }}>Group Chat</span>
+                                    <span className="nav-dropdown-icon" > <Icon name='dropdown' /></span>
+                                </Accordion.Title>
+                                <Accordion.Content active={activeIndex === 0}>
+                                    <div class="ui middle aligned selection list chat-group-contacts">
+
+                                        {
+                                            this.data.user.value().groups
+                                                ?
+                                                this.data.user.value().groups.map((item) => {
+                                                    return <div key={item.groupid} class="item" id={item.groupid} onClick={() => this.selectGroup(item.groupid)}>
+
+                                                        <img class="ui avatar image" src={userpic}
+                                                        />
+                                                        <div class="content">
+                                                            <div class="header" className="contacts"><GroupInfo id={item.groupid} /> </div>
+                                                        </div>
 
 
-                    <div>
+                                                    </div>;
+                                                })
+                                                :
+                                                <p>Loading...</p>
+                                        }
+
+                                    </div>
+                                </Accordion.Content>
+                            </Accordion>
+
+                            <hr />
 
 
-                        {/* <Transition.Group
+                            <div>
+
+
+                                {/* <Transition.Group
                             as={List}
                             duration={200}
                             divided
@@ -370,109 +615,123 @@ export const Chat = createReactClass({
                             verticalAlign='middle'
                         >  */}
 
-                        {
-                            this.state.targetedChat == "contacts"
-                                ?
-                                <div className="chat-msg">
-                                    <div className="chat-head">
-                                        <img class="ui avatar image" src={userpic}
-                                        />
-                                        <span style={{ color: "#76323f" }} className="contacts">
-                                            <strong> <Userinfo id={this.state.tempContactId} /> </strong>
-                                        </span>
-                                    </div>
+                                {
+                                    this.state.targetedChat == "contacts"
+                                        ?
+                                        <div className="chat-msg">
+                                            <div className="chat-head">
+                                                <img class="ui avatar image" src={userpic}
+                                                />
+                                                <span style={{ color: "#76323f" }} className="contacts">
+                                                    <strong> <Userinfo id={this.state.tempContactId} /> </strong>
+                                                </span>
+                                                <span style={{ color: "#76323f" }} className="contacts">
+                                                    <BS.Checkbox onClick={e => this.handleCheckbox(e.target.checked)} >Recording</BS.Checkbox  >
 
-                                    <div style={{ borderTop: '1px solid #76323f', marginTop: '15px' }}>
-                                    </div>
+                                                </span>
+                                            </div>
 
-                                    <div id="messages" class="messages">
-                                        <ul>
-                                            {
-                                                this.data.messages.value()
-                                                    ?
-                                                    this.data.messages.value().messages.map((item) => {
-                                                        return <div >
-                                                            {
-                                                                item.from == this.state.tempContactId
-                                                                    ?
-                                                                    <li style={{ paddingRight: 0 }}>
-                                                                        <img class="ui avatar image" style={{ float: 'right', marginLeft: '5px' }} src={userpic1}
-                                                                        />
-                                                                        <span class="right">{item.content}
-                                                                            <p className="msg-time"> {this.dateConverter(item.date)} </p>
-                                                                        </span>
-                                                                        <div class="clear"></div>
-                                                                    </li>
-                                                                    :
-                                                                    item.to == this.state.tempContactId
-                                                                        ?
-                                                                        <li>
-                                                                            <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }}
-                                                                            />
-                                                                            <span className="chat-from"> {item.content}
-                                                                                <p className="msg-time"> {this.dateConverter(item.date)} </p>
-                                                                            </span>
-                                                                        </li>
-                                                                        :
-                                                                        <span></span>
-                                                            }
-                                                        </div>;
-                                                    })
-                                                    :
-                                                    <p>Loading</p>
-                                            }
+                                            <div style={{ borderTop: '1px solid #76323f', marginTop: '15px' }}>
+                                            </div>
 
-                                        </ul>
-                                        <div class="clear"></div>
-                                    </div>
+                                            <div id="messages" class="messages">
+                                                <ul>
+                                                    {
+                                                        this.data.messages.value()
+                                                            ?
+                                                            this.data.messages.value().messages.map((item) => {
+                                                                return <div >
+                                                                    {
+                                                                        item.from == this.state.tempContactId
+                                                                            ?
+                                                                            item.botmessage == true
+                                                                                ?
+                                                                                <li style={{ paddingRight: 0 }}>
+                                                                                    <span class="right">{item.content}
+                                                                                        <p className="msg-time"> {this.dateConverter(item.date)} </p>
+                                                                                    </span>
+                                                                                    <div class="clear"></div>
+                                                                                </li>
+                                                                                :
+                                                                                <li style={{ paddingRight: 0 }}>
+                                                                                    <img class="ui avatar image" style={{ float: 'right', marginLeft: '5px' }} src={userpic1}
+                                                                                    />
+                                                                                    <span class="right">{item.content}
+                                                                                        <p className="msg-time"> {this.dateConverter(item.date)} </p>
+                                                                                    </span>
+                                                                                    <div class="clear"></div>
+                                                                                </li>
 
-                                    <div className="input-box">
+                                                                            :
+                                                                            item.to == this.state.tempContactId
+                                                                                ?
+                                                                                <li>
+                                                                                    <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }}
+                                                                                    />
+                                                                                    <span className="chat-from"> {item.content}
+                                                                                        <p className="msg-time"> {this.dateConverter(item.date)} </p>
+                                                                                    </span>
+                                                                                </li>
+                                                                                :
+                                                                                <span></span>
+                                                                    }
+                                                                </div>;
+                                                            })
+                                                            :
+                                                            <p>Loading</p>
+                                                    }
 
-                                        <div style={{ float: 'left', marginLeft: '10px', marginTop: '10px' }}>
-                                            <Icon color='grey' size='large' name='smile' />
+                                                </ul>
+                                                <div class="clear"></div>
+                                            </div>
+
+                                            <div className="input-box">
+
+                                                <div style={{ float: 'left', marginLeft: '10px', marginTop: '10px' }}>
+                                                    <Icon color='grey' size='large' name='smile' />
+                                                </div>
+                                                <div style={{ float: 'left' }}>
+                                                    <textarea value={this.state.txtMessage} onChange={(event) => this.setState({ txtMessage: event.target.value })} placeholder="Enter message"></textarea>
+                                                </div>
+                                                <div style={{ float: 'left', marginRight: '10px', marginTop: '10px' }}>
+                                                    <button style={{ border: "none", background: "none" }} onClick={() => this.handleSendContacts()}><Icon color='grey' size='large' name='send' /></button>
+                                                </div>
+                                            </div>
+
                                         </div>
-                                        <div style={{ float: 'left' }}>
-                                            <textarea value={this.state.txtMessage} onChange={(event) => this.setState({ txtMessage: event.target.value })} placeholder="Enter message"></textarea>
-                                        </div>
-                                        <div style={{ float: 'left', marginRight: '10px', marginTop: '10px' }}>
-                                            <button style={{ border: "none", background: "none" }} onClick={() => this.handleSendContacts()}><Icon color='grey' size='large' name='send' /></button>
-                                        </div>
-                                    </div>
 
-                                </div>
-
-                                // it doenst work cause we are already observing user
-                                // <Message.Single id={this.state.tempContactId} contactName={<Userinfo id={this.state.tempContactId} />} />
-                                :
-                                this.state.targetedChat == "group"
-                                    ?
-                                    <Message.Group id={this.state.tempGroupId} groupName={<GroupInfo id={this.state.tempGroupId} />} />
-                                    :
-                                    <span></span>
+                                        // it doenst work cause we are already observing user
+                                        // <Message.Single id={this.state.tempContactId} contactName={<Userinfo id={this.state.tempContactId} />} />
+                                        :
+                                        this.state.targetedChat == "group"
+                                            ?
+                                            <Message.Group id={this.state.tempGroupId} groupName={<GroupInfo id={this.state.tempGroupId} />} />
+                                            :
+                                            <span></span>
 
 
 
-                        }
+                                }
 
-                        {/* </Transition.Group> */}
+                                {/* </Transition.Group> */}
 
-                    </div>
+                            </div>
 
-                </div>
+                        </div>
 
-                    :
-                    <center>
-                        <h3 className="contacts">
-                        Chat has been disabled
+                        :
+                        <center>
+                            <h3 className="contacts">
+                                Chat has been disabled
                         </h3>
 
-                    </center>
+                        </center>
 
                 }
 
 
 
-                
+
             </div>
 
         );
