@@ -53,12 +53,14 @@ const StudentQuestion = createReactClass({
                                 <FroalaEditor
                                     id="answer"
                                     tag='textarea'
-                                    config={FroalaConfiguration.StudentAnswer}
+                                    config={this.props.submitted ? FroalaConfiguration.StudentQuestion : FroalaConfiguration.StudentAnswer}
                                     model={('html.set', this.data.answer.value().answer)}
                                     onModelChange={this.handleEditAnswer}
                                 />
                                 {
                                     this.data.answer.value().feedback
+                                    &&
+                                    this.props.results
                                     &&
                                     <div style={{marginTop: 8, marginBottom: 0}}>
                                         <strong>Feedback</strong>

@@ -58,8 +58,6 @@ const Instructor = createReactClass({
         }
     },
 
-
-
     handleRemove() {
         this.setState({ items: this.state.items.slice(0, -1) })
     },
@@ -288,11 +286,19 @@ const Instructor = createReactClass({
         }
     },
 
+    async handleSubmit () {
+        let query =  r.table('submissions').get(this.state.submissionid).update({
+            submitted: true
+        })
+        await ReactRethinkdb.DefaultSession.runQuery(query)
+        await this.setState({submissionid: null})
+    },
+
     async  handleNewSubmission() {
 
         let time = new Date()
 
-        let query = r.table("submissions").insert({ studentid: this.data.user.value().collegeId, answers: [], time: time })
+        let query = r.table("submissions").insert({ studentid: this.data.user.value().collegeId, answers: [], time: time, submitted: false, results: false })
         let submissionid = null
         ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(async  res => {
             let insertedSubmissionId = res.generated_keys[0]
@@ -333,7 +339,7 @@ const Instructor = createReactClass({
         return (
             <div className="container">
                 <div class="main USD ">
-                    <div class="uk-section-default USD">
+                    <div class="uk-section-default USD" style={{marginTop:40}}>
                         <ul uk-accordion="multiple: true " className='simplemargin5'>
                             <li class="uk-open ">
 
@@ -411,7 +417,10 @@ const Instructor = createReactClass({
                                     {
                                         this.state.contentid
                                         &&
+                                        <span>
                                         <BS.Button onClick={() => this.handleNewSubmission()}> New Submission</BS.Button >
+                                        <BS.Button style={{marginLeft: 50}} onClick={() => this.handleSubmit()}> Submit </BS.Button >
+                                        </span>
                                     }
 
                                 </div>
@@ -635,7 +644,7 @@ const Submission = createReactClass({
                 <td>{this.data.submissions.value().studentid} </td>
                 <td>B</td>
                 <td>B</td>
-                <td>{this.data.submissions.value().grade} </td>
+                <td>{this.data.submissions.value().results ? this.data.submissions.value().grade : "not yet"} </td>
                 <td>B</td>
                
             </tr>

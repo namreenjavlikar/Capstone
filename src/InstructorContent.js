@@ -195,6 +195,19 @@ const Instructor = createReactClass({
     },
     // handleClick2 = () => this.setState({ open: !this.state.open })
 
+    handleNewContent() {
+        // console.log("COUUR", this.state.course)
+        let query = r.table('contents').insert({ docid: null, submissions: [] })
+        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(
+            res => {
+                let insertedContentId = res.generated_keys[0]
+                let courseQuery =  r.table('courses').get(this.state.course.id).update({
+                    contents: r.row('contents').append(insertedContentId)
+                })
+                ReactRethinkdb.DefaultSession.runQuery(courseQuery)
+            })
+    },
+
     handleClose() {
         this.setState({ open: false })
     },
@@ -353,7 +366,11 @@ const Instructor = createReactClass({
                                 <a class="uk-accordion-title checkbx simplemargin4" href="#" ><strong>Work Submitted</strong>  </a>
 
                                 <div class="uk-accordion-content">
-
+                                    {
+                                        this.state.course
+                                        &&
+                                        <BS.Button onClick={() => this.handleNewContent()}>New Work</BS.Button >
+                                    }
                                     <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
                                         <label class=" checkbx2" > <Checkbox checked={this.state.allStudents} onClick={() => this.setState({ allStudents: !this.state.allStudents })} inline>Show All Students</Checkbox></label>
                                     </div>
@@ -500,8 +517,8 @@ const Content = createReactClass({
             &&
             <tr id={this.data.content.value().id} onClick={() => this.handleSelectedDocument()}>
                 <td>{this.props.coursename}</td>
-                <td><Document id={this.data.content.value().docid} /> </td>
-                <td>A</td>
+                <td><DocumentName id={this.data.content.value().docid} /></td>
+                <td><DocumentType id={this.data.content.value().docid} /></td>
                 <td>A</td>
                 <td>A</td>
                 <td>A</td>
@@ -544,7 +561,7 @@ const ContentShowSub = createReactClass({
     },
 });
 
-const Document = createReactClass({
+const DocumentName = createReactClass({
 
     mixins: [ReactRethinkdb.DefaultMixin],
     observe(props, state) {
@@ -562,6 +579,29 @@ const Document = createReactClass({
             this.data.document.value()
             &&
             this.data.document.value().name
+
+        )
+    },
+});
+
+const DocumentType = createReactClass({
+
+    mixins: [ReactRethinkdb.DefaultMixin],
+    observe(props, state) {
+        return {
+            document: new ReactRethinkdb.QueryRequest({
+                query: r.table('documents').get(this.props.id),
+                changes: true,
+                initial: null,
+            }),
+        };
+    },
+
+    render() {
+        return (
+            this.data.document.value()
+            &&
+            this.data.document.value().type
 
         )
     },
@@ -639,6 +679,13 @@ const StudentSubmission = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
+    handlePublishRes() {
+        let query =  r.table('submissions').get(this.props.id).update({
+            results: true
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query)
+    },
+
     render() {
         return (
             this.data.submissions.value()
@@ -657,6 +704,7 @@ const StudentSubmission = createReactClass({
                             <a href="#" onClick={this.props.handleNextSubmission} uk-icon="chevron-left" ></a>
                             <a href="#" onClick={this.props.handlePreviousSubmission} uk-icon="chevron-right"></a>
                         </div>
+                        <BS.Button onClick={() => this.handlePublishRes()}>Publish Results</BS.Button >
                     </Form.Group>
                     </div>
                 </div>
@@ -883,6 +931,8 @@ const Submission = createReactClass({
         // console.log("time", this.data.submissions.value().time)
         return (
             this.data.submissions.value()
+            &&
+            this.data.submissions.value().submitted
                 &&
                 this.checkAll()
                 ?
@@ -890,7 +940,7 @@ const Submission = createReactClass({
                     <td>{this.state.user ? this.state.user.name : "lodaing..."}</td>
                     <td>{this.data.submissions.value().studentid}</td>
                     <td>{new Date(this.data.submissions.value().time).toLocaleDateString()} -
-                    {" " + new Date(this.data.submissions.value().time).toTimeString().split(" ")[0].split(":")[0]}:{new Date(this.data.submissions.value().time).toTimeString().split(" ")[0].split(":")[1]} 
+                    {" " + new Date(this.data.submissions.value().time).toTimeString().split(" ")[0].split(":")[0]}:{new Date(this.data.submissions.value().time).toTimeString().split(" ")[0].split(":")[1]}
                     </td>
                     <td>B</td>
                     <td>{this.data.submissions.value().grade}</td>
