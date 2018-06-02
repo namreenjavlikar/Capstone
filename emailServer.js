@@ -17,7 +17,7 @@ httpServer.listen(3001)
 console.log('Listening on port 3001')
 
 const db = r.connect({
-	host: "localhost",
+	host: "10.10.157.212",
 	port: 28015,
 	db: 'capstone'
 })
@@ -111,4 +111,6 @@ app.get('/file/public/uploads/:filelink', (req, res) => {
 	res.download(__dirname + '/public/uploads/' + req.params.filelink);
 });
 
-
+app.post('/fileUploadChat', upload.single('file'), (req, res) => {
+	res.json({ chat: 'http://localhost:3001/file/' + req.file.path })
+});

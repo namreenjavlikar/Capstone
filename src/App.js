@@ -23,7 +23,7 @@ import Chat from './Chat'
 let r = ReactRethinkdb.r
 
 ReactRethinkdb.DefaultSession.connect({
-  host: 'localhost',
+  host: '10.10.157.212',
   port: 8015,
   path: '/db',
   secure: false,
