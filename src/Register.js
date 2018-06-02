@@ -327,10 +327,7 @@ const Register = createReactClass({
 
                        <br />
                                     60081926
-                           <br />
-                                    <a uk-tooltip="title: My profile page; pos: bottom-right">
-                                        My Profile
-                           </a>
+                         
                                 </strong>
                                 <br />
                             </div>

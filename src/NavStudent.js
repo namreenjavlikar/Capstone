@@ -80,10 +80,8 @@ const NavStudent = createReactClass({
                             <br />
                             {this.data.user.value() && this.data.user.value().collegeid}
                             <br />
-                            <a uk-tooltip="title: My profile page; pos: bottom-right">
-                                My Profile
-                                            </a>
-                            <br />
+                         
+                         
                         </div>
                     </div>
                 </div>

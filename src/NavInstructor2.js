@@ -75,9 +75,7 @@ const NavInstructor = createReactClass({
                             <br />
                             {this.data.user.value() && this.data.user.value().number}
                             <br />
-                            <a uk-tooltip="title: My profile page; pos: bottom-right">
-                                My Profile
-                                            </a>
+                        
                             <br />
                         </div>
                     </div>
@@ -90,16 +88,16 @@ const NavInstructor = createReactClass({
                 <div>
                     <h4 className="nav-head"><input id="nav_check_all" class="uk-checkbox" onClick={() => this.props.handleSelectedCourse("All")} type="checkbox" /> My Term Courses</h4>
                     <Accordion inverted className="nav-box2">
-                    {
-                        this.data.user.value()
-                        &&
-                        this.data.user.value().courses
-                        &&
-                        this.data.user.value().courses.map(
-                            (course, i) =>
-                                <p>{<Course i={i} id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} handleSelectSection={(id, id2) => this.props.handleSelectSection(id, id2)} />}</p>
-                        )
-                    }
+                        {
+                            this.data.user.value()
+                            &&
+                            this.data.user.value().courses
+                            &&
+                            this.data.user.value().courses.map(
+                                (course, i) =>
+                                    <p>{<Course i={i} id={course} handleSelectedCourse={(id) => this.props.handleSelectedCourse(id)} handleSelectSection={(id, id2) => this.props.handleSelectSection(id, id2)} />}</p>
+                            )
+                        }
                     </Accordion>
 
                 </div>
@@ -243,7 +241,7 @@ const Course = createReactClass({
         return (
             this.data.course.value()
             &&
-            <div style={{marginBottom: -17}}>
+            <div style={{ marginBottom: -17 }}>
                 <span className="nav-course-checkbox"><input id={this.props.id} onClick={() => this.props.handleSelectedCourse(this.props.id)} class="Courses Nav_check uk-checkbox" type="checkbox" /></span>
                 <Accordion.Title active={activeIndex === this.props.i} index={this.props.i} onClick={this.handleClick} className="nav-term-course">
                     <span className="nav-font"> {this.data.course.value().name} </span>

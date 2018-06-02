@@ -556,14 +556,21 @@ margin-right:15px;
 }
 .simplemargin4{
   margin-left:15px;
-  
 }
 .simplemargin5{
   margin-left:10px;
   margin-right:10px;
   
 }
-
+.addwork{
+  float: left;
+  margin-right:5px;
+  margin-top: 1px;
+  /* margin-bottom: 10px; */
+  font-size: 2vh;
+  color:#76323f;
+  
+  }
 .navstyle{
   float: right;
   margin-top: 0.25vh;
