@@ -84,13 +84,12 @@ const StudentExam = createReactClass({
                                 </div>
                             </div>
                         </div>
-
                     </div>
-
                     <div className="document-questions-view" id="parent">
                         {
                             this.data.submission.value().answers.map((answer, index) =>
                                 <StudentAnswer
+                                    submitted={this.data.submission.value().submitted}
                                     answer={answer}
                                     key={index}
                                     document={this.props.id}
