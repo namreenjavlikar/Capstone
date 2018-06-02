@@ -57,6 +57,19 @@ const StudentQuestion = createReactClass({
                                     model={('html.set', this.data.answer.value().answer)}
                                     onModelChange={this.handleEditAnswer}
                                 />
+                                {
+                                    this.data.answer.value().feedback
+                                    &&
+                                    <div style={{marginTop: 8, marginBottom: 0}}>
+                                        <strong>Feedback</strong>
+                                        < FroalaEditor
+                                            id="feedback"
+                                            tag='textarea'
+                                            config={FroalaConfiguration.StudentQuestion}
+                                            model={('html.set', this.data.answer.value().feedback)}
+                                        />
+                                    </div>
+                                }
                             </div>
                         }
                     </div>
@@ -85,7 +98,7 @@ const ExamQuestion = createReactClass({
                 id="question"
                 tag='textarea'
                 config={FroalaConfiguration.StudentQuestion}
-                model={('html.set',this.data.question.value().question )}
+                model={('html.set', this.data.question.value().question)}
             />
         )
     },

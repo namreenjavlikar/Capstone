@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import ReactRethinkdb from 'react-rethinkdb';
 import createReactClass from 'create-react-class';
 import StudentAnswer from './StudentAnswer'
+import FroalaEditor from 'react-froala-wysiwyg';
 import $ from 'jquery'
 import * as FroalaConfiguration from './FroalaConfiguration';
 require('jquery-ui');
@@ -57,7 +58,7 @@ const StudentExam = createReactClass({
         console.log("SUBMISSION ID ", this.props.submissionid)
 
         return (
-             this.data.submission.value() == true
+            this.data.submission.value() == true
                 ?
                 <div>Loading</div>
                 :
@@ -96,13 +97,23 @@ const StudentExam = createReactClass({
                                     content={this.props.contentid}
                                     student={this.props.studentid}
                                 />
-                               
+
                             )
                         }
                     </div>
-
-
-
+                    {
+                        this.data.submission.value().feedback
+                        &&
+                        <div style={{ margin: 20 }}>
+                            <strong>Submission Feedback</strong>
+                            < FroalaEditor
+                                id="feedback"
+                                tag='textarea'
+                                config={FroalaConfiguration.StudentQuestion}
+                                model={('html.set', this.data.submission.value().feedback)}
+                            />
+                        </div>
+                    }
                 </div>
         )
     },

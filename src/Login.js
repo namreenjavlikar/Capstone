@@ -30,8 +30,8 @@ const Login = createReactClass({
         };
     },
 
-    async handleUserStatus(id){
-        let querySetOnline = r.table('users').get(id).update({status: "online"})
+    async handleUserStatus(id) {
+        let querySetOnline = r.table('users').get(id).update({ status: "online" })
         ReactRethinkdb.DefaultSession.runQuery(querySetOnline);
     },
 
@@ -75,7 +75,7 @@ const Login = createReactClass({
                                     console.log(sessionStorage.getItem("role"))
                                     //handleUserStatus(result.user.id)
                                     this.setState({ messageToUser: "" })
-                                    if(sessionStorage.getItem("role") === "Instructor"){
+                                    if (sessionStorage.getItem("role") === "Instructor") {
                                         this.props.history.push("instructors")
                                     }
                                 }
@@ -88,7 +88,7 @@ const Login = createReactClass({
                             this.setState({ messageToUser: "Invalid Input" })
                         }
                     }
-                    else{
+                    else {
                         this.setState({ messageToUser: "Activate your account to login" })
                     }
                 })
@@ -101,10 +101,10 @@ const Login = createReactClass({
             <div className='login-container' style={{
                 backgroundImage: 'url(' + photo + ')',
                 backgroundSize: 'cover',
-                overflow: 'hidden',
+                overflow: 'hidden', height: '100vh'
             }}>
                 <center>
-                    <div class="login_card uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20 }}>
+                    <div class="login_card uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20, marginTop: 200 }}>
                         <img src={logo} style={{ width: 200, height: 150 }} />
                         <hr />
                         <h3 class="login-title"><strong>Username.Password</strong></h3>

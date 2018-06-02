@@ -290,7 +290,9 @@ const Instructor = createReactClass({
 
     async  handleNewSubmission() {
 
-        let query = r.table("submissions").insert({ studentid: this.data.user.value().collegeId, answers: [] })
+        let time = new Date()
+
+        let query = r.table("submissions").insert({ studentid: this.data.user.value().collegeId, answers: [], time: time })
         let submissionid = null
         ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(async  res => {
             let insertedSubmissionId = res.generated_keys[0]
@@ -633,7 +635,7 @@ const Submission = createReactClass({
                 <td>{this.data.submissions.value().studentid} </td>
                 <td>B</td>
                 <td>B</td>
-                <td>B</td>
+                <td>{this.data.submissions.value().grade} </td>
                 <td>B</td>
                
             </tr>

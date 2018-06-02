@@ -311,8 +311,6 @@ const Instructor = createReactClass({
                         <ul uk-accordion="multiple: true " className='simplemargin5'>
                             <li class="uk-open ">
                                 <div class="navcss">
-                                    <a href="#" uk-icon="chevron-left"></a>
-                                    <a href="#" uk-icon="chevron-right"></a>
                                 </div>
                                 <a class="uk-accordion-title checkbx " href="#" ><span><strong>Course Works</strong></span></a>
                                 <div class="uk-accordion-content" >
@@ -365,7 +363,7 @@ const Instructor = createReactClass({
                                             <tr>
                                                 <th>Name</th>
                                                 <th>Student Id</th>
-                                                <th>Time</th>
+                                                <th>Date - Time</th>
                                                 <th>Files</th>
                                                 <th>Work Grade</th>
                                                 <th>Course Grade</th>
@@ -507,8 +505,7 @@ const Content = createReactClass({
                 <td>A</td>
                 <td>A</td>
                 <td>A</td>
-                <td>A</td>
-                <td>A</td>
+                <td>{this.data.content.value().submissions.length - 1}</td>
             </tr>
         )
     },
@@ -843,13 +840,11 @@ const Submission = createReactClass({
     },
 
     async componentWillReceiveProps() {
-        console.log("STATE", this.state.user)
         if (this.data.submissions.value()) {
             let query = r.table("users").filter({ collegeId: this.data.submissions.value().studentid })
             ReactRethinkdb.DefaultSession.runQuery(query).then(res => {
                 res.toArray((err, results) => {
-                    console.log("Here", results[0])
-                    this.setState({user: results[0]})
+                    this.setState({ user: results[0] })
                 })
             })
         }
@@ -860,6 +855,7 @@ const Submission = createReactClass({
     },
 
     checkCourse() {
+        // console.log("time", this.data.submissions.value().time)
         let thisStudent = this.props.students.filter(st => st.student === this.data.submissions.value().studentid)
         let show = false
         thisStudent.map(id => {
@@ -874,35 +870,35 @@ const Submission = createReactClass({
     },
 
     checkAll() {
-        if (this.props.allStudents === true)
+        if (this.props.allStudents === true) {
+            this.props.handleAddSubmission(this.props.id)
             return true
-        else {
+        } else {
             return this.checkCourse()
         }
     },
 
     render() {
+        // let time = new Date().toLocaleDateString
+        // console.log("time", this.data.submissions.value().time)
         return (
-            // this.state.user
-            //     &&
-                this.data.submissions.value()
+            this.data.submissions.value()
                 &&
                 this.checkAll()
                 ?
-                <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'yellow' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
-                    {/* <td>{this.state.user.name}</td> */}
-                    <td>B</td>
+                <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'lightgray' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
+                    <td>{this.state.user ? this.state.user.name : "lodaing..."}</td>
                     <td>{this.data.submissions.value().studentid}</td>
-                    <td>B</td>
+                    <td>{new Date(this.data.submissions.value().time).toLocaleDateString()} -
+                    {" " + new Date(this.data.submissions.value().time).toTimeString().split(" ")[0].split(":")[0]}:{new Date(this.data.submissions.value().time).toTimeString().split(" ")[0].split(":")[1]} 
+                    </td>
                     <td>B</td>
                     <td>{this.data.submissions.value().grade}</td>
                     <td>B</td>
-                    <td>B</td>
+                    <td>{this.state.user ? this.state.user.GPA : "lodaing..."}</td>
                 </tr>
                 :
                 <span></span>
-            // :
-            // <span></span>
         )
     },
 });
