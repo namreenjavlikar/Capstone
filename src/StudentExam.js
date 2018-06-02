@@ -89,6 +89,7 @@ const StudentExam = createReactClass({
                         {
                             this.data.submission.value().answers.map((answer, index) =>
                                 <StudentAnswer
+                                    results={this.data.submission.value().results}
                                     submitted={this.data.submission.value().submitted}
                                     answer={answer}
                                     key={index}
@@ -96,12 +97,13 @@ const StudentExam = createReactClass({
                                     content={this.props.contentid}
                                     student={this.props.studentid}
                                 />
-
                             )
                         }
                     </div>
                     {
                         this.data.submission.value().feedback
+                        &&
+                        this.data.submission.value().results
                         &&
                         <div style={{ margin: 20 }}>
                             <strong>Submission Feedback</strong>

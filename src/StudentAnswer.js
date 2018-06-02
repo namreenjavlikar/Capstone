@@ -60,6 +60,8 @@ const StudentQuestion = createReactClass({
                                 {
                                     this.data.answer.value().feedback
                                     &&
+                                    this.props.results
+                                    &&
                                     <div style={{marginTop: 8, marginBottom: 0}}>
                                         <strong>Feedback</strong>
                                         < FroalaEditor

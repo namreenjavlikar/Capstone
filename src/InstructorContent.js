@@ -680,7 +680,10 @@ const StudentSubmission = createReactClass({
     },
 
     handlePublishRes() {
-        
+        let query =  r.table('submissions').get(this.props.id).update({
+            results: true
+        })
+        ReactRethinkdb.DefaultSession.runQuery(query)
     },
 
     render() {
