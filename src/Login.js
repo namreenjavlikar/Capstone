@@ -131,7 +131,8 @@ const Login = createReactClass({
                         <button class="uk-button login-btn" onClick={this.handleLogin}>Login</button>
                         <br />
                         <br />
-                        <a onClick={() => this.props.history.push("/forgot")} className="login-link">Forgot Your Password?</a>
+                        <br/>
+                        <a onClick={() => this.props.history.push("/forgot")} className="login-link"><strong>Forgot Your Password?</strong></a>
                     </div>
                 </center>
 

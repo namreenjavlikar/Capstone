@@ -43,7 +43,7 @@ const ForgotPassword = createReactClass({
 
     async sendEmail() {
         //find user with this specific email
-        let query = r.table('users').filter({ email: this.state.email })
+        let query = r.table('users').filter({ recovEmail: this.state.email })
 
         let user = {}
         await ReactRethinkdb.DefaultSession.runQuery(query).then(
@@ -63,7 +63,7 @@ const ForgotPassword = createReactClass({
             await ReactRethinkdb.DefaultSession.runQuery(replaceQuery)
 
             //send the email
-            const response = await fetch("http://localhost:3001/api/resetpassword/"+user[0].recovEmail+"/"+key+"/"+user[0].id)
+            const response = await fetch("http://localhost:3001/api/resetpassword/" + user[0].recovEmail + "/" + key + "/" + user[0].id)
             try {
                 const json = await response.json()
                 return json
@@ -87,12 +87,13 @@ const ForgotPassword = createReactClass({
                 backgroundImage: 'url(' + photo + ')',
                 backgroundSize: 'cover',
                 overflow: 'hidden',
+                height: '100vh'
             }}>
                 <center>
-                    <div className="uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20 }}>
+                    <div className="uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20, marginTop: 200 }}>
                         <img src={logo} style={{ width: 200, height: 150 }} />
                         <hr />
-                        <h2 className="reset-title2"><strong>Enter your email to reset password</strong></h2>
+                        <h3 className="reset-title2"><strong>Enter your email to reset password</strong></h3>
                         <div className="uk-margin"  >
                             <div className="uk-inline reset-input">
                                 <input className="uk-input reset-input" type="email" value={this.state.email} placeholder="Enter Your Email" onChange={

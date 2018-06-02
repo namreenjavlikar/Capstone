@@ -34,7 +34,7 @@ const ResetPassword = createReactClass({
         let user = {}
         await ReactRethinkdb.DefaultSession.runQuery(query).then(
             (res) => {
-                res.toArray( (err, results) => {
+                res.toArray((err, results) => {
                     console.log("LOOP", results);
                     user = results
                 });
@@ -52,7 +52,7 @@ const ResetPassword = createReactClass({
     },
 
     async observe(props, state) {
-        return { }
+        return {}
     },
 
     handleReset() {
@@ -84,16 +84,19 @@ const ResetPassword = createReactClass({
                 backgroundImage: 'url(' + photo + ')',
                 backgroundSize: 'cover',
                 overflow: 'hidden',
+                height: '100vh'
             }}>
                 <center>
-                    <div class="uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20 }}>
+                    <div class="uk-card uk-card-default uk-card-body uk-width-1-4@m  login-card" style={{ borderRadius: 20, marginTop: 200 }}>
                         <img src={logo} style={{ width: 200, height: 150 }} />
                         <hr />
-                        <h2 class="login-title"><strong>Reset Password</strong></h2>
+                        <h3 class="login-title"><strong>Reset Password</strong></h3>
                         <div class="uk-margin">
                             <div class="uk-inline">
                                 <input class="uk-input reenter-input" type="password" placeholder="New Password" onChange={
                                     (event) => this.setState({ password: event.target.value, error: '' })} />
+                                <br />
+                                <br />
                                 <input class="uk-input reenter-input" type="password" placeholder="Confirm Password" onChange={
                                     (event) => this.setState({ confirmPassword: event.target.value, error: '' })} />
                                 <p>{this.state.error}</p>

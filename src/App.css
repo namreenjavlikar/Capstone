@@ -793,3 +793,7 @@ font-family: 'Roboto', sans-serif;
 /* .left{
   text-align: left
 } */
+
+.login-link{
+  color: #76323f;
+}
