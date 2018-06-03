@@ -35,11 +35,11 @@ const Userinfo = createReactClass({
                 {
                     this.data.user.value()
                         ?
-                        this.data.user.value().name && this.data.user.value().status
+                        this.data.user.value().collegeid && this.data.user.value().status
                             ?
                             <span >
 
-                                {this.data.user.value().name + "   "} 
+                                {this.data.user.value().collegeid + "   "} 
 
                                
 
