@@ -78,6 +78,9 @@ const Login = createReactClass({
                                     if (sessionStorage.getItem("role") === "Instructor") {
                                         this.props.history.push("instructors")
                                     }
+                                    if (sessionStorage.getItem("role") === "Student") {
+                                        this.props.history.push("studenthome")
+                                    }
                                 }
                                 else {
                                     this.setState({ messageToUser: "Invalid Input" })
