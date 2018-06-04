@@ -244,9 +244,9 @@ const Student = createReactClass({
 
         const { items, value, activeIndex, visible, open } = this.state
         return (
-            <div className="container">
+            <div className="container1">
                 <div className={!this.state.expandLeft && "hide"}>
-                    <NavStudent handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} handleSelectSection={(id) => this.handleSelectSection(id)} />
+                    <NavStudent history={this.props.history} handleSelectedCourse={(id) => this.handleSelectCourse(id)} selectedcourses={this.state.selectedcourses} handleSelectSection={(id) => this.handleSelectSection(id)} />
                 </div>
                 <div className={this.state.changeClass}>
                     <span class={this.state.leftButton} uk-icon={this.state.iconLeft} onClick={() => this.handleExpandLeft()}>

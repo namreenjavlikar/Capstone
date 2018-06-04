@@ -15,6 +15,10 @@ const Question = createReactClass({
     mixins: [ReactRethinkdb.DefaultMixin],
     timeoutID: null,
 
+    componentDidMount() {
+        console.log("gggggggg", this.props.questionId)
+    },
+
     getInitialState() {
         return {
             isManagingFocus: false,

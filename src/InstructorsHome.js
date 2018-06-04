@@ -331,7 +331,7 @@ const Instructor = createReactClass({
         const { items, value, activeIndex, visible, open } = this.state
         // const { activeIndex } = this.state
         return (
-            <div className="container">
+            <div className="container1">
                 <div className={!this.state.expandLeft && "hide"}>
                     {/* {
                     this.state.expandLeft

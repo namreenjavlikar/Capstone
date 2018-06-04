@@ -211,6 +211,22 @@ const Instructor = createReactClass({
                 let query = r.table('contents').insert({ docid: res.generated_keys[0], submissions: [] })
                 ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(
                     res2 => {
+                        let query = r.table('questions').insert({
+                            answer: "",
+                            choices: [],
+                            question: "",
+                            title: "",
+                            htmlcode: "",
+                            editor: ""
+                        })
+                        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res3 => {
+                            console.log("gen", res3.generated_keys[0])
+                            let query = r.table('documents').get(res.generated_keys[0]).update({
+                                questions: r.row('questions').append(res3.generated_keys[0])
+                            })
+                            ReactRethinkdb.DefaultSession.runQuery(query)
+                        })
+
                         let insertedContentId = res2.generated_keys[0]
                         let courseQuery = r.table('courses').get(this.state.course.id).update({
                             contents: r.row('contents').append(insertedContentId)

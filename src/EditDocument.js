@@ -225,15 +225,17 @@ const EditDocument = createReactClass({
                             <BS.MenuItem key="Lab" eventKey="Lab" value="Labs">Lab</BS.MenuItem>
                         </BS.DropdownButton>
                         <BS.FormControl type="text" value={this.data.document.value().name} placeholder="Enter Name" onChange={(e) => this.handleEditField(e.target.value, 'name')} />
-                        <BS.FormControl type="datetime-local" value={this.data.document.value().startDate} placeholder="Enter Start Date" onChange={(e) => this.handleEditField(e.target.value, 'startDate')} />
-                        <BS.FormControl type="datetime-local" value={this.data.document.value().dueDate} placeholder="Enter Due Date" onChange={(e) => this.handleEditField(e.target.value, 'dueDate')}  />
-                        <BS.FormControl type="datetime-local" value={this.data.document.value().endDate} placeholder="Enter End Date" onChange={(e) => this.handleEditField(e.target.value, 'endDate')}  />
+                        <BS.FormControl type="text" value={this.data.document.value().startDate} placeholder="Enter Start Date" onChange={(e) => this.handleEditField(e.target.value, 'startDate')} />
+                        <BS.FormControl type="text" value={this.data.document.value().dueDate} placeholder="Enter Due Date" onChange={(e) => this.handleEditField(e.target.value, 'dueDate')} />
+                        <BS.FormControl type="text" value={this.data.document.value().endDate} placeholder="Enter End Date" onChange={(e) => this.handleEditField(e.target.value, 'endDate')} />
                         <BS.DropdownButton style={{ margin: 15 }} id="status" title={this.data.document.value().status} onSelect={this.handleSelectStatus}>
                             <BS.MenuItem key="Draft" eventKey="Draft" value="Draft">Draft</BS.MenuItem>
                             <BS.MenuItem key="Publish" eventKey="Publish" value="Publish">Publish</BS.MenuItem>
                         </BS.DropdownButton>
                         {/* <BS.Button bsStyle="primary" onClick={() => this.handleNewQuestion()}>New Question</BS.Button> */}
-                        <BS.Button bsStyle="primary" onClick={() => this.handleSortQuestion()}>{this.state.sort ? "Finish Sort" : "Sort Questions"}</BS.Button>
+                        <BS.Button bsStyle="primary" style={{ marginLeft: 13 }}onClick={() => this.handleSortQuestion()}>
+                            {this.state.sort ? "Finish Sort" : "Sort Questions"}
+                        </BS.Button>
                     </div>
 
                     <div className="document-questions-search-div">
@@ -252,7 +254,7 @@ const EditDocument = createReactClass({
                                                 config={FroalaConfiguration.SearchQuestion}
                                                 model={('html.set', result.question)}
                                             />
-                                            <Rail attached internal position='right' style={{ padding: 20 , margin: 0, width: 10, height: 10}}>
+                                            <Rail attached internal position='right' style={{ padding: 20, margin: 0, width: 10, height: 10 }}>
                                                 <button uk-icon="plus-circle" onClick={() => this.handleAddSearch(result.id)}></button>
                                             </Rail>
                                         </div>
