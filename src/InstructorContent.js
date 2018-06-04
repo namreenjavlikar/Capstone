@@ -417,13 +417,13 @@ const Instructor = createReactClass({
                                     <table className="scroll" >
                                         <thead>
                                             <tr>
-                                                <th>Name</th>
+                                                {/* <th>Name</th> */}
                                                 <th>Student Id</th>
                                                 <th>Date - Time</th>
                                                 <th>Files</th>
                                                 <th>Work Grade</th>
                                                 <th>Course Grade</th>
-                                                <th >GPA </th>
+                                                {/* <th >GPA </th> */}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -938,7 +938,7 @@ const Answer = createReactClass({
                             }
                             }
                                 style={{ width: '10vh', marginLeft: '0.5vh' }} />
-                            <input type="text" value={"/20"} readOnly style={{ width: '8vh', marginLeft: '0.5vh' }} />
+                            <input type="text" value={"/1"} readOnly style={{ width: '8vh', marginLeft: '0.5vh' }} />
                         </div>
                     </Form.Group>
                 </div>
@@ -1080,7 +1080,7 @@ const Submission = createReactClass({
                 this.checkAll()
                 ?
                 <tr style={this.props.selectedsubmissionid === this.props.id ? { backgroundColor: 'lightgray' } : null} id={this.data.submissions.value().id} onClick={() => this.handleSelectedSubmission()}>
-                    <td>{this.state.user ? this.state.user.name : "lodaing..."}</td>
+                    {/* <td>{this.state.user ? this.state.user.name : "lodaing..."}</td> */}
                     <td>{this.data.submissions.value().studentid}</td>
                     <td>{new Date(this.data.submissions.value().time).toLocaleDateString()} -
                     {" " + new Date(this.data.submissions.value().time).toTimeString().split(" ")[0].split(":")[0]}:{new Date(this.data.submissions.value().time).toTimeString().split(" ")[0].split(":")[1]}
@@ -1088,7 +1088,7 @@ const Submission = createReactClass({
                     <td>B</td>
                     <td>{this.data.submissions.value().grade}</td>
                     <td>B</td>
-                    <td>{this.state.user ? this.state.user.GPA : "lodaing..."}</td>
+                    {/* <td>{this.state.user ? this.state.user.GPA : "lodaing..."}</td> */}
                 </tr>
                 :
                 <span></span>

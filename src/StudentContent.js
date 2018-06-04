@@ -99,36 +99,36 @@ const Instructor = createReactClass({
         this.setState(
             {
                 changeClass:
-                    this.state.expandLeft && right ?
-                        "container-instructor-both" :
-                        !this.state.expandLeft && !right ?
-                            "container-instructor-full" :
-                            !this.state.expandLeft && right ?
-                                "container-instructor-right" :
-                                this.state.expandLeft && !right ?
-                                    "container-instructor-left" :
-                                    "container-instructor-both2",
+                this.state.expandLeft && right ?
+                    "container-instructor-both" :
+                    !this.state.expandLeft && !right ?
+                        "container-instructor-full" :
+                        !this.state.expandLeft && right ?
+                            "container-instructor-right" :
+                            this.state.expandLeft && !right ?
+                                "container-instructor-left" :
+                                "container-instructor-both2",
                 rightButton:
-                    this.state.expandLeft && right ?
-                        "chat-button-open" :
-                        !this.state.expandLeft && !right ?
-                            "chat-button" :
-                            !this.state.expandLeft && right ?
-                                "chat-button-open" :
-                                this.state.expandLeft && !right ?
-                                    "chat-button" :
-                                    "chat-button",
+                this.state.expandLeft && right ?
+                    "chat-button-open" :
+                    !this.state.expandLeft && !right ?
+                        "chat-button" :
+                        !this.state.expandLeft && right ?
+                            "chat-button-open" :
+                            this.state.expandLeft && !right ?
+                                "chat-button" :
+                                "chat-button",
 
                 leftButton:
-                    this.state.expandLeft && right ?
-                        "nav-button-open" :
-                        !this.state.expandLeft && !right ?
-                            "nav-button" :
-                            this.state.expandLeft && !right ?
-                                "nav-button-open" :
-                                !this.state.expandLeft && right ?
-                                    "nav-button" :
-                                    "nav-button",
+                this.state.expandLeft && right ?
+                    "nav-button-open" :
+                    !this.state.expandLeft && !right ?
+                        "nav-button" :
+                        this.state.expandLeft && !right ?
+                            "nav-button-open" :
+                            !this.state.expandLeft && right ?
+                                "nav-button" :
+                                "nav-button",
                 expandRight: right,
                 iconRight: !this.state.expandRight ? "icon: chevron-right; ratio: 2.5" : "icon: chevron-left; ratio: 2.5"
             }
@@ -140,35 +140,35 @@ const Instructor = createReactClass({
         this.setState(
             {
                 changeClass:
-                    left && this.state.expandRight ?
-                        "container-instructor-both" :
-                        !left && !this.state.expandRight ?
-                            "container-instructor-full" :
-                            left && !this.state.expandRight ?
-                                "container-instructor-left" :
-                                !left && this.state.expandRight ?
-                                    "container-instructor-right" :
-                                    "container-instructor-both2",
+                left && this.state.expandRight ?
+                    "container-instructor-both" :
+                    !left && !this.state.expandRight ?
+                        "container-instructor-full" :
+                        left && !this.state.expandRight ?
+                            "container-instructor-left" :
+                            !left && this.state.expandRight ?
+                                "container-instructor-right" :
+                                "container-instructor-both2",
                 rightButton:
-                    left && this.state.expandRight ?
-                        "chat-button-open" :
-                        !left && !this.state.expandRight ?
+                left && this.state.expandRight ?
+                    "chat-button-open" :
+                    !left && !this.state.expandRight ?
+                        "chat-button" :
+                        left && !this.state.expandRight ?
                             "chat-button" :
-                            left && !this.state.expandRight ?
-                                "chat-button" :
-                                !left && this.state.expandRight ?
-                                    "chat-button-open" :
-                                    "chat-button",
+                            !left && this.state.expandRight ?
+                                "chat-button-open" :
+                                "chat-button",
                 leftButton:
-                    left && this.state.expandRight ?
-                        "nav-button-open" :
-                        !left && !this.state.expandRight ?
-                            "nav-button" :
-                            left && !this.state.expandRight ?
-                                "nav-button-open" :
-                                !left && this.state.expandRight ?
-                                    "nav-button" :
-                                    "nav-button",
+                left && this.state.expandRight ?
+                    "nav-button-open" :
+                    !left && !this.state.expandRight ?
+                        "nav-button" :
+                        left && !this.state.expandRight ?
+                            "nav-button-open" :
+                            !left && this.state.expandRight ?
+                                "nav-button" :
+                                "nav-button",
                 expandLeft: left,
                 iconLeft: !this.state.expandLeft ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5"
             }
@@ -216,28 +216,36 @@ const Instructor = createReactClass({
         })
     },
     getAllSubmissionsforStudent() {
+        console.log("STU ", this.state.contentid)
+
+
         let query = r.table('contents').get(this.state.contentid)('submissions')
         ReactRethinkdb.DefaultSession.runQuery(query).then(
             submissions => {
-                submissions.map(
-                    sub => {
-                        console.log("SUB ", sub)
-                        let query1 = r.table('submissions').get(sub)
-                        ReactRethinkdb.DefaultSession.runQuery(query1).then(
-                            async result => {
-                                //
-                                console.log(result.studentid === this.data.user.value().collegeId)
-                                if (result.studentid === this.data.user.value().collegeId) {
-                                    let subid = result.id
-                                    if (this.state.allsubmissions.findIndex(e => e == subid) == -1)
-                                        await this.setState({
-                                            allsubmissions: [...this.state.allsubmissions, subid]
-                                        })
+                
+                    submissions.map(
+                        sub => {
+                            console.log("SUB ", sub)
+                            let query1 = r.table('submissions').get(sub)
+                            ReactRethinkdb.DefaultSession.runQuery(query1).then(
+                                async result => {
+                                    
+                                        console.log("result", result)
+                                        console.log(result.studentid === this.data.user.value().collegeId)
+                                        if (result.studentid === this.data.user.value().collegeId) {
+                                            let subid = result.id
+                                            if (this.state.allsubmissions.findIndex(e => e == subid) == -1)
+                                                await this.setState({
+                                                    allsubmissions: [...this.state.allsubmissions, subid]
+                                                })
+                                        }
+                                    
+
                                 }
-                            }
-                        )
-                    }
-                )
+                            )
+                        }
+                    )
+                
             }
         )
     },
@@ -286,19 +294,19 @@ const Instructor = createReactClass({
         }
     },
 
-    async handleSubmit () {
-        let query =  r.table('submissions').get(this.state.submissionid).update({
+    async handleSubmit() {
+        let query = r.table('submissions').get(this.state.submissionid).update({
             submitted: true
         })
         await ReactRethinkdb.DefaultSession.runQuery(query)
-        await this.setState({submissionid: null})
+        await this.setState({ submissionid: null })
     },
 
     async  handleNewSubmission() {
 
         let time = new Date()
 
-        let query = r.table("submissions").insert({ studentid: this.data.user.value().collegeId, answers: [], time: time, submitted: false, results: false })
+        let query = r.table("submissions").insert({ studentid: this.data.user.value().collegeid, answers: [], time: time, submitted: false, results: false })
         let submissionid = null
         ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(async  res => {
             let insertedSubmissionId = res.generated_keys[0]
@@ -339,7 +347,7 @@ const Instructor = createReactClass({
         return (
             <div className="container">
                 <div class="main USD ">
-                    <div class="uk-section-default USD" style={{marginTop:40}}>
+                    <div class="uk-section-default USD" style={{ marginTop: 40 }}>
                         <ul uk-accordion="multiple: true " className='simplemargin5'>
                             <li class="uk-open ">
 
@@ -356,7 +364,6 @@ const Instructor = createReactClass({
                                                     <th>Start</th>
                                                     <th>Due</th>
                                                     <th>End</th>
-                                                    <th>Grade</th>
                                                 </tr>
                                             </thead>
                                             <tbody class='tbodystyle'>
@@ -406,7 +413,7 @@ const Instructor = createReactClass({
                                                     selectedsubmissionid={this.state.submissionid}
                                                     id={this.state.contentid}
                                                     sections={this.props.selectedsections}
-                                                    studentid={this.data.user.value().collegeId}
+                                                    studentid={this.data.user.value().collegeid}
                                                     handleSaveSubmissionId={(id) => this.handleSaveSubmissionId(id)}
                                                 //    handleSaveAllSubmissions={(submission) => this.handleSaveAllSubmissions(submission)}
 
@@ -418,8 +425,8 @@ const Instructor = createReactClass({
                                         this.state.contentid
                                         &&
                                         <span>
-                                        <BS.Button onClick={() => this.handleNewSubmission()}> New Submission</BS.Button >
-                                        <BS.Button style={{marginLeft: 50}} onClick={() => this.handleSubmit()}> Submit </BS.Button >
+                                            <BS.Button onClick={() => this.handleNewSubmission()}> New Submission</BS.Button >
+                                            <BS.Button style={{ marginLeft: 50 }} onClick={() => this.handleSubmit()}> Submit </BS.Button >
                                         </span>
                                     }
 
@@ -570,12 +577,11 @@ const Document = createReactClass({
             &&
             <span>
                 <td>{this.props.coursename}</td>
+                <td>{this.data.document.value().type}</td>
                 <td>{this.data.document.value().name}</td>
-                <td>A</td>
-                <td>A</td>
+                <td>{this.data.document.value().startDate}</td>
                 <td>{this.data.document.value().dueDate}</td>
                 <td>{this.data.document.value().endDate}</td>
-                <td>A</td>
             </span>
 
         )
@@ -646,7 +652,7 @@ const Submission = createReactClass({
                 <td>B</td>
                 <td>{this.data.submissions.value().results ? this.data.submissions.value().grade : "not yet"} </td>
                 <td>B</td>
-               
+
             </tr>
         )
     },
