@@ -44,9 +44,15 @@ const NavStudent = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(querySetOffline);
     },
 
+    async handleClearMessages(id){
+        let clearMessages = r.table('messages').get(id).update({ messages: [] });
+        ReactRethinkdb.DefaultSession.runQuery(clearMessages);
+    },
+
 
     handleLogout() {
         //handleUserStatus(sessionStorage.getItem("user_id"))
+        //handleClearMessages(sessionStorage.getItem("user_id"))
         sessionStorage.clear()
         this.props.history.push("/")
     },

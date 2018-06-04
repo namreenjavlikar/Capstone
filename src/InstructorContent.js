@@ -201,7 +201,7 @@ const Instructor = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(
             res => {
                 let insertedContentId = res.generated_keys[0]
-                let courseQuery =  r.table('courses').get(this.state.course.id).update({
+                let courseQuery = r.table('courses').get(this.state.course.id).update({
                     contents: r.row('contents').append(insertedContentId)
                 })
                 ReactRethinkdb.DefaultSession.runQuery(courseQuery)
@@ -320,12 +320,12 @@ const Instructor = createReactClass({
         return (
             <div className="container">
                 <div class="main USD ">
-                    <div class="uk-section-default USD">
+                    <div class="uk-section-default USD" style={{ marginTop: 40 }}>
                         <ul uk-accordion="multiple: true " className='simplemargin5'>
                             <li class="uk-open ">
                                 <div class="navcss">
                                 </div>
-                                <a class="uk-accordion-title checkbx " href="#" ><span><strong>Course Works</strong></span></a>
+                                <a class="uk-accordion-title checkbx " href="#"><span><strong>Course Works</strong></span></a>
                                 <div class="uk-accordion-content" >
                                     <div>
                                         <table className="scroll " >
@@ -363,14 +363,17 @@ const Instructor = createReactClass({
                                     <a href="#" onClick={() => this.handlePreviousWork()} uk-icon="chevron-left" ></a>
                                     <a href="#" onClick={() => this.handleNextWork()} uk-icon="chevron-right"></a>
                                 </div>
-                                <a class="uk-accordion-title checkbx simplemargin4" href="#" ><strong>Work Submitted</strong>  </a>
-
+                                    <div class='addwork'>
+                                    <Icon onClick={() => this.handleNewContent()} inverted color='black' name='plus'  /> 
+                                    </div>
+                                    <a class="uk-accordion-title checkbx" href="#" ><strong>Work Submitted</strong></a>
                                 <div class="uk-accordion-content">
-                                    {
+                                    {/* {
                                         this.state.course
                                         &&
-                                        <BS.Button onClick={() => this.handleNewContent()}>New Work</BS.Button >
-                                    }
+                                        
+                                        <button class="uk-button" style={{ borderRadius: 20, marginLeft:10 }} onClick={() => this.handleNewContent()}>New Work</button>
+                                    } */}
                                     <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
                                         <label class=" checkbx2" > <Checkbox checked={this.state.allStudents} onClick={() => this.setState({ allStudents: !this.state.allStudents })} inline>Show All Students</Checkbox></label>
                                     </div>
@@ -680,7 +683,7 @@ const StudentSubmission = createReactClass({
     },
 
     handlePublishRes() {
-        let query =  r.table('submissions').get(this.props.id).update({
+        let query = r.table('submissions').get(this.props.id).update({
             results: true
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
@@ -931,8 +934,8 @@ const Submission = createReactClass({
         // console.log("time", this.data.submissions.value().time)
         return (
             this.data.submissions.value()
-            &&
-            this.data.submissions.value().submitted
+                &&
+                this.data.submissions.value().submitted
                 &&
                 this.checkAll()
                 ?
