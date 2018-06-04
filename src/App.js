@@ -27,7 +27,7 @@ ReactRethinkdb.DefaultSession.connect({
   port: 8015,
   path: '/db',
   secure: false,
-  db: 'capstone',
+  db: 'capstonedemo',
 });
 
 const App = createReactClass({

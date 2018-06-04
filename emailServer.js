@@ -19,7 +19,7 @@ console.log('Listening on port 3001')
 const db = r.connect({
 	host: "localhost",
 	port: 28015,
-	db: 'capstone'
+	db: 'capstonedemo'
 })
 
 import nodemailer from 'nodemailer'

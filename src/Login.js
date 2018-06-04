@@ -126,7 +126,7 @@ const Login = createReactClass({
                                     placeholder="username.password"
                                     value={this.state.credentials}
                                     onChange={e => this.setState({ credentials: e.target.value, messageToUser: '' })} />
-                                <i className={this.state.showcredentials ? "hide link icon" : "unhide link icon"} style={{ fontSize: 22 }}
+                                <i className={this.state.showcredentials ? "unhide link icon" : "unhide link icon"} style={{ fontSize: 22 }}
                                     onClick={() => { this.setState({ showcredentials: !this.state.showcredentials }) }} ></i>
                             </div>
                         </div>

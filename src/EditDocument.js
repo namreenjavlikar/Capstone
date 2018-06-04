@@ -32,7 +32,7 @@ const EditDocument = createReactClass({
     changeOrder(e) {
         const order = Array.from(e.target.childNodes).map((item) => { return item.id })
         console.log("order", order)
-        let query = r.table('documents').get(this.props.match.params.id).update({
+        let query = r.table('documents').get(this.props.id).update({
             questions: order
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
@@ -41,7 +41,7 @@ const EditDocument = createReactClass({
     observe(props, state) {
         return {
             document: new ReactRethinkdb.QueryRequest({
-                query: r.table('documents').get(this.props.match.params.id),
+                query: r.table('documents').get(this.props.id),
                 changes: true,
                 initial: true,
             })
@@ -58,7 +58,8 @@ const EditDocument = createReactClass({
     },
 
     handleEditField(newValue, fieldName) {
-        let query = r.table('documents').get(this.props.match.params.id).update({
+        console.log("HERE", newValue)
+        let query = r.table('documents').get(this.props.id).update({
             [fieldName]: newValue
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
@@ -89,7 +90,7 @@ const EditDocument = createReactClass({
         })
         ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
             console.log("gen", res.generated_keys[0])
-            let query = r.table('documents').get(this.props.match.params.id).update({
+            let query = r.table('documents').get(this.props.id).update({
                 questions: r.row('questions').append(res.generated_keys[0])
             })
             ReactRethinkdb.DefaultSession.runQuery(query)
@@ -121,11 +122,11 @@ const EditDocument = createReactClass({
         // let user = this.data.document.value().collaborators.find(collaborator => collaborator.user == "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4")
         // console.log("gggg", user)
         // if (user && user.question != question) {
-        //     let removeQuery = r.table('documents').get(this.props.match.params.id).update({
+        //     let removeQuery = r.table('documents').get(this.props.id).update({
         //         collaborators: r.row('collaborators').difference([{ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: user.question }])
         //     })
         //     ReactRethinkdb.DefaultSession.runQuery(removeQuery).then(res => {
-        //         let documentQuery = r.table('documents').get(this.props.match.params.id).update({
+        //         let documentQuery = r.table('documents').get(this.props.id).update({
         //             collaborators: r.row('collaborators').append({ user: "e0bf8fcd-7048-4fdd-8751-e71f7562cdd4", question: question })
         //         })
         //         ReactRethinkdb.DefaultSession.runQuery(documentQuery)
@@ -167,7 +168,7 @@ const EditDocument = createReactClass({
     },
 
     handleAddSearch(questionId) {
-        let query = r.table('documents').get(this.props.match.params.id).update({
+        let query = r.table('documents').get(this.props.id).update({
             questions: r.row('questions').append(questionId)
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
@@ -185,7 +186,7 @@ const EditDocument = createReactClass({
         ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
             console.log("gen", res.generated_keys[0])
             let currentQuestion = this.data.document.value().questions.findIndex(question => question == questionId)
-            let query = r.table('documents').get(this.props.match.params.id).update({
+            let query = r.table('documents').get(this.props.id).update({
                 questions: r.row('questions').insertAt(currentQuestion + 1, res.generated_keys[0])
             })
             ReactRethinkdb.DefaultSession.runQuery(query)
@@ -194,7 +195,7 @@ const EditDocument = createReactClass({
 
     handleDeleteQuestionAtPosition(questionId) {
         let questionIndex = this.data.document.value().questions.findIndex(question => question == questionId)
-        let query = r.table('documents').get(this.props.match.params.id).update({
+        let query = r.table('documents').get(this.props.id).update({
             questions: r.row('questions').deleteAt(questionIndex)
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
@@ -224,9 +225,9 @@ const EditDocument = createReactClass({
                             <BS.MenuItem key="Lab" eventKey="Lab" value="Labs">Lab</BS.MenuItem>
                         </BS.DropdownButton>
                         <BS.FormControl type="text" value={this.data.document.value().name} placeholder="Enter Name" onChange={(e) => this.handleEditField(e.target.value, 'name')} />
-                        <BS.FormControl type="datetime-local" value={this.data.document.value().startDate} placeholder="Enter Start Date" onChange={(e) => this.setState({ startDate: e.target.value })} />
-                        <BS.FormControl type="datetime-local" value={this.data.document.value().dueDate} placeholder="Enter Due Date" onChange={(e) => this.setState({ dueDate: e.target.value })} />
-                        <BS.FormControl type="datetime-local" value={this.data.document.value().endDate} placeholder="Enter End Date" onChange={(e) => this.setState({ endDate: e.target.value })} />
+                        <BS.FormControl type="datetime-local" value={this.data.document.value().startDate} placeholder="Enter Start Date" onChange={(e) => this.handleEditField(e.target.value, 'startDate')} />
+                        <BS.FormControl type="datetime-local" value={this.data.document.value().dueDate} placeholder="Enter Due Date" onChange={(e) => this.handleEditField(e.target.value, 'dueDate')}  />
+                        <BS.FormControl type="datetime-local" value={this.data.document.value().endDate} placeholder="Enter End Date" onChange={(e) => this.handleEditField(e.target.value, 'endDate')}  />
                         <BS.DropdownButton style={{ margin: 15 }} id="status" title={this.data.document.value().status} onSelect={this.handleSelectStatus}>
                             <BS.MenuItem key="Draft" eventKey="Draft" value="Draft">Draft</BS.MenuItem>
                             <BS.MenuItem key="Publish" eventKey="Publish" value="Publish">Publish</BS.MenuItem>
@@ -268,7 +269,7 @@ const EditDocument = createReactClass({
                                 <Question
                                     questionId={question}
                                     key={index}
-                                    document={this.props.match.params.id}
+                                    document={this.props.id}
                                     questionsList={this.data.document.value().questions}
                                     handleAdd={this.handleAddQuestionAtPosition}
                                     handleDelete={this.handleDeleteQuestionAtPosition}

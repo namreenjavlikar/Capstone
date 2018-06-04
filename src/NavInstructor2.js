@@ -294,7 +294,7 @@ const Section = createReactClass({
             &&
             <span>
                 {
-                    this.data.section.value().sectionNo
+                    this.data.section.value().sectionNo.split(' ')[0] + " " + this.data.section.value().sectionNo.split(' ')[1] + " " + this.data.section.value().sectionNo.split(' ')[2]
                 }
             </span>
         )

@@ -17,6 +17,7 @@ import { Rating } from 'semantic-ui-react'
 import NavInstructor2 from './NavInstructor2'
 import Chat from './Chat'
 import './App.css'
+import EditDocument from './EditDocument'
 
 let r = ReactRethinkdb.r
 
@@ -60,7 +61,8 @@ const Instructor = createReactClass({
             listofsubmissions: [],
             course: null,
             students: [],
-            allStudents: false
+            allStudents: false,
+            contentEdit: null
         }
     },
 
@@ -196,16 +198,28 @@ const Instructor = createReactClass({
     // handleClick2 = () => this.setState({ open: !this.state.open })
 
     handleNewContent() {
-        // console.log("COUUR", this.state.course)
-        let query = r.table('contents').insert({ docid: null, submissions: [] })
-        ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(
-            res => {
-                let insertedContentId = res.generated_keys[0]
-                let courseQuery = r.table('courses').get(this.state.course.id).update({
-                    contents: r.row('contents').append(insertedContentId)
-                })
-                ReactRethinkdb.DefaultSession.runQuery(courseQuery)
+        if (this.state.course) {
+            let query = r.table('documents').insert({
+                type: "Quiz",
+                name: "New Document",
+                startDate: "",
+                endDate: "",
+                dueDate: "",
+                questions: []
             })
+            ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(res => {
+                let query = r.table('contents').insert({ docid: res.generated_keys[0], submissions: [] })
+                ReactRethinkdb.DefaultSession.runQuery(query, { return_changes: true }).then(
+                    res2 => {
+                        let insertedContentId = res2.generated_keys[0]
+                        let courseQuery = r.table('courses').get(this.state.course.id).update({
+                            contents: r.row('contents').append(insertedContentId)
+                        })
+                        ReactRethinkdb.DefaultSession.runQuery(courseQuery)
+                    })
+            })
+
+        }
     },
 
     handleClose() {
@@ -310,8 +324,12 @@ const Instructor = createReactClass({
     async handleSaveSubmissionId(submissionId) {
         if (submissionId != this.state.submissionId) {
             await this.setState({ submissionId: null })
-            await this.setState({ submissionId, listofsubmissions: [] })
+            await this.setState({ submissionId, listofsubmissions: [], contentEdit: null })
         }
+    },
+
+    async handleEditDoc(docId) {
+        await this.setState({submissionId: null, contentEdit: docId})
     },
 
     render() {
@@ -338,6 +356,7 @@ const Instructor = createReactClass({
                                                     <th>Due</th>
                                                     <th>End</th>
                                                     <th>Submitted</th>
+                                                    <th>Edit</th>
                                                 </tr>
                                             </thead>
                                             <tbody class='tbodystyle'>
@@ -347,6 +366,7 @@ const Instructor = createReactClass({
                                                     this.props.selectedcourses.map(
                                                         (course, i) =>
                                                             <Course key={i} id={course}
+                                                                handleEditDoc={this.handleEditDoc}
                                                                 handleAddDocument={this.handleAddDocument}
                                                                 handleSaveCName={this.handleSaveCName}
                                                                 handleSaveContentId={this.handleSaveContentId} />
@@ -409,6 +429,19 @@ const Instructor = createReactClass({
                                 </div>
                             </li>
                         </ul>
+
+                        <div className='simplemargin5'>
+                            <Transition visible={visible} animation='scale' duration={500}>
+                                <div class='togglestyle' >
+                                    {
+                                        this.state.contentEdit
+                                        &&
+                                         <EditDocument id={this.state.contentEdit}/>
+                                    }
+                                </div>
+                            </Transition>
+                        </div>
+
                         <div className='simplemargin5'>
                             <Transition visible={visible} animation='scale' duration={500}>
                                 <div class='togglestyle' >
@@ -468,7 +501,9 @@ const Course = createReactClass({
             &&
             this.data.course.value().contents.map(
                 (content, i) =>
-                    <Content key={i} handleSaveCName={this.props.handleSaveCName}
+                    <Content
+                    handleEditDoc={this.props.handleEditDoc}
+                        key={i} handleSaveCName={this.props.handleSaveCName}
                         id={content} courseid={this.props.id}
                         course={this.data.course.value()}
                         coursename={this.data.course.value().name}
@@ -520,12 +555,13 @@ const Content = createReactClass({
             &&
             <tr id={this.data.content.value().id} onClick={() => this.handleSelectedDocument()}>
                 <td>{this.props.coursename}</td>
-                <td><DocumentName id={this.data.content.value().docid} /></td>
                 <td><DocumentType id={this.data.content.value().docid} /></td>
-                <td>A</td>
-                <td>A</td>
-                <td>A</td>
-                <td>{this.data.content.value().submissions.length - 1}</td>
+                <td><DocumentName id={this.data.content.value().docid} /></td>
+                <td><DocumentStart id={this.data.content.value().docid} /></td>
+                <td><DocumentDue id={this.data.content.value().docid} /></td>
+                <td><DocumentEnd id={this.data.content.value().docid} /></td>
+                <td>{this.data.content.value().submissions.length}</td>
+                <td><Icon onClick={() => this.props.handleEditDoc(this.data.content.value().docid)} inverted color='black' name='edit' /></td>
             </tr>
         )
     },
@@ -563,6 +599,79 @@ const ContentShowSub = createReactClass({
         )
     },
 });
+
+const DocumentEnd = createReactClass({
+
+    mixins: [ReactRethinkdb.DefaultMixin],
+    observe(props, state) {
+        return {
+            document: new ReactRethinkdb.QueryRequest({
+                query: r.table('documents').get(this.props.id),
+                changes: true,
+                initial: null,
+            }),
+        };
+    },
+
+    render() {
+        return (
+            this.data.document.value()
+                ?
+                this.data.document.value().endDate
+                :
+                <span></span>
+        )
+    },
+});
+
+const DocumentDue = createReactClass({
+
+    mixins: [ReactRethinkdb.DefaultMixin],
+    observe(props, state) {
+        return {
+            document: new ReactRethinkdb.QueryRequest({
+                query: r.table('documents').get(this.props.id),
+                changes: true,
+                initial: null,
+            }),
+        };
+    },
+
+    render() {
+        return (
+            this.data.document.value()
+                ?
+                this.data.document.value().dueDate
+                :
+                <span></span>
+        )
+    },
+});
+
+const DocumentStart = createReactClass({
+
+    mixins: [ReactRethinkdb.DefaultMixin],
+    observe(props, state) {
+        return {
+            document: new ReactRethinkdb.QueryRequest({
+                query: r.table('documents').get(this.props.id),
+                changes: true,
+                initial: null,
+            }),
+        };
+    },
+
+    render() {
+        return (
+            this.data.document.value()
+                ?
+                this.data.document.value().startDate
+                :
+                <span></span>
+        )
+    },
+});
+
 
 const DocumentName = createReactClass({
 
@@ -709,7 +818,7 @@ const StudentSubmission = createReactClass({
                             <a href="#" onClick={this.props.handleNextSubmission} uk-icon="chevron-left" ></a>
                             <a href="#" onClick={this.props.handlePreviousSubmission} uk-icon="chevron-right"></a>
                         </div>
-                        <button  class="uk-button register-btn" style={{ borderRadius: 20,}} onClick={() => this.handlePublishRes()}>Publish Results</button>
+                        <button class="uk-button register-btn" style={{ borderRadius: 20, }} onClick={() => this.handlePublishRes()}>Publish Results</button>
                     </Form.Group>
                     </div>
                 </div>

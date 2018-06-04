@@ -17,7 +17,7 @@ let r = ReactRethinkdb.r;
 //   port: 8015,        // port number of the websocket server
 //   path: '/db',       // HTTP path to websocket route
 //   secure: false,     // set true to use secure TLS websockets
-//   db: 'capstone',    // default database, passed to rethinkdb.connect
+//   db: 'capstonedemo',    // default database, passed to rethinkdb.connect
 // });
 
 const ForgotPassword = createReactClass({

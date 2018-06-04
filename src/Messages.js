@@ -78,7 +78,7 @@ export const Single = createReactClass({
                     />
                     <span style={{ color: "#76323f" }} className="contacts">
                         {/* <strong> <Userinfo id={this.props.id} /> </strong> */}
-                        <strong>  {this.props.contactName} </strong> 
+                        <strong>  {this.props.contactName} </strong>
                         <span class="chat-online-status"></span>
                     </span>
                     <span style={{ marginLeft: '140px', paddingRight: '10px', borderRight: '1px solid #76323f' }}>
@@ -215,22 +215,22 @@ export const Group = createReactClass({
                 <div className="chat-head">
 
                     <span style={{ color: "#76323f" }} className="contacts">
-                    <strong> {this.props.groupname} </strong>
+                        <strong> {this.props.groupname} </strong>
 
-                    
 
-                    {
-                        // group info causes error
-                        // this.data.messages.value().id
-                        // ?
-                        // <strong> <GroupInfo id={this.data.messages.value().id} /> </strong>
-                        // :
-                        // <strong> Loading.. </strong>
-                    }
-                    <strong> {this.props.groupName} </strong>
-            
+
+                        {
+                            // group info causes error
+                            // this.data.messages.value().id
+                            // ?
+                            // <strong> <GroupInfo id={this.data.messages.value().id} /> </strong>
+                            // :
+                            // <strong> Loading.. </strong>
+                        }
+                        <strong> {this.props.groupName} </strong>
+
                     </span>
-                    
+
                 </div>
 
                 <div style={{ borderTop: '1px solid #76323f', marginTop: '15px' }}>
@@ -246,9 +246,16 @@ export const Group = createReactClass({
                                     return <div >
                                         {
                                             <span>
-                                                <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }}
-                                                />
-                                                <span class="chat-from"> <Userinfo id={item.from} />: {item.content}
+                                                {/* <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }}
+                                                /> */}
+                                                <span class="chat-from">
+                                                    <Userinfo id={item.from} />
+                                                    :
+                                                    <span class="right">
+                                                        {item.content}
+                                                    </span>
+
+
                                                     <p className="msg-time"> {this.dateConverter(item.date)} </p>
                                                 </span>
                                             </span>

@@ -110,15 +110,15 @@ export const Chat = createReactClass({
         await this.setState(
             {
                 changeClass:
-                this.state.expandLeft && right ?
-                    "container-instructor-both" :
-                    !this.state.expandLeft && !right ?
-                        "container-instructor-full" :
-                        !this.state.expandLeft && right ?
-                            "container-instructor-right" :
-                            this.state.expandLeft && !right ?
-                                "container-instructor-left" :
-                                "container-instructor-both2",
+                    this.state.expandLeft && right ?
+                        "container-instructor-both" :
+                        !this.state.expandLeft && !right ?
+                            "container-instructor-full" :
+                            !this.state.expandLeft && right ?
+                                "container-instructor-right" :
+                                this.state.expandLeft && !right ?
+                                    "container-instructor-left" :
+                                    "container-instructor-both2",
                 expandRight: right,
                 iconRight: !this.state.expandRight ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5"
             }
@@ -133,15 +133,15 @@ export const Chat = createReactClass({
         await this.setState(
             {
                 changeClass:
-                left && this.state.expandRight ?
-                    "container-instructor-both" :
-                    !left && !this.state.expandRight ?
-                        "container-instructor-full" :
-                        left && !this.state.expandRight ?
-                            "container-instructor-left" :
-                            !left && this.state.expandRight ?
-                                "container-instructor-right" :
-                                "container-instructor-both2",
+                    left && this.state.expandRight ?
+                        "container-instructor-both" :
+                        !left && !this.state.expandRight ?
+                            "container-instructor-full" :
+                            left && !this.state.expandRight ?
+                                "container-instructor-left" :
+                                !left && this.state.expandRight ?
+                                    "container-instructor-right" :
+                                    "container-instructor-both2",
                 expandLeft: left,
                 iconLeft: !this.state.expandLeft ? "icon: chevron-left; ratio: 2.5" : "icon: chevron-right; ratio: 2.5"
             }
@@ -512,9 +512,9 @@ export const Chat = createReactClass({
                                                                                                                                     <img class="ui avatar image" src={userpic}
                                                                                                                                     />
                                                                                                                                     <span style={{ color: "#76323f" }} className="contacts">
-                                                                                                                                        <span style={{ color:"white" }} >{student}</span>
+                                                                                                                                        <span style={{ color: "white" }} >{student}</span>
                                                                                                                                     </span>
-                                                                                                                                    
+
                                                                                                                                 </div>
                                                                                                                             </span>
                                                                                                                             :
