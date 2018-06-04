@@ -32,10 +32,16 @@ const Question = createReactClass({
 
     },
 
+    componentWillReceiveProps() {
+        console.log("hello")
+        this.onFocus()
+        this.onBlur()
+    },
+
     handleEditTitle(model) {
         let query = r.table('questions').get(this.props.questionId).update({
-            question: model,
-            editor: sessionStorage.getItem('user_id')
+            title: model,
+            //editor: sessionStorage.getItem('user_id')
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
     },
@@ -43,15 +49,15 @@ const Question = createReactClass({
     handleEditQuestion(model) {
         let query = r.table('questions').get(this.props.questionId).update({
             question: model,
-            editor: sessionStorage.getItem('user_id')
+            //editor: sessionStorage.getItem('user_id')
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
-         },
+    },
 
     handleEditAnswer(model) {
         let query = r.table('questions').get(this.props.questionId).update({
-            question: model,
-            editor: sessionStorage.getItem('user_id')
+            answer: model,
+            //editor: sessionStorage.getItem('user_id')
         })
         ReactRethinkdb.DefaultSession.runQuery(query)
     },
@@ -89,41 +95,42 @@ const Question = createReactClass({
                     <div id={this.data.question.value().id} className="document-question"
                         style={{ backgroundColor: this.data.question.value().editor ? '#D5F5E3' : 'white' }}
                         class="uk-card uk-card-default uk-card-body">
-                        {
-                            <div>
-                                <FroalaEditor
-                                    id="title"
-                                    tag='textarea'
-                                    config={FroalaConfiguration.Title}
-                                    model={('html.set', this.data.question.value().title)}
-                                    onModelChange={this.handleEditTitle}
-                                />
-                                <br />
-                                <FroalaEditor
-                                    id="question"
-                                    tag='textarea'
-                                    config={FroalaConfiguration.Question}
-                                    model={('html.set', this.data.question.value().question)}
-                                    onModelChange={this.handleEditQuestion}
-                                />
-                                <br />
-                                <FroalaEditor
-                                    id="answer"
-                                    tag='textarea'
-                                    config={FroalaConfiguration.Answer}
-                                    model={('html.set', this.data.question.value().answer)}
-                                    onModelChange={this.handleEditAnswer}
-                                />
+                        <div>
+                            <FroalaEditor
+                                id="title"
+                                tag='textarea'
+                                config={FroalaConfiguration.Title}
+                                model={('html.set', this.data.question.value().title)}
+                                //onModelChange={this.handleEditTitle}
+                            />
+                            <br />
+                            <FroalaEditor
+                                id="question"
+                                tag='textarea'
+                                config={FroalaConfiguration.Question}
+                                model={('html.set', this.data.question.value().question)}
+                                //onModelChange={this.handleEditQuestion}
+                            />
+                            <br />
+                            <FroalaEditor
+                                id="answer"
+                                tag='textarea'
+                                config={FroalaConfiguration.Answer}
+                                model={('html.set', this.data.question.value().answer)}
+                                //onModelChange={this.handleEditAnswer}
+                            />
+
+                            <Rail attached internal position='right' style={{ margin: 30, height: 40, width: 70 }}>
                                 {
                                     this.data.question.value().editor
                                     &&
-                                    <Rail attached internal position='right' style={{ width: 50, margin: 20 }}>
-                                        <Utils.UserPopup userId={this.data.question.value().editor} />
-                                    </Rail>
+                                    <Utils.UserPopup userId={this.data.question.value().editor} />
                                 }
-                            </div>
-                        }
+                                <button onClick={() => this.props.handleDelete(this.props.questionId)} uk-icon="close" className="document-question-button"></button>
+                            </Rail>
+                        </div>
                     </div>
+                    <div className="document-add" onClick={() => this.props.handleAdd(this.props.questionId)}></div>
                 </div>
         )
     },

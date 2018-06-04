@@ -122,3 +122,17 @@ export const StudentAnswer = {
         }
     }
 }
+
+export const SearchQuestion = {
+    charCounterCount: false,
+    toolbarVisibleWithoutSelection: true,
+    toolbarInline: true,
+    toolbarButtons: [""],
+    quickInsertButtons: [""],
+    events: {
+        'froalaEditor.initialized': function (e, editor) {
+            editor.edit.off();
+        }
+    }
+ 
+ }

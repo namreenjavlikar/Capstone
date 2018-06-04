@@ -779,6 +779,31 @@ font-family: 'Roboto', sans-serif;
 
 .fr-toolbar-buttons { display: none; }
 
+.document-add {
+  background-color: white;
+  min-height: 3px;
+}
+
+.document-add:hover {
+  background-color: #76323f;
+}
+
+.edit-rails {
+  border: 1px solid black;
+}
+
+.document-questions-search-div {
+  border: 1px solid #D6DBDF;
+  padding: 10px;
+  margin: 15px 45px 15px 45px;
+  height: 300px;
+  overflow-y: scroll;
+}
+
+.test-border {
+  border: 1px solid #D6DBDF;
+}
+
 .PageHeader{
   text-align: center
 }
