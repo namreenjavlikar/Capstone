@@ -17,7 +17,7 @@ httpServer.listen(3001)
 console.log('Listening on port 3001')
 
 const db = r.connect({
-	host: "10.10.157.212",
+	host: "localhost",
 	port: 28015,
 	db: 'capstone'
 })

@@ -13,7 +13,7 @@ var httpServer = http.createServer(app);
 RethinkdbWebsocketServer.listen({
 	httpServer: httpServer,
 	httpPath: '/db',
-	dbHost: '10.10.157.212',
+	dbHost: 'localhost',
 	dbPort: 28015,
 	unsafelyAllowAnyQuery: true,
 });

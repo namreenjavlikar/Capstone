@@ -363,10 +363,10 @@ const Instructor = createReactClass({
                                     <a href="#" onClick={() => this.handlePreviousWork()} uk-icon="chevron-left" ></a>
                                     <a href="#" onClick={() => this.handleNextWork()} uk-icon="chevron-right"></a>
                                 </div>
-                                    <div class='addwork'>
-                                    <Icon onClick={() => this.handleNewContent()} inverted color='black' name='plus'  /> 
-                                    </div>
-                                    <a class="uk-accordion-title checkbx" href="#" ><strong>Work Submitted</strong></a>
+                                <div class='addwork'>
+                                    <Icon onClick={() => this.handleNewContent()} inverted color='black' name='plus' />
+                                </div>
+                                <a class="uk-accordion-title checkbx" href="#" ><strong>Work Submitted</strong></a>
                                 <div class="uk-accordion-content">
                                     {/* {
                                         this.state.course
@@ -580,9 +580,10 @@ const DocumentName = createReactClass({
     render() {
         return (
             this.data.document.value()
-            &&
-            this.data.document.value().name
-
+                ?
+                this.data.document.value().name
+                :
+                <span></span>
         )
     },
 });
@@ -603,9 +604,10 @@ const DocumentType = createReactClass({
     render() {
         return (
             this.data.document.value()
-            &&
-            this.data.document.value().type
-
+                ?
+                this.data.document.value().type
+                :
+                <span></span>
         )
     },
 });
@@ -707,7 +709,7 @@ const StudentSubmission = createReactClass({
                             <a href="#" onClick={this.props.handleNextSubmission} uk-icon="chevron-left" ></a>
                             <a href="#" onClick={this.props.handlePreviousSubmission} uk-icon="chevron-right"></a>
                         </div>
-                        <BS.Button onClick={() => this.handlePublishRes()}>Publish Results</BS.Button >
+                        <button  class="uk-button register-btn" style={{ borderRadius: 20,}} onClick={() => this.handlePublishRes()}>Publish Results</button>
                     </Form.Group>
                     </div>
                 </div>
@@ -719,8 +721,9 @@ const StudentSubmission = createReactClass({
                 }
 
                 <div class="ui dividing header">
-                    <div class="inline fields">
+                    <div class="inline fields" style={{ marginLeft: 25 }}>
                         <label>Feedback:</label>
+                        <br />
                         <textarea value={this.data.submissions.value().feedback} onChange={(e) => this.handleEditField(e.target.value, "feedback")} placeholder="Document Feedback" rows="1" style={{ width: '100vh', height: '3vh' }} />
                     </div>
                 </div>
@@ -780,15 +783,24 @@ const Answer = createReactClass({
 
                     <div class="inline fields ">
                         <div class="field">
-                            <label>Student Answer:</label>
-                            <FroalaEditor
-                                id="answer"
-                                tag='textarea'
-                                config={FroalaConfiguration.StudentQuestion}
-                                model={('html.set', this.data.answer.value().answer)}
-                            />
-                            <label>Correct Answer:</label>
-                            <CorrectAnswer id={this.data.answer.value().questionid} />
+                            <div style={{ float: 'left', marginRight: 20 }}>
+                                <label>Student Answer:</label>
+                            </div>
+                            <div style={{ float: 'left' }}>
+                                <FroalaEditor
+                                    id="answer"
+                                    tag='textarea'
+                                    config={FroalaConfiguration.StudentQuestion}
+                                    model={('html.set', this.data.answer.value().answer)}
+                                />
+                            </div>
+                            <br />
+                            <div style={{ float: 'left', marginRight: 20, color: 'green' }} >
+                                <label>Correct Answer:</label>
+                            </div>
+                            <div style={{ float: 'left' }}>
+                                <CorrectAnswer id={this.data.answer.value().questionid} />
+                            </div>
                         </div>
                     </div></div>
                 <div className='simplemargin' >
@@ -805,8 +817,9 @@ const Answer = createReactClass({
                         </div>
                     </Form.Group>
                 </div>
-                <div class="inline fields">
-                    <label>Feedback:</label>
+                <div class="inline fields" style={{ marginLeft: 25 }}>
+                    <label >Feedback:</label>
+                    <br />
                     <textarea value={this.data.answer.value().feedback} onChange={(e) => this.handleEditField(e.target.value, "feedback")} placeholder="Feedback" rows="1" style={{ width: '50vh', height: '3vh' }} />
                 </div>
             </div>
@@ -831,12 +844,14 @@ const Question = createReactClass({
         return (
             this.data.question.value()
             &&
-            <FroalaEditor
-                id="question"
-                tag='textarea'
-                config={FroalaConfiguration.StudentQuestion}
-                model={('html.set', this.data.question.value().question)}
-            />
+            <div style={{ marginLeft: -25 }}>
+                <FroalaEditor
+                    id="question"
+                    tag='textarea'
+                    config={FroalaConfiguration.StudentQuestion}
+                    model={('html.set', this.data.question.value().question)}
+                />
+            </div>
 
         )
     },
