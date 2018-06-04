@@ -314,6 +314,21 @@ export const Chat = createReactClass({
             ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
 
 
+            //////////////////////////
+
+            let messageToSelfQueryLog = r.table('messageslog').get(sessionStorage.getItem("user_id")).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToSelfQueryLog);
+
+            let messageToOtherQueryLog = r.table('messageslog').get(this.state.tempContactId).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToOtherQueryLog);
+
+            // this.clearTime()
+
+
             await this.setState({ txtMessage: '' })
 
         } else {
@@ -325,7 +340,23 @@ export const Chat = createReactClass({
                 content: this.state.txtMessage
             }
 
-            this.data.messages.value().messages.push(tempMessage)
+            //
+
+            let messageToSelfQuery = r.table('messages').get(sessionStorage.getItem("user_id")).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
+
+            let messageToOtherQuery = r.table('messages').get(this.state.tempContactId).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
+
+            //
+
+            //this.data.messages.value().messages.push(tempMessage)
+
+            // this.clearTime()
 
             await this.setState({ txtMessage: '' })
 
@@ -348,7 +379,18 @@ export const Chat = createReactClass({
                 content: "The message is being recorded"
             }
 
-            this.data.messages.value().messages.push(tempMessage)
+
+            let messageToSelfQuery = r.table('messages').get(sessionStorage.getItem("user_id")).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
+
+            let messageToOtherQuery = r.table('messages').get(this.state.tempContactId).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
+
+            //this.data.messages.value().messages.push(tempMessage)
             await this.setState({ isRecorded: true })
 
 
@@ -361,10 +403,38 @@ export const Chat = createReactClass({
                 content: "The message stopped recording"
             }
 
-            this.data.messages.value().messages.push(tempMessage)
+
+            let messageToSelfQuery = r.table('messages').get(sessionStorage.getItem("user_id")).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToSelfQuery);
+
+            let messageToOtherQuery = r.table('messages').get(this.state.tempContactId).update({
+                messages: r.row('messages').append(tempMessage)
+            });
+            ReactRethinkdb.DefaultSession.runQuery(messageToOtherQuery);
+
+            //this.data.messages.value().messages.push(tempMessage)
             await this.setState({ isRecorded: false })
         }
 
+
+    },
+
+
+
+    async clearTime() {
+        this.interval = setInterval(() => {
+            console.log(this.state.number, this.props.counter)
+            if (this.state.isRecorded == false) {
+                console.log("clearing message")
+                let clearMessages = r.table('messages').get(sessionStorage.getItem("user_id")).update({ messages: [] });
+                ReactRethinkdb.DefaultSession.runQuery(clearMessages);
+            } else {
+                console.log("not clearing message")
+                this.setState({ tempMessage: this.state.tempMessage })
+            }
+        }, 60000);
     },
 
 
@@ -375,6 +445,9 @@ export const Chat = createReactClass({
         return (
 
             <div className="chat">
+
+
+
 
                 {
                     this.data.user.value().chatStatus == "enabled" && this.data.user.value()
@@ -389,97 +462,6 @@ export const Chat = createReactClass({
                             <div class="ui middle aligned selection list chat-contacts">
 
 
-                                {
-                                    // old contacts
-                                    // this.data.user.value().contacts
-                                    //     ?
-                                    //     this.data.user.value().contacts.map((item) => {
-                                    //         return <div key={item.userid} class="item" id={item.userid} onClick={() => this.selectContact(item.userid)}>
-
-                                    //             <img class="ui avatar image" src={userpic}
-                                    //             />
-                                    //             <div class="content">
-                                    //                 <div class="header" className="contacts"><Userinfo id={item.userid} option={"1"} /></div>
-                                    //             </div>
-
-
-                                    //         </div>;
-                                    //     })
-                                    //     :
-                                    //     <p>Empty</p>
-                                }
-
-                                {
-                                    // new from sections
-                                    // this.data.sections.value()
-                                    //     ?
-                                    //     // this.data.sections.value().map((section) => {
-                                    //     //     console.log(section)
-                                    //     // })
-                                    //         this.data.sections.value().map((item) => {
-                                    //         return <div key={item.id} class="item" id={item.id} >
-
-                                    //             <img class="ui avatar image" src={userpic}
-                                    //             />
-                                    //             <div class="content">
-                                    //                 <div class="header" className="contacts">section {item.id}</div>
-                                    //             </div>
-
-                                    //         </div>;
-                                    //     })
-                                    //     :
-                                    //     <div class="item" >
-
-                                    //     </div>
-
-                                }
-                                {
-                                    // this.data.user.value().courses
-                                    //     ?
-                                    //     this.data.user.value().courses.map((course) => {
-                                    //         return <span>
-
-
-                                    //             <span >
-                                    //                 {/* dont forget to get the course name */}
-                                    //                 {/* <span > {course}</span> */}
-                                    //                 <h5 class="header" className="contacts">  <CourseInfo id={course} /> </h5>
-                                    //                 {
-                                    //                     this.data.hardsection.value().students
-                                    //                         ?
-                                    //                         // console.log(this.data.hardsection.value().students)
-                                    //                         this.data.hardsection.value().students.map((student) => {
-                                    //                             return <div key={student} class="item" id={student} onClick={() => this.selectContact(student)}>
-
-                                    //                                 {
-                                    //                                     student != this.data.user.value().collegeid
-                                    //                                         ?
-                                    //                                         <span>
-                                    //                                             <img class="ui avatar image" src={userpic}
-                                    //                                             />
-                                    //                                             <div class="content">
-                                    //                                                 <div class="header" className="contacts">{student}</div>
-                                    //                                             </div>
-                                    //                                         </span>
-                                    //                                         :
-                                    //                                         <span></span>
-                                    //                                 }
-
-
-                                    //                             </div>;
-                                    //                         })
-                                    //                         :
-                                    //                         <div></div>
-
-                                    //                 }
-                                    //             </span>
-
-
-                                    //         </span>;
-                                    //     })
-                                    //     :
-                                    //     <p>Empty</p>
-                                }
 
                                 {
                                     this.data.user.value().courses
@@ -519,10 +501,20 @@ export const Chat = createReactClass({
                                                                                                                         student != this.data.user.value().collegeid
                                                                                                                             ?
                                                                                                                             <span>
-                                                                                                                                <img class="ui avatar image" src={userpic}
-                                                                                                                                />
-                                                                                                                                <div class="content">
+
+                                                                                                                                {/* <div class="content">
+                                                                                                                                    <img class="ui avatar image" src={userpic}
+                                                                                                                                    style={{ display:"inline-block" }} />
                                                                                                                                     <div class="header" className="contacts">{student}</div>
+                                                                                                                                </div> */}
+
+                                                                                                                                <div className="content">
+                                                                                                                                    <img class="ui avatar image" src={userpic}
+                                                                                                                                    />
+                                                                                                                                    <span style={{ color: "#76323f" }} className="contacts">
+                                                                                                                                        <span style={{ color:"white" }} >{student}</span>
+                                                                                                                                    </span>
+                                                                                                                                    
                                                                                                                                 </div>
                                                                                                                             </span>
                                                                                                                             :
@@ -665,13 +657,22 @@ export const Chat = createReactClass({
                                                                             :
                                                                             item.to == this.state.tempContactId
                                                                                 ?
-                                                                                <li>
-                                                                                    <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }}
-                                                                                    />
-                                                                                    <span className="chat-from"> {item.content}
-                                                                                        <p className="msg-time"> {this.dateConverter(item.date)} </p>
-                                                                                    </span>
-                                                                                </li>
+                                                                                item.botmessage == true
+                                                                                    ?
+                                                                                    <li style={{ paddingRight: 0 }}>
+                                                                                        <span className="chat-from">{item.content}
+                                                                                            <p className="msg-time"> {this.dateConverter(item.date)} </p>
+                                                                                        </span>
+                                                                                        <div class="clear"></div>
+                                                                                    </li>
+                                                                                    :
+                                                                                    <li style={{ paddingRight: 0 }}>
+                                                                                        <img class="ui avatar image left" src={userpic} style={{ marginBottom: '20px' }} />
+                                                                                        <span className="chat-from">{item.content}
+                                                                                            <p className="msg-time"> {this.dateConverter(item.date)} </p>
+                                                                                        </span>
+                                                                                        <div class="clear"></div>
+                                                                                    </li>
                                                                                 :
                                                                                 <span></span>
                                                                     }
@@ -681,6 +682,9 @@ export const Chat = createReactClass({
                                                             <p>Loading</p>
                                                     }
 
+
+
+
                                                 </ul>
                                                 <div class="clear"></div>
                                             </div>
@@ -688,7 +692,7 @@ export const Chat = createReactClass({
                                             <div className="input-box">
 
                                                 <div style={{ float: 'left', marginLeft: '10px', marginTop: '10px' }}>
-                                                    <Icon color='grey' size='large' name='smile' />
+                                                    <Icon color='grey' size='large' name='folder open' />
                                                 </div>
                                                 <div style={{ float: 'left' }}>
                                                     <textarea value={this.state.txtMessage} onChange={(event) => this.setState({ txtMessage: event.target.value })} placeholder="Enter message"></textarea>
